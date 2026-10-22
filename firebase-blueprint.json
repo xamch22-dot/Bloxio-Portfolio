@@ -1,0 +1,131 @@
+{
+  "entities": {
+    "CommissionSubmission": {
+      "title": "CommissionSubmission",
+      "description": "A Roblox commission application submitted by a player to balo_xio.",
+      "type": "object",
+      "properties": {
+        "recipientEmail": {
+          "type": "string",
+          "description": "The portfolio owner's email address (xamch22@gmail.com).",
+          "maxLength": 120
+        },
+        "submitterUid": {
+          "type": "string",
+          "description": "The Firebase Auth UID of the user who created the document.",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "clientEmail": {
+          "type": "string",
+          "format": "email",
+          "description": "The client's Gmail or contact email address.",
+          "maxLength": 120
+        },
+        "robloxUsername": {
+          "type": "string",
+          "description": "The client's Roblox username looked up by the Roblox avatar bot.",
+          "minLength": 2,
+          "maxLength": 60
+        },
+        "robloxDisplayName": {
+          "type": "string",
+          "description": "The client's Roblox display name.",
+          "maxLength": 60
+        },
+        "robloxUserId": {
+          "type": "string",
+          "description": "The client's numeric Roblox user ID as a string.",
+          "maxLength": 40
+        },
+        "robloxAvatarUrl": {
+          "type": "string",
+          "description": "The client's Roblox profile headshot URL fetched by the bot.",
+          "maxLength": 600
+        },
+        "discordTag": {
+          "type": "string",
+          "description": "The client's Discord username.",
+          "maxLength": 80
+        },
+        "workType": {
+          "type": "string",
+          "description": "Which Roblox discipline the player needs help with.",
+          "enum": ["scripting", "ui-design", "modeling", "animating", "all-rounder"]
+        },
+        "contractType": {
+          "type": "string",
+          "description": "Commission engagement tier.",
+          "enum": ["commission", "short-term", "long-term"]
+        },
+        "currency": {
+          "type": "string",
+          "description": "Payment currency selected by the player.",
+          "enum": ["USD", "ROBUX"]
+        },
+        "totalPrice": {
+          "type": "number",
+          "description": "Total price in the selected currency."
+        },
+        "upfrontPrice": {
+          "type": "number",
+          "description": "Mandatory 40% upfront payment amount."
+        },
+        "projectDetails": {
+          "type": "string",
+          "description": "Detailed description of what the player wants help with in their game.",
+          "minLength": 5,
+          "maxLength": 3000
+        },
+        "gameImages": {
+          "type": "array",
+          "description": "Up to 4 game reference screenshots uploaded by the player.",
+          "maxLength": 4
+        },
+        "status": {
+          "type": "string",
+          "description": "Inbox workflow status controlled by balo_xio.",
+          "enum": ["unread", "read", "starred", "accepted", "completed"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the commission was submitted."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the commission was last updated."
+        }
+      },
+      "required": [
+        "recipientEmail",
+        "submitterUid",
+        "clientEmail",
+        "robloxUsername",
+        "robloxDisplayName",
+        "robloxUserId",
+        "robloxAvatarUrl",
+        "discordTag",
+        "workType",
+        "contractType",
+        "currency",
+        "totalPrice",
+        "upfrontPrice",
+        "projectDetails",
+        "gameImages",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/commissions/{commissionId}": {
+      "schema": {
+        "$ref": "#/entities/CommissionSubmission"
+      },
+      "description": "Stores commission applications submitted to balo_xio's private inbox."
+    }
+  }
+}

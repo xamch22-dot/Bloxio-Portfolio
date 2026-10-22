@@ -1,0 +1,126 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 1: Global Default-Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isOwnerAdmin() {
+      return isSignedIn() && request.auth.token.email == 'xamch22@gmail.com';
+    }
+
+    function isValidGameImages(images) {
+      return images is list &&
+        images.size() <= 4 &&
+        (images.size() == 0 || (images[0] is string && images[0].size() <= 350000));
+    }
+
+    function isValidCommission(data) {
+      return data.keys().hasAll([
+          'recipientEmail',
+          'submitterUid',
+          'clientEmail',
+          'robloxUsername',
+          'robloxDisplayName',
+          'robloxUserId',
+          'robloxAvatarUrl',
+          'discordTag',
+          'workType',
+          'contractType',
+          'currency',
+          'totalPrice',
+          'upfrontPrice',
+          'projectDetails',
+          'gameImages',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'recipientEmail',
+          'submitterUid',
+          'clientEmail',
+          'robloxUsername',
+          'robloxDisplayName',
+          'robloxUserId',
+          'robloxAvatarUrl',
+          'discordTag',
+          'workType',
+          'contractType',
+          'currency',
+          'totalPrice',
+          'upfrontPrice',
+          'projectDetails',
+          'gameImages',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.recipientEmail == 'xamch22@gmail.com' &&
+        data.submitterUid is string && data.submitterUid.size() >= 1 && data.submitterUid.size() <= 128 && data.submitterUid.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.clientEmail is string && data.clientEmail.size() >= 3 && data.clientEmail.size() <= 120 &&
+        data.robloxUsername is string && data.robloxUsername.size() >= 2 && data.robloxUsername.size() <= 60 &&
+        data.robloxDisplayName is string && data.robloxDisplayName.size() >= 1 && data.robloxDisplayName.size() <= 60 &&
+        data.robloxUserId is string && data.robloxUserId.size() >= 1 && data.robloxUserId.size() <= 40 &&
+        data.robloxAvatarUrl is string && data.robloxAvatarUrl.size() <= 600 &&
+        data.discordTag is string && data.discordTag.size() <= 80 &&
+        data.workType in ['scripting', 'ui-design', 'modeling', 'animating', 'all-rounder'] &&
+        data.contractType in ['commission', 'short-term', 'long-term'] &&
+        data.currency in ['USD', 'ROBUX'] &&
+        data.totalPrice is number && data.totalPrice >= 10 && data.totalPrice <= 100000 &&
+        data.upfrontPrice is number && data.upfrontPrice >= 4 && data.upfrontPrice <= 40000 &&
+        data.projectDetails is string && data.projectDetails.size() >= 5 && data.projectDetails.size() <= 3000 &&
+        isValidGameImages(data.gameImages) &&
+        data.status in ['unread', 'read', 'starred', 'accepted', 'completed'] &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    match /commissions/{commissionId} {
+      // Strictly private to balo_xio (xamch22@gmail.com)
+      allow get: if isOwnerAdmin() && isValidId(commissionId);
+
+      // Enforces Query Enforcer (Pillar 8) + Owner Admin check
+      allow list: if isOwnerAdmin() && existing().recipientEmail == 'xamch22@gmail.com';
+
+      // Any verified signed-in user can submit a commission to balo_xio
+      allow create: if isSignedIn() &&
+        isValidId(commissionId) &&
+        isValidCommission(incoming()) &&
+        incoming().submitterUid == request.auth.uid &&
+        incoming().status == 'unread' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      // Action-Based Update Pattern (only balo_xio can update status in the private inbox)
+      allow update: if isOwnerAdmin() &&
+        isValidId(commissionId) &&
+        isValidCommission(incoming()) &&
+        incoming().submitterUid == existing().submitterUid &&
+        incoming().recipientEmail == existing().recipientEmail &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']);
+
+      allow delete: if isOwnerAdmin() && isValidId(commissionId);
+    }
+  }
+}
