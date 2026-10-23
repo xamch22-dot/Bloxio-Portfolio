@@ -6,13 +6,11 @@ export type AppView = 'portfolio' | 'previous-work';
 interface NavbarProps {
   activeView: AppView;
   onChangeView: (view: AppView) => void;
-  onOpenBooking: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeView,
   onChangeView,
-  onOpenBooking,
 }) => {
   const handleNavClick = (view: AppView) => {
     playPageChangeSfx();
@@ -73,19 +71,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           Estimator
         </a>
       </nav>
-
-      {/* Zone 3: 1 primary action */}
-      <div className="flex items-center shrink-0">
-        <button
-          type="button"
-          onClick={onOpenBooking}
-          className="px-4 py-2 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-        >
-          Commission Me
-        </button>
-      </div>
     </header>
   );
 };
+
 
 

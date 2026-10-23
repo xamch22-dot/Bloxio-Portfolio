@@ -38,18 +38,15 @@ interface LightboxTarget {
 interface PreviousWorkPageProps {
   initialSubPage?: PreviousWorkSubPage;
   onBackToPortfolio: () => void;
-  onBookCommissionFromDemo: (discipline: DisciplineId, prefilledSummary: string) => void;
 }
 
 interface DemoCardProps {
   demo: PreviousWorkDemo;
-  onBookCommission: (discipline: DisciplineId, prefilledSummary: string) => void;
   onOpenLightbox: (target: LightboxTarget) => void;
 }
 
 const DemoShowcaseCard: React.FC<DemoCardProps> = ({
   demo,
-  onBookCommission,
   onOpenLightbox,
 }) => {
   const [copied, setCopied] = useState(false);
@@ -97,27 +94,6 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
     v.play().catch(() => {});
     setIsPlaying(true);
   };
-
-  const handleBookThisDiscipline = () => {
-    const estimate = calculateCommissionBreakdown({
-      disciplineId: demo.disciplineId,
-      contractType: 'commission',
-      currency: 'USD',
-    });
-    const refLine = demo.assetId
-      ? `Reference Demo: ${demo.title} (Asset ID: ${demo.assetId})`
-      : `Reference Demo: ${demo.title} (${demo.categoryLabel})`;
-    onBookCommission(demo.disciplineId, `${estimate.summaryText}\n${refLine}`);
-  };
-
-  const bookButtonLabel =
-    demo.category === 'scripting'
-      ? 'Book Custom Scripting'
-      : demo.category === 'animating'
-      ? 'Book Custom Animation'
-      : demo.category === 'ui-design'
-      ? 'Book Custom UI Design'
-      : 'Book Custom 3D Modeling';
 
   const highlightsHeading =
     demo.category === 'scripting'
@@ -420,14 +396,6 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
 
             <div className="p-3.5 rounded-md bg-zinc-900/70 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="text-xs text-zinc-300 font-mono">{demo.rateLabel}</div>
-              <button
-                type="button"
-                onClick={handleBookThisDiscipline}
-                className="inline-flex items-center gap-1 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 underline underline-offset-4 whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <span>{bookButtonLabel}</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </button>
             </div>
           </div>
         </div>
@@ -468,7 +436,6 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
 export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
   initialSubPage = 'all',
   onBackToPortfolio,
-  onBookCommissionFromDemo,
 }) => {
   const [activeSubPage, setActiveSubPage] = useState<PreviousWorkSubPage>(initialSubPage);
   const [lightboxTarget, setLightboxTarget] = useState<LightboxTarget | null>(null);
@@ -628,7 +595,6 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             <DemoShowcaseCard
               key={demo.id}
               demo={demo}
-              onBookCommission={onBookCommissionFromDemo}
               onOpenLightbox={(t) => setLightboxTarget(t)}
             />
           ))}

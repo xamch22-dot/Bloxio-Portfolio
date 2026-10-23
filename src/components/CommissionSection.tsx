@@ -12,7 +12,6 @@ import { Check, Copy, ArrowUpRight } from 'lucide-react';
 interface CommissionSectionProps {
   selectedDiscipline: CommissionInput['disciplineId'];
   onChangeDiscipline: (id: CommissionInput['disciplineId']) => void;
-  onOpenBookingWithSummary: (summary: string) => void;
 }
 
 const ROLE_OPTIONS: Array<{ id: CommissionInput['disciplineId']; label: string }> = [
@@ -26,7 +25,6 @@ const ROLE_OPTIONS: Array<{ id: CommissionInput['disciplineId']; label: string }
 export const CommissionSection: React.FC<CommissionSectionProps> = ({
   selectedDiscipline,
   onChangeDiscipline,
-  onOpenBookingWithSummary,
 }) => {
   const [contractType, setContractType] = useState<ContractType>('commission');
   const [currency, setCurrency] = useState<CurrencyMode>('USD');
@@ -273,16 +271,8 @@ export const CommissionSection: React.FC<CommissionSectionProps> = ({
             <div className="pt-2 flex flex-col sm:flex-row gap-3">
               <button
                 type="button"
-                onClick={() => onOpenBookingWithSummary(estimate.summaryText)}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-5 py-3 text-xs font-semibold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <span>Book With This Rate</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
                 onClick={handleCopyBrief}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-mono text-zinc-200 bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-mono text-zinc-200 bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 {copiedBrief ? (
                   <>

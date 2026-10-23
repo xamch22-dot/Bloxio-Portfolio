@@ -8,12 +8,10 @@ import {
 } from '../utils/portfolioLogic';
 
 interface HeroSectionProps {
-  onOpenBooking: () => void;
   onOpenPreviousWork?: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
-  onOpenBooking,
   onOpenPreviousWork,
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -223,19 +221,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
           {/* Clean Action Row */}
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <button
-              type="button"
-              onClick={onOpenBooking}
-              className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              <span>Start a Commission</span>
-              <ArrowUpRight className="w-4 h-4" />
-            </button>
             {onOpenPreviousWork && (
               <button
                 type="button"
                 onClick={onOpenPreviousWork}
-                className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-medium text-zinc-100 hover:text-emerald-400 border border-emerald-500/30 hover:border-emerald-400 bg-emerald-500/10 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <span>Previous Work (Demo)</span>
                 <ArrowUpRight className="w-4 h-4" />

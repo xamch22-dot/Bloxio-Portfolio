@@ -8,32 +8,14 @@ import { Navbar, AppView } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { ExperienceSection } from './components/ExperienceSection';
 import { CommissionSection } from './components/CommissionSection';
-import { BookingModal } from './components/BookingModal';
 import { PreviousWorkPage, PreviousWorkSubPage } from './components/PreviousWorkPage';
-import { CommissionInput, DisciplineId } from './utils/portfolioLogic';
+import { CommissionInput } from './utils/portfolioLogic';
 
 export default function App() {
   const [activeView, setActiveView] = useState<AppView>('portfolio');
   const [demoSubPage, setDemoSubPage] = useState<PreviousWorkSubPage>('all');
   const [selectedDiscipline, setSelectedDiscipline] =
     useState<CommissionInput['disciplineId']>('all-rounder');
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [prefilledSummary, setPrefilledSummary] = useState('');
-
-  const handleOpenBooking = () => {
-    setIsBookingOpen(true);
-  };
-
-  const handleOpenBookingWithSummary = (summary: string) => {
-    setPrefilledSummary(summary);
-    setIsBookingOpen(true);
-  };
-
-  const handleBookFromDemo = (discipline: DisciplineId, summary: string) => {
-    setSelectedDiscipline(discipline);
-    setPrefilledSummary(summary);
-    setIsBookingOpen(true);
-  };
 
   const handleOpenDemoView = (subPage: PreviousWorkSubPage = 'all') => {
     setDemoSubPage(subPage);
@@ -48,7 +30,6 @@ export default function App() {
           if (v === 'previous-work') setDemoSubPage('all');
           setActiveView(v);
         }}
-        onOpenBooking={handleOpenBooking}
       />
 
       <main className="flex-1">
@@ -56,12 +37,10 @@ export default function App() {
           <PreviousWorkPage
             initialSubPage={demoSubPage}
             onBackToPortfolio={() => setActiveView('portfolio')}
-            onBookCommissionFromDemo={handleBookFromDemo}
           />
         ) : (
           <>
             <HeroSection
-              onOpenBooking={handleOpenBooking}
               onOpenPreviousWork={() => handleOpenDemoView('all')}
             />
 
@@ -73,7 +52,6 @@ export default function App() {
             <CommissionSection
               selectedDiscipline={selectedDiscipline}
               onChangeDiscipline={setSelectedDiscipline}
-              onOpenBookingWithSummary={handleOpenBookingWithSummary}
             />
           </>
         )}
@@ -113,15 +91,9 @@ export default function App() {
           </div>
         </div>
       </footer>
-
-      <BookingModal
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-        initialDiscipline={selectedDiscipline}
-        prefilledSummary={prefilledSummary}
-      />
     </div>
   );
 }
+
 
 
