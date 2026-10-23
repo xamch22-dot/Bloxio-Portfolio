@@ -9,9 +9,7 @@ import { HeroSection } from './components/HeroSection';
 import { ExperienceSection } from './components/ExperienceSection';
 import { CommissionSection } from './components/CommissionSection';
 import { BookingModal } from './components/BookingModal';
-import { PrivateInboxPage } from './components/PrivateInboxPage';
 import { PreviousWorkPage, PreviousWorkSubPage } from './components/PreviousWorkPage';
-import { GoogleSitesExportModal } from './components/GoogleSitesExportModal';
 import { CommissionInput, DisciplineId } from './utils/portfolioLogic';
 
 export default function App() {
@@ -20,9 +18,7 @@ export default function App() {
   const [selectedDiscipline, setSelectedDiscipline] =
     useState<CommissionInput['disciplineId']>('all-rounder');
   const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [isGoogleSitesModalOpen, setIsGoogleSitesModalOpen] = useState(false);
   const [prefilledSummary, setPrefilledSummary] = useState('');
-  const [inboxRefreshCount, setInboxRefreshCount] = useState(0);
 
   const handleOpenBooking = () => {
     setIsBookingOpen(true);
@@ -56,12 +52,7 @@ export default function App() {
       />
 
       <main className="flex-1">
-        {activeView === 'inbox' ? (
-          <PrivateInboxPage
-            onBackToPortfolio={() => setActiveView('portfolio')}
-            refreshTrigger={inboxRefreshCount}
-          />
-        ) : activeView === 'previous-work' ? (
+        {activeView === 'previous-work' ? (
           <PreviousWorkPage
             initialSubPage={demoSubPage}
             onBackToPortfolio={() => setActiveView('portfolio')}
@@ -96,6 +87,14 @@ export default function App() {
             <span>Scripter (3+ Yrs) · UI Designer (2+ Yrs) · Modeler (2+ Yrs) · Animator (1+ Yr)</span>
           </div>
           <div className="flex flex-wrap items-center gap-4">
+            <a
+              href="#overview"
+              onClick={() => setActiveView('portfolio')}
+              className="text-zinc-400 hover:text-white underline underline-offset-4"
+            >
+              Overview
+            </a>
+            <span aria-hidden="true">·</span>
             <button
               type="button"
               onClick={() => handleOpenDemoView('all')}
@@ -104,28 +103,12 @@ export default function App() {
               Previous Work (Demo)
             </button>
             <span aria-hidden="true">·</span>
-            <button
-              type="button"
-              onClick={() => setActiveView('inbox')}
-              className="text-zinc-400 hover:text-emerald-400 underline underline-offset-4 cursor-pointer"
-            >
-              Private Owner Inbox
-            </button>
-            <span aria-hidden="true">·</span>
-            <button
-              type="button"
-              onClick={() => setIsGoogleSitesModalOpen(true)}
-              className="text-emerald-400 hover:text-emerald-300 font-mono font-semibold underline underline-offset-4 cursor-pointer"
-            >
-              Export to Google Sites
-            </button>
-            <span aria-hidden="true">·</span>
             <a
-              href="/api/download-zip"
-              download="balo_xio-portfolio.zip"
-              className="text-zinc-300 hover:text-emerald-400 font-mono underline underline-offset-4"
+              href="#estimator"
+              onClick={() => setActiveView('portfolio')}
+              className="text-zinc-400 hover:text-white underline underline-offset-4"
             >
-              Download Website (.zip)
+              Commission Estimator
             </a>
           </div>
         </div>
@@ -136,12 +119,6 @@ export default function App() {
         onClose={() => setIsBookingOpen(false)}
         initialDiscipline={selectedDiscipline}
         prefilledSummary={prefilledSummary}
-        onCommissionSubmitted={() => setInboxRefreshCount((c) => c + 1)}
-      />
-
-      <GoogleSitesExportModal
-        isOpen={isGoogleSitesModalOpen}
-        onClose={() => setIsGoogleSitesModalOpen(false)}
       />
     </div>
   );

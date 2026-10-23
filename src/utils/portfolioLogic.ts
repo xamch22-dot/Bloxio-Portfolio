@@ -588,6 +588,170 @@ export const SFX_AUDIO_CONFIG: Record<'click' | 'page-change', SfxTrimmedProfile
   },
 };
 
+export const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mqppkrdd';
+export const COMMISSION_RECIPIENT_EMAIL = 'xamch@gmail.com';
+export const COMMISSION_COOLDOWN_MS = 60 * 60 * 1000; // 1 Hour (3,600,000 ms)
+export const COMMISSION_COOLDOWN_STORAGE_KEY = 'balo_xio_last_commission_ts';
+
+export interface CooldownStatus {
+  isOnCooldown: boolean;
+  remainingMs: number;
+  remainingMinutes: number;
+  remainingSeconds: number;
+  formattedRemaining: string;
+}
+
+export function getCommissionCooldownStatus(
+  lastSubmittedTimestampMs: number | null | undefined,
+  nowMs: number = Date.now()
+): CooldownStatus {
+  if (
+    lastSubmittedTimestampMs === null ||
+    lastSubmittedTimestampMs === undefined ||
+    !Number.isFinite(lastSubmittedTimestampMs) ||
+    lastSubmittedTimestampMs <= 0
+  ) {
+    return {
+      isOnCooldown: false,
+      remainingMs: 0,
+      remainingMinutes: 0,
+      remainingSeconds: 0,
+      formattedRemaining: '0m 00s',
+    };
+  }
+
+  const elapsed = nowMs - lastSubmittedTimestampMs;
+  if (elapsed >= COMMISSION_COOLDOWN_MS) {
+    return {
+      isOnCooldown: false,
+      remainingMs: 0,
+      remainingMinutes: 0,
+      remainingSeconds: 0,
+      formattedRemaining: '0m 00s',
+    };
+  }
+
+  const remainingMs = Math.max(0, COMMISSION_COOLDOWN_MS - elapsed);
+  const totalSeconds = Math.ceil(remainingMs / 1000);
+  const remainingMinutes = Math.floor(totalSeconds / 60);
+  const remainingSeconds = totalSeconds % 60;
+  const formattedRemaining = `${remainingMinutes}m ${String(remainingSeconds).padStart(2, '0')}s`;
+
+  return {
+    isOnCooldown: true,
+    remainingMs,
+    remainingMinutes,
+    remainingSeconds,
+    formattedRemaining,
+  };
+}
+
+export const DISCIPLINE_LABELS: Record<DisciplineId, string> = {
+  'all-rounder': 'All-Rounder (Full Pack — Scripting, UI, Modeling, Animation)',
+  scripting: 'Scripting Work (3+ Years Experience)',
+  'ui-design': 'UI Design Work (2+ Years Experience)',
+  modeling: '3D Modeling Work (2+ Years Experience)',
+  animating: 'Animation Work (1+ Year Experience)',
+};
+
+export interface CommissionEmailPayloadInput {
+  commissionId: string;
+  clientEmail: string;
+  robloxUsername: string;
+  robloxDisplayName?: string;
+  robloxUserId?: string;
+  robloxProfileUrl?: string;
+  discordTag?: string;
+  disciplineId: DisciplineId;
+  contractType: ContractType;
+  currency: CurrencyMode;
+  projectDetails: string;
+  screenshotCount?: number;
+  submittedAtIso?: string;
+}
+
+export function formatCommissionEmailPayload(
+  input: CommissionEmailPayloadInput
+): Record<string, string> {
+  const estimate = calculateCommissionBreakdown({
+    disciplineId: input.disciplineId,
+    contractType: input.contractType,
+    currency: input.currency,
+  });
+
+  const workLabel = DISCIPLINE_LABELS[input.disciplineId] ?? DISCIPLINE_LABELS['all-rounder'];
+  const cleanRobloxUser = input.robloxUsername.trim().replace(/^@/, '');
+  const displayName = (input.robloxDisplayName || cleanRobloxUser).trim();
+  const userId = (input.robloxUserId || '156').trim();
+  const profileUrl =
+    input.robloxProfileUrl ||
+    `https://www.roblox.com/users/${encodeURIComponent(userId)}/profile`;
+  const discord = (input.discordTag || '').trim() || 'Not provided';
+  const submittedAt = input.submittedAtIso || new Date().toISOString();
+  const screenshotCount = input.screenshotCount ?? 0;
+
+  const totalFormatted = `${estimate.currencySymbol}${estimate.totalAmount.toLocaleString('en-US')} ${estimate.currencyLabel}`;
+  const upfrontFormatted = `${estimate.currencySymbol}${estimate.upfrontAmount.toLocaleString('en-US')} ${estimate.currencyLabel}`;
+  const completionFormatted = `${estimate.currencySymbol}${estimate.completionAmount.toLocaleString('en-US')} ${estimate.currencyLabel}`;
+  const dualCurrencyEquivalent = `$${estimate.usdEquivalent.toLocaleString('en-US')} USD / ${estimate.robuxEquivalent.toLocaleString('en-US')} R$`;
+
+  const alignedSummaryBlock = [
+    '====================================================================',
+    '               BALO_XIO ROBLOX COMMISSION APPLICATION               ',
+    '====================================================================',
+    '',
+    '[01. CLIENT & CONTACT DETAILS]',
+    `  • Recipient Gmail       : ${COMMISSION_RECIPIENT_EMAIL}`,
+    `  • Client Gmail          : ${input.clientEmail.trim()}`,
+    `  • Roblox Username       : @${cleanRobloxUser} (${displayName})`,
+    `  • Roblox User ID        : ${userId}`,
+    `  • Roblox Profile URL    : ${profileUrl}`,
+    `  • Discord Username      : ${discord}`,
+    `  • Attached Screenshots  : ${screenshotCount} / 4`,
+    `  • Submitted Timestamp   : ${submittedAt}`,
+    `  • Reference ID          : ${input.commissionId}`,
+    '',
+    '[02. COMMISSION PACKAGE & PRICING BREAKDOWN]',
+    `  • Selected Work Type    : ${workLabel}`,
+    `  • Engagement Term       : ${estimate.contractLabel} (${estimate.estimatedDelivery})`,
+    `  • Preferred Currency    : ${estimate.currencyLabel}`,
+    `  • Total Package Rate    : ${totalFormatted} (${dualCurrencyEquivalent})`,
+    `  • 40% Upfront Deposit   : ${upfrontFormatted} (MANDATORY BEFORE START)`,
+    `  • 60% Completion Balance: ${completionFormatted} (PAID ON COMPLETION)`,
+    `  • Revenue Share Policy  : 0% Revenue Share (Strictly Fixed Rate)`,
+    '',
+    '====================================================================',
+    '[03. PROJECT SCOPE & DESCRIPTION]',
+    '--------------------------------------------------------------------',
+    input.projectDetails.trim(),
+    '====================================================================',
+  ].join('\n');
+
+  return {
+    _subject: `[balo_xio Commission] ${workLabel} — @${cleanRobloxUser} (${totalFormatted})`,
+    _replyto: input.clientEmail.trim(),
+    email: input.clientEmail.trim(),
+    recipient_gmail: COMMISSION_RECIPIENT_EMAIL,
+    '01_Recipient_Gmail': COMMISSION_RECIPIENT_EMAIL,
+    '02_Client_Gmail': input.clientEmail.trim(),
+    '03_Roblox_Username': `@${cleanRobloxUser} (${displayName})`,
+    '04_Roblox_User_ID': userId,
+    '05_Roblox_Profile_Link': profileUrl,
+    '06_Discord_Username': discord,
+    '07_Selected_Work_Type': workLabel,
+    '08_Engagement_Term': `${estimate.contractLabel} (${estimate.estimatedDelivery})`,
+    '09_Selected_Currency': estimate.currencyLabel,
+    '10_Total_Commission_Rate': `${totalFormatted} (${dualCurrencyEquivalent})`,
+    '11_Mandatory_40_Percent_Upfront': upfrontFormatted,
+    '12_Completion_60_Percent_Balance': completionFormatted,
+    '13_Revenue_Share_Policy': 'Strictly No Revenue Share (0% Rev-Share)',
+    '14_Attached_Screenshots': `${screenshotCount} image(s) attached`,
+    '15_Project_Description': input.projectDetails.trim(),
+    message: alignedSummaryBlock,
+  };
+}
+
+
 
 
 

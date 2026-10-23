@@ -1,7 +1,7 @@
 import React from 'react';
 import { playPageChangeSfx } from '../utils/sfxEngine';
 
-export type AppView = 'portfolio' | 'previous-work' | 'inbox';
+export type AppView = 'portfolio' | 'previous-work';
 
 interface NavbarProps {
   activeView: AppView;
@@ -31,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         balo_xio
       </a>
 
-      {/* Zone 2: 5 concise single-line text navigation links */}
+      {/* Zone 2: 4 concise single-line text navigation links */}
       <nav
         aria-label="Primary Navigation"
         className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400"
@@ -72,16 +72,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           Estimator
         </a>
-        <button
-          type="button"
-          data-sfx="page-change"
-          onClick={() => handleNavClick('inbox')}
-          className={`hover:text-emerald-400 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-            activeView === 'inbox' ? 'text-emerald-400 font-semibold' : ''
-          }`}
-        >
-          Owner Inbox
-        </button>
       </nav>
 
       {/* Zone 3: 1 primary action */}

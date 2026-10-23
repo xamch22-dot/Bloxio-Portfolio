@@ -5,33 +5,20 @@ import {
   DISCIPLINE_EXPERIENCES,
   PREVIOUS_WORK_DEMOS,
   COMBAT_SYSTEM_ASSET_URL,
+  FORMSPREE_ENDPOINT,
+  COMMISSION_RECIPIENT_EMAIL,
+  COMMISSION_COOLDOWN_STORAGE_KEY,
+  getCommissionCooldownStatus,
+  formatCommissionEmailPayload,
   getPricingTiersForDiscipline,
   calculateCommissionBreakdown,
   scrambleText,
   getDemosByCategory,
 } from './src/utils/portfolioLogic';
-import {
-  SHARED_LIVE_APP_URL,
-  buildStandaloneGoogleSitesHtml,
-} from './src/components/GoogleSitesExportModal';
-import { auth, db } from './src/firebase';
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-} from 'firebase/auth';
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-} from 'firebase/firestore';
-
-const OWNER_EMAIL = 'xamch22@gmail.com';
 
 // Application State (Vanilla JS)
 const state = {
-  activeView: 'portfolio', // 'portfolio' | 'previous-work' | 'inbox'
+  activeView: 'portfolio', // 'portfolio' | 'previous-work'
   demoSubPage: 'all', // 'all' | 'scripting' | 'animating' | 'ui-design'
   selectedDiscipline: 'all-rounder', // 'all-rounder' | 'scripting' | 'ui-design' | 'modeling' | 'animating'
   selectedContract: 'commission', // 'commission' | 'short-term' | 'long-term'
@@ -46,20 +33,8 @@ const state = {
   bookingCurrency: 'USD',
   bookingAvatarData: null,
   bookingScreenshots: [],
-  // Inbox State
-  currentUser: null,
-  ownerSessionVerified:
-    typeof window !== 'undefined' &&
-    window.localStorage?.getItem('balo_xio_owner_verified') === 'true',
-  inboxItems: [],
-  selectedInboxId: null,
-  inboxFilter: 'all', // 'all' | 'unread' | 'starred' | 'accepted' | 'completed'
-  inboxSearchQuery: '',
-  // Code Export Modal Tab
-  exportCodeTab: 'all-in-one', // 'all-in-one' | 'html' | 'css' | 'js'
+  cooldownTimerId: null,
 };
-
-const LOCAL_COMMISSIONS_KEY = 'balo_xio_commissions_v1';
 
 function makeClientFallbackAvatarSvg(username) {
   const clean =
@@ -71,108 +46,43 @@ function makeClientFallbackAvatarSvg(username) {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
-function makeClientSampleScreenshotSvg(index) {
-  const titles = [
-    'ANIME BATTLEGROUNDS - LOBBY MAP',
-    'CUSTOM HUD AND INVENTORY LAYOUT',
-    'WEAPON AND RIG REFERENCE',
-    'COMBAT ABILITY SHOWCASE',
-  ];
-  const title = titles[index % titles.length];
-  const accent = index % 2 === 0 ? '#10b981' : '#34d399';
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360"><rect width="640" height="360" fill="#090d0b"/><rect x="44" y="44" width="552" height="272" rx="12" fill="#0f1714" stroke="${accent}" stroke-width="2"/><rect x="70" y="74" width="290" height="28" rx="6" fill="${accent}" opacity="0.2"/><text x="84" y="93" font-family="monospace" font-size="13" font-weight="bold" fill="${accent}">${title}</text><rect x="70" y="122" width="310" height="160" rx="8" fill="#18181b" stroke="#27272a"/><rect x="400" y="122" width="168" height="74" rx="8" fill="#18181b" stroke="#27272a"/><rect x="400" y="208" width="168" height="74" rx="8" fill="#18181b" stroke="#27272a"/><circle cx="225" cy="202" r="42" fill="${accent}" opacity="0.25"/><polygon points="212,182 212,222 246,202" fill="${accent}"/></svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
-
-const DEFAULT_SEED_COMMISSION = {
-  id: 'comm_seed_builderman',
-  recipientEmail: 'xamch22@gmail.com',
-  submitterUid: 'seed_system_user',
-  clientEmail: 'david.studio.lead@gmail.com',
-  robloxUsername: 'Builderman',
-  robloxDisplayName: 'Builderman',
-  robloxUserId: '156',
-  robloxAvatarUrl: makeClientFallbackAvatarSvg('BM'),
-  discordTag: 'builderman_dev',
-  workType: 'all-rounder',
-  contractType: 'short-term',
-  currency: 'ROBUX',
-  totalPrice: 20000,
-  upfrontPrice: 8000,
-  projectDetails:
-    'Hey balo_xio! We need help finishing our Anime Battlegrounds lobby UI, 2 custom sword meshes, R15 dash animations, and the server-side cooldown script. Ready to pay the 40% upfront (8,000 Robux) today.',
-  gameImages: [makeClientSampleScreenshotSvg(0), makeClientSampleScreenshotSvg(1)],
-  status: 'unread',
-  createdAtIso: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-};
-
-function loadLocalCommissions() {
-  try {
-    const raw = window.localStorage.getItem(LOCAL_COMMISSIONS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
-      }
-    }
-  } catch {}
-  return [DEFAULT_SEED_COMMISSION];
-}
-
-function saveLocalCommissions(list) {
-  try {
-    window.localStorage.setItem(LOCAL_COMMISSIONS_KEY, JSON.stringify(list));
-  } catch {}
-}
-
 // Format helper
 function formatNumber(n) {
   return Number(n).toLocaleString('en-US');
 }
 
 // ============================================================================
-// 1. VIEW NAVIGATION (PORTFOLIO / PREVIOUS WORK / OWNER INBOX)
+// 1. VIEW NAVIGATION (PORTFOLIO / PREVIOUS WORK)
 // ============================================================================
 function setView(viewName, optionalDemoSubPage) {
-  state.activeView = viewName;
+  state.activeView = viewName === 'previous-work' ? 'previous-work' : 'portfolio';
   if (optionalDemoSubPage) {
     state.demoSubPage = optionalDemoSubPage;
   }
 
   const viewPortfolio = document.getElementById('view-portfolio');
   const viewPreviousWork = document.getElementById('view-previous-work');
-  const viewInbox = document.getElementById('view-inbox');
 
-  if (viewPortfolio) viewPortfolio.classList.toggle('hidden-view', viewName !== 'portfolio');
-  if (viewPreviousWork) viewPreviousWork.classList.toggle('hidden-view', viewName !== 'previous-work');
-  if (viewInbox) viewInbox.classList.toggle('hidden-view', viewName !== 'inbox');
+  if (viewPortfolio) viewPortfolio.classList.toggle('hidden-view', state.activeView !== 'portfolio');
+  if (viewPreviousWork) viewPreviousWork.classList.toggle('hidden-view', state.activeView !== 'previous-work');
 
   // Update top nav active states
   const navOverview = document.getElementById('nav-overview');
   const navPrevWork = document.getElementById('nav-previous-work');
-  const navInbox = document.getElementById('nav-inbox');
 
   if (navOverview) {
     navOverview.className = `hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 ${
-      viewName === 'portfolio' ? 'text-white' : 'text-zinc-400'
+      state.activeView === 'portfolio' ? 'text-white' : 'text-zinc-400'
     }`;
   }
   if (navPrevWork) {
     navPrevWork.className = `hover:text-emerald-400 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-      viewName === 'previous-work' ? 'text-emerald-400 font-semibold' : 'text-zinc-400'
-    }`;
-  }
-  if (navInbox) {
-    navInbox.className = `hover:text-emerald-400 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-      viewName === 'inbox' ? 'text-emerald-400 font-semibold' : 'text-zinc-400'
+      state.activeView === 'previous-work' ? 'text-emerald-400 font-semibold' : 'text-zinc-400'
     }`;
   }
 
-  if (viewName === 'previous-work') {
+  if (state.activeView === 'previous-work') {
     renderPreviousWorkDemos();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  } else if (viewName === 'inbox') {
-    fetchCommissionsForInbox();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
@@ -837,8 +747,57 @@ function openImageLightbox(demo) {
 }
 
 // ============================================================================
-// 6. COMMISSION BOOKING MODAL & ROBLOX AVATAR BOT
+// 6. COMMISSION BOOKING MODAL, ROBLOX AVATAR BOT & 1-HOUR ANTI-SPAM COOLDOWN
 // ============================================================================
+function getStoredLastCommissionTimestamp() {
+  try {
+    const raw = localStorage.getItem(COMMISSION_COOLDOWN_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredLastCommissionTimestamp(ts) {
+  try {
+    localStorage.setItem(COMMISSION_COOLDOWN_STORAGE_KEY, String(ts));
+  } catch {}
+}
+
+function updateBookingCooldownUI() {
+  const cooldownBanner = document.getElementById('booking-cooldown-banner');
+  const submitBtn = document.getElementById('booking-submit-btn');
+  const lastTs = getStoredLastCommissionTimestamp();
+  const status = getCommissionCooldownStatus(lastTs, Date.now());
+
+  if (status.isOnCooldown) {
+    if (cooldownBanner) {
+      cooldownBanner.className =
+        'p-3 rounded-md text-xs font-mono bg-amber-950/50 border border-amber-500/40 text-amber-200 flex items-center justify-between gap-3';
+      cooldownBanner.innerHTML = `
+        <span>1-Hour Anti-Spam Cooldown Active: Please wait before sending another commission application.</span>
+        <strong class="text-amber-300 whitespace-nowrap shrink-0 tabular-nums">${status.formattedRemaining} left</strong>
+      `;
+    }
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = `Cooldown Active (${status.formattedRemaining})`;
+    }
+  } else {
+    if (cooldownBanner) {
+      cooldownBanner.className = 'hidden-view';
+      cooldownBanner.innerHTML = '';
+    }
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Commission Application';
+    }
+  }
+  return status;
+}
+
 function openBookingModal(prefilledText) {
   const modal = document.getElementById('booking-modal');
   const detailsArea = document.getElementById('booking-project-details');
@@ -849,11 +808,20 @@ function openBookingModal(prefilledText) {
     detailsArea.value = prefilledText;
   }
   renderBookingSelectors();
+  updateBookingCooldownUI();
+  if (state.cooldownTimerId) {
+    clearInterval(state.cooldownTimerId);
+  }
+  state.cooldownTimerId = setInterval(updateBookingCooldownUI, 1000);
   if (modal) modal.classList.remove('hidden-view');
 }
 
 function closeBookingModal() {
   const modal = document.getElementById('booking-modal');
+  if (state.cooldownTimerId) {
+    clearInterval(state.cooldownTimerId);
+    state.cooldownTimerId = null;
+  }
   if (modal) modal.classList.add('hidden-view');
 }
 
@@ -1045,318 +1013,13 @@ function renderBookingScreenshotsPreview() {
 }
 
 // ============================================================================
-// 7. PRIVATE OWNER INBOX (LOCKED TO xamch22@gmail.com — VERCEL COMPATIBLE)
-// ============================================================================
-async function fetchCommissionsForInbox() {
-  const localItems = loadLocalCommissions();
-  const map = new Map();
-  for (const item of localItems) {
-    map.set(item.id, item);
-  }
-
-  try {
-    const res = await fetch('/api/commissions');
-    if (res.ok) {
-      const data = await res.json();
-      const apiList = Array.isArray(data.commissions) ? data.commissions : [];
-      for (const item of apiList) {
-        if (!map.has(item.id)) {
-          map.set(item.id, item);
-        }
-      }
-    }
-  } catch {}
-
-  state.inboxItems = Array.from(map.values()).sort(
-    (a, b) => new Date(b.createdAtIso || 0).getTime() - new Date(a.createdAtIso || 0).getTime()
-  );
-  saveLocalCommissions(state.inboxItems);
-
-  if (!state.selectedInboxId && state.inboxItems.length > 0) {
-    state.selectedInboxId = state.inboxItems[0].id;
-  }
-  renderInboxView();
-}
-
-function updateCommissionItemStatus(id, nextStatus) {
-  state.inboxItems = state.inboxItems.map((item) =>
-    item.id === id ? { ...item, status: nextStatus } : item
-  );
-  saveLocalCommissions(state.inboxItems);
-  fetch(`/api/commissions/${encodeURIComponent(id)}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status: nextStatus }),
-  }).catch(() => {});
-  renderInboxView();
-}
-
-function deleteCommissionItem(id) {
-  state.inboxItems = state.inboxItems.filter((item) => item.id !== id);
-  saveLocalCommissions(state.inboxItems);
-  if (state.selectedInboxId === id) {
-    state.selectedInboxId = state.inboxItems[0]?.id || null;
-  }
-  fetch(`/api/commissions/${encodeURIComponent(id)}`, {
-    method: 'DELETE',
-  }).catch(() => {});
-  renderInboxView();
-}
-
-function renderInboxView() {
-  const authGate = document.getElementById('inbox-auth-gate');
-  const mailClient = document.getElementById('inbox-mail-client');
-  const authError = document.getElementById('inbox-auth-error');
-  const unreadBadge = document.getElementById('inbox-unread-badge');
-
-  const isFirebaseOwner =
-    state.currentUser &&
-    state.currentUser.email &&
-    state.currentUser.email.toLowerCase() === OWNER_EMAIL.toLowerCase();
-
-  const isOwner = Boolean(isFirebaseOwner || state.ownerSessionVerified);
-
-  if (!isOwner) {
-    if (authGate) authGate.classList.remove('hidden-view');
-    if (mailClient) mailClient.classList.add('hidden-view');
-    if (authError) {
-      if (state.currentUser && state.currentUser.email && !isFirebaseOwner) {
-        authError.textContent = `Access Denied: Signed in as ${state.currentUser.email}. Only ${OWNER_EMAIL} can access this private inbox.`;
-        authError.classList.remove('hidden-view');
-      }
-    }
-    return;
-  }
-
-  if (authGate) authGate.classList.add('hidden-view');
-  if (mailClient) mailClient.classList.remove('hidden-view');
-
-  const unreadCount = state.inboxItems.filter((i) => i.status === 'unread').length;
-  if (unreadBadge) {
-    unreadBadge.textContent = `(${unreadCount} unread)`;
-  }
-
-  // Render Folder Filters
-  const folderListEl = document.getElementById('inbox-folder-list');
-  if (folderListEl) {
-    const folders = [
-      { id: 'all', label: 'All Mail', count: state.inboxItems.length },
-      { id: 'unread', label: 'Unread', count: unreadCount },
-      {
-        id: 'starred',
-        label: 'Starred',
-        count: state.inboxItems.filter((i) => i.status === 'starred').length,
-      },
-      {
-        id: 'accepted',
-        label: 'Accepted (40% Paid)',
-        count: state.inboxItems.filter((i) => i.status === 'accepted').length,
-      },
-      {
-        id: 'completed',
-        label: 'Completed',
-        count: state.inboxItems.filter((i) => i.status === 'completed').length,
-      },
-    ];
-
-    folderListEl.innerHTML = folders
-      .map(
-        (f) => `
-        <button
-          type="button"
-          data-inbox-folder="${f.id}"
-          class="w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-colors cursor-pointer ${
-            state.inboxFilter === f.id
-              ? 'bg-emerald-400/15 text-emerald-300 font-semibold'
-              : 'text-zinc-400 hover:text-white hover:bg-white/[0.03]'
-          }"
-        >
-          <span class="truncate">${f.label}</span>
-          <span class="font-mono text-[11px] tabular-nums">${f.count}</span>
-        </button>
-      `
-      )
-      .join('');
-
-    folderListEl.querySelectorAll('[data-inbox-folder]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        state.inboxFilter = btn.getAttribute('data-inbox-folder');
-        renderInboxView();
-      });
-    });
-  }
-
-  const listEl = document.getElementById('inbox-message-list');
-  const detailEl = document.getElementById('inbox-message-detail');
-
-  const filtered = state.inboxItems.filter((item) => {
-    if (state.inboxFilter !== 'all' && item.status !== state.inboxFilter) return false;
-    if (state.inboxSearchQuery.trim()) {
-      const q = state.inboxSearchQuery.toLowerCase();
-      const hay = `${item.clientEmail} ${item.robloxUsername} ${item.robloxDisplayName} ${item.projectDetails} ${item.discordTag}`.toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
-    return true;
-  });
-
-  if (listEl) {
-    if (filtered.length === 0) {
-      listEl.innerHTML = `<div class="p-6 text-xs font-mono text-zinc-400">No commissions in this mailbox filter.</div>`;
-    } else {
-      listEl.innerHTML = filtered
-        .map(
-          (item) => `
-          <button
-            type="button"
-            data-inbox-item="${item.id}"
-            class="w-full text-left p-4 border-b border-white/10 hover:bg-zinc-900/80 transition-colors flex items-start gap-3 cursor-pointer ${
-              state.selectedInboxId === item.id ? 'bg-emerald-950/25 border-l-2 border-l-emerald-400' : ''
-            }"
-          >
-            <img src="${item.robloxAvatarUrl || makeClientFallbackAvatarSvg(item.robloxUsername)}" alt="${item.robloxUsername}" referrerpolicy="no-referrer" class="w-10 h-10 rounded-full border border-emerald-500/40 shrink-0 object-cover bg-zinc-900" />
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="font-bold text-xs text-white truncate">@${item.robloxUsername}</span>
-                <span class="font-mono text-[11px] text-emerald-400 shrink-0">${
-                  item.currency === 'USD' ? '$' : 'R$ '
-                }${formatNumber(item.totalPrice)}</span>
-              </div>
-              <div class="text-xs text-zinc-300 truncate">${item.clientEmail}</div>
-              <div class="flex items-center justify-between gap-2 mt-1">
-                <span class="text-[11px] font-mono text-zinc-400">${item.workType.toUpperCase()} · ${item.contractType.toUpperCase()}</span>
-                <span class="text-[10px] font-mono text-emerald-400 uppercase">${item.status}</span>
-              </div>
-            </div>
-          </button>
-        `
-        )
-        .join('');
-
-      listEl.querySelectorAll('[data-inbox-item]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          state.selectedInboxId = btn.getAttribute('data-inbox-item');
-          renderInboxView();
-        });
-      });
-    }
-  }
-
-  const selected = state.inboxItems.find((i) => i.id === state.selectedInboxId) || filtered[0];
-  if (detailEl) {
-    if (!selected) {
-      detailEl.innerHTML = `<div class="p-8 text-sm text-zinc-400">Select a commission email on the left to inspect its details.</div>`;
-    } else {
-      const symbol = selected.currency === 'USD' ? '$' : 'R$ ';
-      const screenshotsHtml =
-        Array.isArray(selected.gameImages) && selected.gameImages.length > 0
-          ? `<div class="mt-6">
-              <div class="text-xs font-mono text-zinc-400 mb-3">Attached Game Screenshots (${selected.gameImages.length}):</div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                ${selected.gameImages
-                  .map(
-                    (src, idx) =>
-                      `<img src="${src}" alt="Game screenshot ${idx + 1}" referrerpolicy="no-referrer" class="rounded-lg border border-white/15 w-full h-44 object-cover bg-zinc-950" />`
-                  )
-                  .join('')}
-              </div>
-            </div>`
-          : '';
-
-      detailEl.innerHTML = `
-        <div class="p-6 space-y-6">
-          <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
-            <div class="flex items-center gap-4">
-              <img src="${selected.robloxAvatarUrl || makeClientFallbackAvatarSvg(selected.robloxUsername)}" alt="${selected.robloxUsername}" referrerpolicy="no-referrer" class="w-14 h-14 rounded-full border-2 border-emerald-400 object-cover bg-zinc-900" />
-              <div>
-                <h3 class="font-display text-xl font-bold text-white">${selected.robloxDisplayName} (@${selected.robloxUsername})</h3>
-                <div class="text-xs font-mono text-emerald-400">From Gmail: ${selected.clientEmail} · Discord: ${selected.discordTag}</div>
-              </div>
-            </div>
-            <div class="text-right font-mono">
-              <div class="text-lg font-bold text-white">${symbol}${formatNumber(selected.totalPrice)} ${selected.currency}</div>
-              <div class="text-xs text-emerald-400">40% Upfront: ${symbol}${formatNumber(selected.upfrontPrice)}</div>
-            </div>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-2">
-            <button type="button" id="inbox-copy-gmail-btn" class="px-3 py-1.5 text-xs font-mono text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded cursor-pointer">Copy Player Gmail</button>
-            <button type="button" data-status-action="starred" class="px-3 py-1.5 text-xs font-mono text-amber-300 bg-amber-950/30 hover:bg-amber-950/50 border border-amber-500/30 rounded cursor-pointer">Star Inquiry</button>
-            <button type="button" data-status-action="accepted" class="px-3 py-1.5 text-xs font-mono text-emerald-300 bg-emerald-950/30 hover:bg-emerald-950/50 border border-emerald-500/30 rounded cursor-pointer">Mark Accepted (40% Paid)</button>
-            <button type="button" data-status-action="completed" class="px-3 py-1.5 text-xs font-mono text-sky-300 bg-sky-950/30 hover:bg-sky-950/50 border border-sky-500/30 rounded cursor-pointer">Mark Completed</button>
-            <button type="button" id="inbox-delete-item-btn" class="px-3 py-1.5 text-xs font-mono text-rose-300 bg-rose-950/30 hover:bg-rose-950/50 border border-rose-500/30 rounded cursor-pointer">Delete</button>
-          </div>
-
-          <div class="whitespace-pre-wrap text-sm text-zinc-200 leading-relaxed bg-zinc-900/50 p-4 rounded-lg border border-white/10">${selected.projectDetails}</div>
-          ${screenshotsHtml}
-        </div>
-      `;
-
-      const copyGmailBtn = document.getElementById('inbox-copy-gmail-btn');
-      if (copyGmailBtn) {
-        copyGmailBtn.addEventListener('click', async () => {
-          try {
-            await navigator.clipboard.writeText(selected.clientEmail);
-          } catch {}
-          copyGmailBtn.textContent = 'Copied Gmail!';
-          setTimeout(() => {
-            copyGmailBtn.textContent = 'Copy Player Gmail';
-          }, 1800);
-        });
-      }
-
-      detailEl.querySelectorAll('[data-status-action]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const next = btn.getAttribute('data-status-action');
-          updateCommissionItemStatus(selected.id, next);
-        });
-      });
-
-      const delBtn = document.getElementById('inbox-delete-item-btn');
-      if (delBtn) {
-        delBtn.addEventListener('click', () => {
-          deleteCommissionItem(selected.id);
-        });
-      }
-    }
-  }
-}
-
-// ============================================================================
-// 8. HTML / CSS / JS SOURCE & GOOGLE SITES EXPORT MODAL
-// ============================================================================
-function renderExportCodeModal() {
-  const codeBlock = document.getElementById('export-code-preview');
-  if (!codeBlock) return;
-
-  if (state.exportCodeTab === 'all-in-one') {
-    codeBlock.textContent = buildStandaloneGoogleSitesHtml(SHARED_LIVE_APP_URL);
-  } else if (state.exportCodeTab === 'html') {
-    codeBlock.textContent = document.documentElement.outerHTML;
-  } else if (state.exportCodeTab === 'css') {
-    codeBlock.textContent = `/* style.css — Pure CSS Stylesheet for balo_xio portfolio */\nbody {\n  font-family: 'Plus Jakarta Sans', sans-serif;\n  background-color: #070908;\n  color: #f4f4f5;\n  margin: 0;\n  overflow-x: hidden;\n}\n.selective-video-blur {\n  backdrop-filter: blur(8px);\n  mask-image: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.88) 44%, rgba(0,0,0,0.25) 75%, rgba(0,0,0,0) 100%);\n}\n.hacker-text-shadow {\n  text-shadow: 0 0 20px rgba(34, 197, 94, 0.32);\n}`;
-  } else {
-    codeBlock.textContent = `// script.js — Pure Vanilla JavaScript for balo_xio portfolio\n// Handles 2.0s video loop, 5-sentence hacker text decode, 5-discipline USD/Robux estimator, Previous Work (Demo) tabs, and Roblox Avatar Bot.`;
-  }
-
-  document.querySelectorAll('[data-code-tab]').forEach((btn) => {
-    const tab = btn.getAttribute('data-code-tab');
-    btn.className = `px-3 py-1.5 text-xs font-mono rounded cursor-pointer ${
-      state.exportCodeTab === tab
-        ? 'bg-emerald-400 text-zinc-950 font-bold'
-        : 'bg-zinc-900 text-zinc-300 hover:text-white'
-    }`;
-  });
-}
-
-// ============================================================================
-// 9. INITIALIZE ALL EVENT LISTENERS ON DOM READY
+// 7. INITIALIZE ALL EVENT LISTENERS ON DOM READY
 // ============================================================================
 function initApp() {
   initHeroVideoAndHackerSequence();
   renderExperienceGrid();
   renderRateEstimator();
   renderPreviousWorkDemos();
-  fetchCommissionsForInbox();
 
   // Top Bar & Footer View Links
   document.querySelectorAll('[data-nav-view]').forEach((el) => {
@@ -1417,7 +1080,6 @@ function initApp() {
 
   // Screenshot Uploads in Booking Form
   const shotInput = document.getElementById('booking-screenshot-input');
-  const sampleShotBtn = document.getElementById('booking-sample-screenshot-btn');
   if (shotInput) {
     shotInput.addEventListener('change', (e) => {
       const files = Array.from(e.target.files || []).slice(0, 4 - state.bookingScreenshots.length);
@@ -1433,18 +1095,8 @@ function initApp() {
       });
     });
   }
-  if (sampleShotBtn) {
-    sampleShotBtn.addEventListener('click', () => {
-      if (state.bookingScreenshots.length < 4) {
-        state.bookingScreenshots.push(
-          makeClientSampleScreenshotSvg(state.bookingScreenshots.length)
-        );
-        renderBookingScreenshotsPreview();
-      }
-    });
-  }
 
-  // Booking Form Submit
+  // Booking Form Submit (Sends perfectly aligned details + description to Formspree -> xamch@gmail.com with 1-hour cooldown)
   const bookingForm = document.getElementById('booking-form');
   if (bookingForm) {
     bookingForm.addEventListener('submit', async (e) => {
@@ -1454,16 +1106,37 @@ function initApp() {
       const discordTag = document.getElementById('booking-discord-tag').value.trim();
       const projectDetails = document.getElementById('booking-project-details').value.trim();
       const statusBanner = document.getElementById('booking-submit-status');
+      const submitBtn = document.getElementById('booking-submit-btn');
 
-      if (!clientEmail || !robloxUsername || !projectDetails) {
+      // 1. Check 1-Hour Anti-Spam Cooldown
+      const currentCooldown = updateBookingCooldownUI();
+      if (currentCooldown.isOnCooldown) {
         if (statusBanner) {
-          statusBanner.textContent = 'Please fill in your Gmail, Roblox username, and project details.';
-          statusBanner.className = 'p-3 rounded text-xs font-mono bg-red-950/60 border border-red-500/40 text-red-200';
+          statusBanner.textContent = `Anti-spam cooldown active: You can send another commission application in ${currentCooldown.formattedRemaining}.`;
+          statusBanner.className =
+            'p-3 rounded text-xs font-mono bg-amber-950/60 border border-amber-500/40 text-amber-200';
         }
         return;
       }
 
-      if (!state.bookingAvatarData || state.bookingAvatarData.username?.toLowerCase() !== robloxUsername.toLowerCase()) {
+      if (!clientEmail || !robloxUsername || !projectDetails) {
+        if (statusBanner) {
+          statusBanner.textContent = 'Please fill in your Gmail, Roblox username, and project details.';
+          statusBanner.className =
+            'p-3 rounded text-xs font-mono bg-red-950/60 border border-red-500/40 text-red-200';
+        }
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending to Formspree...';
+      }
+
+      if (
+        !state.bookingAvatarData ||
+        state.bookingAvatarData.username?.toLowerCase() !== robloxUsername.toLowerCase()
+      ) {
         await lookupRobloxAvatarBot(robloxUsername);
       }
 
@@ -1473,10 +1146,31 @@ function initApp() {
         currency: state.bookingCurrency,
       });
 
+      const commissionId = `comm_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+      const submittedAtIso = new Date().toISOString();
+
+      const formspreePayload = formatCommissionEmailPayload({
+        commissionId,
+        clientEmail,
+        robloxUsername,
+        robloxDisplayName: state.bookingAvatarData?.displayName || robloxUsername,
+        robloxUserId: state.bookingAvatarData?.userId || '156',
+        robloxProfileUrl:
+          state.bookingAvatarData?.profileUrl ||
+          `https://www.roblox.com/users/${encodeURIComponent(state.bookingAvatarData?.userId || '156')}/profile`,
+        discordTag: discordTag || 'Not provided',
+        disciplineId: state.bookingDiscipline,
+        contractType: state.bookingContract,
+        currency: state.bookingCurrency,
+        projectDetails,
+        screenshotCount: state.bookingScreenshots.length,
+        submittedAtIso,
+      });
+
       const newCommission = {
-        id: `comm_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-        recipientEmail: OWNER_EMAIL,
-        submitterUid: state.currentUser ? state.currentUser.uid : 'guest_client',
+        id: commissionId,
+        recipientEmail: COMMISSION_RECIPIENT_EMAIL,
+        submitterUid: 'guest_client',
         clientEmail,
         robloxUsername,
         robloxDisplayName: state.bookingAvatarData?.displayName || robloxUsername,
@@ -1492,37 +1186,46 @@ function initApp() {
         projectDetails,
         gameImages: [...state.bookingScreenshots],
         status: 'unread',
-        createdAtIso: new Date().toISOString(),
+        createdAtIso: submittedAtIso,
+        formspreePayload,
       };
 
-      // Save locally first so it works 100% on Vercel & static deployments
-      const currentLocal = loadLocalCommissions();
-      saveLocalCommissions([newCommission, ...currentLocal]);
-
-      try {
-        await fetch('/api/commissions', {
+      // Send directly to Formspree endpoint (https://formspree.io/f/mqppkrdd) and backend relay in parallel
+      await Promise.allSettled([
+        fetch(FORMSPREE_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(formspreePayload),
+        }),
+        fetch('/api/commissions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newCommission),
-        });
-      } catch {}
+        }),
+      ]);
 
-      try {
-        if (state.currentUser) {
-          await addDoc(collection(db, 'commissions'), {
-            ...newCommission,
-            createdAt: serverTimestamp(),
-          });
-        }
-      } catch {}
+      // Activate 1-hour anti-spam cooldown immediately
+      setStoredLastCommissionTimestamp(Date.now());
+      updateBookingCooldownUI();
 
       if (statusBanner) {
-        statusBanner.textContent =
-          'Commission sent to balo_xio! Your Roblox avatar & Gmail have been delivered to the Private Inbox.';
+        statusBanner.innerHTML = `
+          <div class="space-y-2">
+            <div class="font-semibold text-emerald-300">
+              ✓ Commission Application Sent to ${COMMISSION_RECIPIENT_EMAIL} via Formspree!
+            </div>
+            <div class="text-zinc-300">
+              All commission details and your project description have been formatted and aligned. A 1-hour anti-spam cooldown is now active before you can send another application.
+            </div>
+          </div>
+        `;
         statusBanner.className =
-          'p-3 rounded text-xs font-mono bg-emerald-950/60 border border-emerald-500/40 text-emerald-200';
+          'p-3.5 rounded-md text-xs font-mono bg-emerald-950/60 border border-emerald-500/40 text-emerald-200';
+        bookingForm.scrollTo({ top: bookingForm.scrollHeight, behavior: 'smooth' });
       }
-      fetchCommissionsForInbox();
     });
   }
 
@@ -1533,113 +1236,6 @@ function initApp() {
       if (m) m.classList.add('hidden-view');
     });
   });
-
-  // Google Sites / HTML-CSS-JS Export Modal
-  const openExportBtn = document.getElementById('footer-export-btn');
-  const exportModal = document.getElementById('export-modal');
-  if (openExportBtn && exportModal) {
-    openExportBtn.addEventListener('click', () => {
-      renderExportCodeModal();
-      exportModal.classList.remove('hidden-view');
-    });
-  }
-  document.querySelectorAll('[data-close-export]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      if (exportModal) exportModal.classList.add('hidden-view');
-    });
-  });
-  document.querySelectorAll('[data-code-tab]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.exportCodeTab = btn.getAttribute('data-code-tab');
-      renderExportCodeModal();
-    });
-  });
-
-  const copyExportBtn = document.getElementById('copy-export-code-btn');
-  if (copyExportBtn) {
-    copyExportBtn.addEventListener('click', async () => {
-      const preview = document.getElementById('export-code-preview');
-      try {
-        await navigator.clipboard.writeText(preview ? preview.textContent : '');
-      } catch {}
-      copyExportBtn.textContent = 'Copied Whole Code!';
-      setTimeout(() => {
-        copyExportBtn.textContent = 'Copy Whole HTML Code';
-      }, 2200);
-    });
-  }
-
-  // Inbox Search Input
-  const searchInput = document.getElementById('inbox-search-input');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      state.inboxSearchQuery = e.target.value || '';
-      renderInboxView();
-    });
-  }
-
-  // Firebase Auth + Vercel Domain Owner Verification for Private Owner Inbox
-  onAuthStateChanged(auth, (user) => {
-    state.currentUser = user;
-    if (user?.email?.toLowerCase() === OWNER_EMAIL.toLowerCase()) {
-      state.ownerSessionVerified = true;
-      try {
-        window.localStorage.setItem('balo_xio_owner_verified', 'true');
-      } catch {}
-    }
-    renderInboxView();
-  });
-
-  const signInBtn = document.getElementById('inbox-google-signin-btn');
-  if (signInBtn) {
-    signInBtn.addEventListener('click', async () => {
-      const emailInput = document.getElementById('inbox-owner-email-input');
-      const authError = document.getElementById('inbox-auth-error');
-      const enteredEmail = (emailInput ? emailInput.value : OWNER_EMAIL).trim().toLowerCase();
-
-      if (authError) {
-        authError.classList.add('hidden-view');
-      }
-
-      if (enteredEmail !== OWNER_EMAIL.toLowerCase()) {
-        if (authError) {
-          authError.textContent = `Access Denied: Only ${OWNER_EMAIL} can unlock this private inbox.`;
-          authError.classList.remove('hidden-view');
-        }
-        return;
-      }
-
-      // Immediately unlock the Private Commission Inbox once the owner email (xamch22@gmail.com) is verified
-      state.ownerSessionVerified = true;
-      try {
-        window.localStorage.setItem('balo_xio_owner_verified', 'true');
-      } catch {}
-      renderInboxView();
-
-      // Only invoke Firebase popup if running on an authorized Firebase/Cloud Run domain
-      const host = window.location.hostname || '';
-      if (host.endsWith('.run.app') || host.endsWith('.firebaseapp.com') || host.endsWith('.web.app')) {
-        try {
-          const provider = new GoogleAuthProvider();
-          await signInWithPopup(auth, provider);
-        } catch {}
-      }
-    });
-  }
-
-  const signOutBtn = document.getElementById('inbox-signout-btn');
-  if (signOutBtn) {
-    signOutBtn.addEventListener('click', async () => {
-      state.ownerSessionVerified = false;
-      try {
-        window.localStorage.removeItem('balo_xio_owner_verified');
-      } catch {}
-      try {
-        await signOut(auth);
-      } catch {}
-      renderInboxView();
-    });
-  }
 }
 
 if (document.readyState === 'loading') {

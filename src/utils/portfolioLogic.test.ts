@@ -12,6 +12,11 @@ import {
   MODELING_CHAIR_IMAGE_URL,
   MODELING_SEA_BEAST_IMAGE_URL,
   SFX_AUDIO_CONFIG,
+  FORMSPREE_ENDPOINT,
+  COMMISSION_RECIPIENT_EMAIL,
+  COMMISSION_COOLDOWN_MS,
+  getCommissionCooldownStatus,
+  formatCommissionEmailPayload,
   getDemosByCategory,
   scrambleText,
   calculateCommissionBreakdown,
@@ -248,6 +253,64 @@ test('SFX_AUDIO_CONFIG defines exact trimmed active audio windows for click and 
   );
   assert.equal(pageCfg.localTrimmedUrl, '/assets/sfx/camera_flash_trimmed.wav');
 });
+
+test('getCommissionCooldownStatus enforces a strict 1-hour (3,600,000 ms) anti-spam cooldown', () => {
+  assert.equal(COMMISSION_COOLDOWN_MS, 3600000);
+
+  // No previous submission
+  const none = getCommissionCooldownStatus(null, 1000000);
+  assert.equal(none.isOnCooldown, false);
+  assert.equal(none.remainingMs, 0);
+
+  // 15 minutes after submission -> 45m 00s remaining
+  const baseTs = 1700000000000;
+  const after15Min = getCommissionCooldownStatus(baseTs, baseTs + 15 * 60 * 1000);
+  assert.equal(after15Min.isOnCooldown, true);
+  assert.equal(after15Min.remainingMinutes, 45);
+  assert.equal(after15Min.remainingSeconds, 0);
+  assert.equal(after15Min.formattedRemaining, '45m 00s');
+
+  // Exactly 60 minutes after submission -> cooldown expired
+  const after60Min = getCommissionCooldownStatus(baseTs, baseTs + 60 * 60 * 1000);
+  assert.equal(after60Min.isOnCooldown, false);
+  assert.equal(after60Min.remainingMs, 0);
+});
+
+test('formatCommissionEmailPayload targets https://formspree.io/f/mqppkrdd and xamch@gmail.com with aligned details and description', () => {
+  assert.equal(FORMSPREE_ENDPOINT, 'https://formspree.io/f/mqppkrdd');
+  assert.equal(COMMISSION_RECIPIENT_EMAIL, 'xamch@gmail.com');
+
+  const payload = formatCommissionEmailPayload({
+    commissionId: 'comm_test_01',
+    clientEmail: 'player@gmail.com',
+    robloxUsername: 'Builderman',
+    robloxDisplayName: 'Builderman',
+    robloxUserId: '156',
+    discordTag: 'builder#0001',
+    disciplineId: 'scripting',
+    contractType: 'short-term',
+    currency: 'USD',
+    projectDetails: 'Need a complete server-authoritative combat system with raycast hitboxes.',
+    screenshotCount: 2,
+    submittedAtIso: '2026-10-23T20:00:00.000Z',
+  });
+
+  assert.equal(payload['01_Recipient_Gmail'], 'xamch@gmail.com');
+  assert.equal(payload['02_Client_Gmail'], 'player@gmail.com');
+  assert.equal(payload['03_Roblox_Username'], '@Builderman (Builderman)');
+  assert.equal(payload['10_Total_Commission_Rate'], '$75 USD ($75 USD / 15,000 R$)');
+  assert.equal(payload['11_Mandatory_40_Percent_Upfront'], '$30 USD');
+  assert.equal(payload['15_Project_Description'], 'Need a complete server-authoritative combat system with raycast hitboxes.');
+  assert.equal(payload.message.includes('[01. CLIENT & CONTACT DETAILS]'), true);
+  assert.equal(payload.message.includes('[02. COMMISSION PACKAGE & PRICING BREAKDOWN]'), true);
+  assert.equal(payload.message.includes('[03. PROJECT SCOPE & DESCRIPTION]'), true);
+  assert.equal(
+    payload.message.indexOf('[01. CLIENT & CONTACT DETAILS]') <
+      payload.message.indexOf('[03. PROJECT SCOPE & DESCRIPTION]'),
+    true
+  );
+});
+
 
 
 

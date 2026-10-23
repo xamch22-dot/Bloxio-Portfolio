@@ -6,18 +6,23 @@ import {
   Search,
   Upload,
   Trash2,
-  ImagePlus,
   Loader2,
   ShieldCheck,
+  Clock,
 } from 'lucide-react';
 import {
   getPricingTiersForDiscipline,
   calculateCommissionBreakdown,
+  FORMSPREE_ENDPOINT,
+  COMMISSION_RECIPIENT_EMAIL,
+  COMMISSION_COOLDOWN_STORAGE_KEY,
+  getCommissionCooldownStatus,
+  formatCommissionEmailPayload,
   CommissionInput,
   ContractType,
   CurrencyMode,
 } from '../utils/portfolioLogic';
-import { auth, db, OWNER_EMAIL, OperationType, handleFirestoreError } from '../firebase';
+import { auth, db, OperationType, handleFirestoreError } from '../firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 interface BookingModalProps {
@@ -82,46 +87,6 @@ async function compressImageFile(file: File): Promise<string> {
   });
 }
 
-function createSampleGameImageSvg(index: number): string {
-  const titles = [
-    'GAME MAP + ENVIRONMENT PREVIEW',
-    'UI HUD + INVENTORY CONCEPT',
-    'WEAPON + RIG REFERENCE',
-    'COMBAT ABILITY SHOWCASE',
-  ];
-  const title = titles[index % titles.length];
-  const canvas = document.createElement('canvas');
-  canvas.width = 640;
-  canvas.height = 360;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return '';
-
-  ctx.fillStyle = '#090d0b';
-  ctx.fillRect(0, 0, 640, 360);
-
-  ctx.strokeStyle = '#10b981';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(24, 24, 592, 312);
-
-  ctx.fillStyle = '#0f1714';
-  ctx.fillRect(26, 26, 588, 308);
-
-  ctx.fillStyle = '#10b981';
-  ctx.font = 'bold 16px monospace';
-  ctx.fillText(title, 48, 64);
-
-  ctx.fillStyle = '#18181b';
-  ctx.fillRect(48, 86, 340, 216);
-  ctx.fillRect(408, 86, 184, 100);
-  ctx.fillRect(408, 202, 184, 100);
-
-  ctx.fillStyle = '#34d399';
-  ctx.font = '13px monospace';
-  ctx.fillText('ROBLOX STUDIO CAPTURE #' + (index + 1), 115, 198);
-
-  return canvas.toDataURL('image/png');
-}
-
 export const BookingModal: React.FC<BookingModalProps> = ({
   isOpen,
   onClose,
@@ -155,7 +120,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     imageCount: number;
   } | null>(null);
 
+  const [nowMs, setNowMs] = useState(() => Date.now());
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setNowMs(Date.now());
+    const interval = setInterval(() => setNowMs(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, [isOpen]);
 
   useEffect(() => {
     if (initialDiscipline) {
@@ -183,6 +156,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   }, [robloxUsername]);
 
   if (!isOpen) return null;
+
+  let storedLastTs: number | null = null;
+  try {
+    const raw = localStorage.getItem(COMMISSION_COOLDOWN_STORAGE_KEY);
+    if (raw) {
+      const parsed = Number(raw);
+      if (Number.isFinite(parsed) && parsed > 0) storedLastTs = parsed;
+    }
+  } catch {}
+  const cooldownStatus = getCommissionCooldownStatus(storedLastTs, nowMs);
 
   const estimate = calculateCommissionBreakdown({
     disciplineId: workType,
@@ -229,11 +212,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     }
   };
 
-  const handleAddSampleScreenshot = () => {
-    if (gameImages.length >= 4) return;
-    setGameImages((prev) => [...prev, createSampleGameImageSvg(prev.length)].slice(0, 4));
-  };
-
   const handleRemoveImage = (index: number) => {
     setGameImages((prev) => prev.filter((_, i) => i !== index));
   };
@@ -241,6 +219,13 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    if (cooldownStatus.isOnCooldown) {
+      setErrorMessage(
+        `1-Hour Anti-Spam Cooldown Active: Please wait ${cooldownStatus.formattedRemaining} before sending another application.`
+      );
+      return;
+    }
 
     const trimmedEmail = clientEmail.trim();
     const trimmedRoblox = robloxUsername.trim();
@@ -283,45 +268,71 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       };
 
       const commissionId = `comm_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const submittedAtIso = new Date().toISOString();
 
-      // 1. Send to backend relay (which also guarantees Roblox avatar resolution)
-      const apiRes = await fetch('/api/commissions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: commissionId,
-          recipientEmail: OWNER_EMAIL,
-          submitterUid: auth.currentUser?.uid || 'guest_client',
-          clientEmail: trimmedEmail,
-          robloxUsername: finalProfile.username,
-          robloxDisplayName: finalProfile.displayName,
-          robloxUserId: finalProfile.userId,
-          robloxAvatarUrl: finalProfile.avatarUrl,
-          discordTag: discordTag.trim() || 'Not provided',
-          workType,
-          contractType,
-          currency,
-          totalPrice: estimate.totalAmount,
-          upfrontPrice: estimate.upfrontAmount,
-          projectDetails: trimmedDetails,
-          gameImages,
-        }),
+      const formspreePayload = formatCommissionEmailPayload({
+        commissionId,
+        clientEmail: trimmedEmail,
+        robloxUsername: finalProfile.username,
+        robloxDisplayName: finalProfile.displayName,
+        robloxUserId: finalProfile.userId,
+        robloxProfileUrl: finalProfile.profileUrl,
+        discordTag: discordTag.trim() || 'Not provided',
+        disciplineId: workType,
+        contractType,
+        currency,
+        projectDetails: trimmedDetails,
+        screenshotCount: gameImages.length,
+        submittedAtIso,
       });
 
+      const [, apiSettled] = await Promise.allSettled([
+        fetch(FORMSPREE_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(formspreePayload),
+        }),
+        fetch('/api/commissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: commissionId,
+            recipientEmail: COMMISSION_RECIPIENT_EMAIL,
+            submitterUid: auth.currentUser?.uid || 'guest_client',
+            clientEmail: trimmedEmail,
+            robloxUsername: finalProfile.username,
+            robloxDisplayName: finalProfile.displayName,
+            robloxUserId: finalProfile.userId,
+            robloxAvatarUrl: finalProfile.avatarUrl,
+            discordTag: discordTag.trim() || 'Not provided',
+            workType,
+            contractType,
+            currency,
+            totalPrice: estimate.totalAmount,
+            upfrontPrice: estimate.upfrontAmount,
+            projectDetails: trimmedDetails,
+            gameImages,
+            formspreePayload,
+          }),
+        }),
+      ]);
+
       let savedAvatarUrl = finalProfile.avatarUrl;
-      if (apiRes.ok) {
-        const apiJson = await apiRes.json();
+      if (apiSettled.status === 'fulfilled' && apiSettled.value.ok) {
+        const apiJson = await apiSettled.value.json();
         if (apiJson?.commission?.robloxAvatarUrl) {
           savedAvatarUrl = apiJson.commission.robloxAvatarUrl;
         }
       }
 
-      // 2. If user is signed in with verified Firebase Auth, also persist directly to Firestore
       if (auth.currentUser && auth.currentUser.emailVerified) {
         const docPath = `commissions/${commissionId}`;
         try {
           await setDoc(doc(db, 'commissions', commissionId), {
-            recipientEmail: OWNER_EMAIL,
+            recipientEmail: COMMISSION_RECIPIENT_EMAIL,
             submitterUid: auth.currentUser.uid,
             clientEmail: trimmedEmail.slice(0, 120),
             robloxUsername: finalProfile.username.slice(0, 60),
@@ -344,6 +355,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           handleFirestoreError(firestoreErr, OperationType.CREATE, docPath);
         }
       }
+
+      try {
+        localStorage.setItem(COMMISSION_COOLDOWN_STORAGE_KEY, String(Date.now()));
+        setNowMs(Date.now());
+      } catch {}
 
       const workObj = WORK_OPTIONS.find((w) => w.id === workType) ?? WORK_OPTIONS[0];
       setSubmittedData({
@@ -691,16 +707,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   <Upload className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Upload Game Screenshots</span>
                 </button>
-
-                <button
-                  type="button"
-                  onClick={handleAddSampleScreenshot}
-                  disabled={gameImages.length >= 4}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-mono text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/50 disabled:opacity-40 border border-emerald-500/30 rounded-lg transition-colors cursor-pointer"
-                >
-                  <ImagePlus className="w-3.5 h-3.5" />
-                  <span>+ Attach Demo Game Screenshot</span>
-                </button>
               </div>
 
               {gameImages.length > 0 && (
@@ -800,6 +806,18 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               </label>
             </div>
 
+            {cooldownStatus.isOnCooldown && (
+              <div className="p-3 rounded-lg bg-amber-950/40 border border-amber-500/40 flex items-center justify-between gap-3 text-xs font-mono text-amber-200">
+                <span className="inline-flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>1-Hour Anti-Spam Cooldown Active</span>
+                </span>
+                <strong className="text-amber-300 tabular-nums">
+                  {cooldownStatus.formattedRemaining} remaining
+                </strong>
+              </div>
+            )}
+
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800">
               <button
                 type="button"
@@ -810,11 +828,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || cooldownStatus.isOnCooldown}
                 className="px-5 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 disabled:opacity-50 rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer inline-flex items-center gap-2"
               >
                 {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                <span>Send Commission to balo_xio</span>
+                <span>
+                  {cooldownStatus.isOnCooldown
+                    ? `Cooldown Active (${cooldownStatus.formattedRemaining})`
+                    : 'Send Commission to balo_xio'}
+                </span>
               </button>
             </div>
           </form>
