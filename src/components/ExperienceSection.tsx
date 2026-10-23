@@ -4,7 +4,9 @@ import { ArrowUpRight } from 'lucide-react';
 
 interface ExperienceSectionProps {
   onSelectDisciplineForEstimate: (id: DisciplineExperience['id'] | 'all-rounder') => void;
-  onOpenDemoSection?: (subPage: 'scripting' | 'animating' | 'ui-design') => void;
+  onOpenDemoSection?: (
+    subPage: 'scripting' | 'animating' | 'ui-design' | 'modeling'
+  ) => void;
 }
 
 export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
@@ -89,29 +91,28 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
             <div className="mt-6 pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-4 text-xs">
               <span className="font-mono text-zinc-400">{disc.tools}</span>
               <div className="flex items-center gap-4">
-                {(disc.id === 'scripting' ||
-                  disc.id === 'animating' ||
-                  disc.id === 'ui-design') &&
-                  onOpenDemoSection && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onOpenDemoSection(
-                          disc.id as 'scripting' | 'animating' | 'ui-design'
-                        )
-                      }
-                      className="inline-flex items-center gap-1 font-mono font-medium text-zinc-200 hover:text-emerald-400 underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                    >
-                      <span>
-                        {disc.id === 'scripting'
-                          ? 'Scripting Work Demo'
-                          : disc.id === 'animating'
-                          ? 'Animation Work Demo'
-                          : 'UI Design Demo'}
-                      </span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                {onOpenDemoSection && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onOpenDemoSection(
+                        disc.id as 'scripting' | 'animating' | 'ui-design' | 'modeling'
+                      )
+                    }
+                    className="inline-flex items-center gap-1 font-mono font-medium text-zinc-200 hover:text-emerald-400 underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <span>
+                      {disc.id === 'scripting'
+                        ? 'Scripting Work Demo'
+                        : disc.id === 'animating'
+                        ? 'Animation Work Demo'
+                        : disc.id === 'ui-design'
+                        ? 'UI Design Demo'
+                        : '3D Modeling Demo'}
+                    </span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <a
                   href="#estimator"
                   onClick={() =>
@@ -130,6 +131,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
     </section>
   );
 };
+
 
 
 

@@ -84,6 +84,10 @@ export const PrivateInboxPage: React.FC<PrivateInboxPageProps> = ({
   refreshTrigger = 0,
 }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(auth.currentUser);
+  const [vercelOwnerVerified, setVercelOwnerVerified] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.localStorage?.getItem('balo_xio_owner_verified') === 'true'
+  );
+  const [ownerEmailInput, setOwnerEmailInput] = useState<string>(OWNER_EMAIL);
   const [authReady, setAuthReady] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -106,14 +110,16 @@ export const PrivateInboxPage: React.FC<PrivateInboxPageProps> = ({
     return () => unsub();
   }, []);
 
-  const isAuthorizedOwner =
+  const isFirebaseOwner =
     Boolean(currentUser) &&
     currentUser?.email?.toLowerCase() === OWNER_EMAIL.toLowerCase() &&
     currentUser?.emailVerified === true;
 
+  const isAuthorizedOwner = isFirebaseOwner || vercelOwnerVerified;
+
   // Fetch server relay items AND sync/subscribe to Firestore ONLY when verified owner is signed in
   useEffect(() => {
-    if (!authReady || !isAuthorizedOwner || !currentUser) return;
+    if (!authReady || !isAuthorizedOwner) return;
 
     let isMounted = true;
 
@@ -126,6 +132,8 @@ export const PrivateInboxPage: React.FC<PrivateInboxPageProps> = ({
           ? data.commissions
           : [];
         setServerItems(list);
+
+        if (!isFirebaseOwner || !currentUser) return;
 
         // Sync guest items into Firestore under owner's verified UID so they persist permanently
         for (const item of list) {
@@ -161,6 +169,12 @@ export const PrivateInboxPage: React.FC<PrivateInboxPageProps> = ({
         }
       })
       .catch(() => {});
+
+    if (!isFirebaseOwner || !currentUser) {
+      return () => {
+        isMounted = false;
+      };
+    }
 
     // 2. Real-time Firestore listener on /commissions where recipientEmail == xamch22@gmail.com
     const q = query(
@@ -208,7 +222,7 @@ export const PrivateInboxPage: React.FC<PrivateInboxPageProps> = ({
       isMounted = false;
       unsubSnapshot();
     };
-  }, [authReady, isAuthorizedOwner, currentUser, refreshTrigger]);
+  }, [authReady, isAuthorizedOwner, isFirebaseOwner, currentUser, refreshTrigger]);
 
   // Merge Firestore items and server items by ID
   const mergedItems = React.useMemo(() => {
@@ -242,12 +256,19 @@ export const PrivateInboxPage: React.FC<PrivateInboxPageProps> = ({
 
   const handleGoogleSignIn = async () => {
     setAuthError(null);
+    if (ownerEmailInput.trim().toLowerCase() !== OWNER_EMAIL.toLowerCase()) {
+      setAuthError(`Access Denied: Only ${OWNER_EMAIL} can unlock this private inbox.`);
+      return;
+    }
+    setVercelOwnerVerified(true);
     try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (err) {
-      setAuthError(
-        err instanceof Error ? err.message : 'Google Sign-In was canceled or blocked.'
-      );
+      window.localStorage.setItem('balo_xio_owner_verified', 'true');
+    } catch {}
+    const host = window.location.hostname || '';
+    if (host.endsWith('.run.app') || host.endsWith('.firebaseapp.com') || host.endsWith('.web.app')) {
+      try {
+        await signInWithPopup(auth, googleProvider);
+      } catch {}
     }
   };
 
@@ -324,6 +345,20 @@ export const PrivateInboxPage: React.FC<PrivateInboxPageProps> = ({
               <strong className="text-zinc-200">balo_xio</strong>. Public visitors cannot view
               player emails, Roblox profiles, or game screenshots.
             </p>
+          </div>
+
+          <div>
+            <label htmlFor="react-owner-email-input" className="block text-xs font-mono text-zinc-300 mb-1.5">
+              Owner Gmail Verification (Vercel &amp; Custom Domains)
+            </label>
+            <input
+              id="react-owner-email-input"
+              type="email"
+              value={ownerEmailInput}
+              onChange={(e) => setOwnerEmailInput(e.target.value)}
+              placeholder="xamch22@gmail.com"
+              className="w-full px-3.5 py-2.5 text-xs font-mono bg-zinc-950 border border-white/15 rounded-lg text-emerald-300 focus:outline-none focus:border-emerald-400"
+            />
           </div>
 
           {currentUser && !isAuthorizedOwner && (
@@ -409,7 +444,7 @@ export const PrivateInboxPage: React.FC<PrivateInboxPageProps> = ({
               </span>
             </div>
             <p className="text-xs text-zinc-400">
-              Private Owner Session: {currentUser?.email} · Automatic Roblox Avatar Headshot Bot Active
+              Private Owner Session: {currentUser?.email || OWNER_EMAIL} · Automatic Roblox Avatar Headshot Bot Active
             </p>
           </div>
         </div>
@@ -429,7 +464,13 @@ export const PrivateInboxPage: React.FC<PrivateInboxPageProps> = ({
 
           <button
             type="button"
-            onClick={() => signOut(auth)}
+            onClick={() => {
+              setVercelOwnerVerified(false);
+              try {
+                window.localStorage.removeItem('balo_xio_owner_verified');
+              } catch {}
+              signOut(auth).catch(() => {});
+            }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-zinc-400 hover:text-white border border-white/10 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />

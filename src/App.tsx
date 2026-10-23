@@ -11,6 +11,7 @@ import { CommissionSection } from './components/CommissionSection';
 import { BookingModal } from './components/BookingModal';
 import { PrivateInboxPage } from './components/PrivateInboxPage';
 import { PreviousWorkPage, PreviousWorkSubPage } from './components/PreviousWorkPage';
+import { GoogleSitesExportModal } from './components/GoogleSitesExportModal';
 import { CommissionInput, DisciplineId } from './utils/portfolioLogic';
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
   const [selectedDiscipline, setSelectedDiscipline] =
     useState<CommissionInput['disciplineId']>('all-rounder');
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isGoogleSitesModalOpen, setIsGoogleSitesModalOpen] = useState(false);
   const [prefilledSummary, setPrefilledSummary] = useState('');
   const [inboxRefreshCount, setInboxRefreshCount] = useState(0);
 
@@ -94,11 +96,9 @@ export default function App() {
             <span>Scripter (3+ Yrs) · UI Designer (2+ Yrs) · Modeler (2+ Yrs) · Animator (1+ Yr)</span>
           </div>
           <div className="flex flex-wrap items-center gap-4">
-            <span>16+ Years Old · 40% Upfront · No Revenue Share</span>
-            <span aria-hidden="true">·</span>
             <button
               type="button"
-              onClick={() => setActiveView('previous-work')}
+              onClick={() => handleOpenDemoView('all')}
               className="text-zinc-400 hover:text-emerald-400 underline underline-offset-4 cursor-pointer"
             >
               Previous Work (Demo)
@@ -111,6 +111,22 @@ export default function App() {
             >
               Private Owner Inbox
             </button>
+            <span aria-hidden="true">·</span>
+            <button
+              type="button"
+              onClick={() => setIsGoogleSitesModalOpen(true)}
+              className="text-emerald-400 hover:text-emerald-300 font-mono font-semibold underline underline-offset-4 cursor-pointer"
+            >
+              Export to Google Sites
+            </button>
+            <span aria-hidden="true">·</span>
+            <a
+              href="/api/download-zip"
+              download="balo_xio-portfolio.zip"
+              className="text-zinc-300 hover:text-emerald-400 font-mono underline underline-offset-4"
+            >
+              Download Website (.zip)
+            </a>
           </div>
         </div>
       </footer>
@@ -122,7 +138,13 @@ export default function App() {
         prefilledSummary={prefilledSummary}
         onCommissionSubmitted={() => setInboxRefreshCount((c) => c + 1)}
       />
+
+      <GoogleSitesExportModal
+        isOpen={isGoogleSitesModalOpen}
+        onClose={() => setIsGoogleSitesModalOpen(false)}
+      />
     </div>
   );
 }
+
 

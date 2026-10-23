@@ -1,4 +1,5 @@
 import React from 'react';
+import { playPageChangeSfx } from '../utils/sfxEngine';
 
 export type AppView = 'portfolio' | 'previous-work' | 'inbox';
 
@@ -13,12 +14,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   onChangeView,
   onOpenBooking,
 }) => {
+  const handleNavClick = (view: AppView) => {
+    playPageChangeSfx();
+    onChangeView(view);
+  };
+
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between gap-8 px-6 lg:px-12 py-4 bg-[#070908]/80 backdrop-blur-md border-b border-white/10">
       {/* Zone 1: Single text element wordmark */}
       <a
         href="#overview"
-        onClick={() => onChangeView('portfolio')}
+        data-sfx="page-change"
+        onClick={() => handleNavClick('portfolio')}
         className="font-display text-lg font-bold tracking-tight text-white hover:text-emerald-400 transition-colors whitespace-nowrap shrink-0"
       >
         balo_xio
@@ -31,7 +38,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       >
         <a
           href="#overview"
-          onClick={() => onChangeView('portfolio')}
+          data-sfx="page-change"
+          onClick={() => handleNavClick('portfolio')}
           className={`hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 ${
             activeView === 'portfolio' ? 'text-white' : ''
           }`}
@@ -40,7 +48,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         </a>
         <button
           type="button"
-          onClick={() => onChangeView('previous-work')}
+          data-sfx="page-change"
+          onClick={() => handleNavClick('previous-work')}
           className={`hover:text-emerald-400 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
             activeView === 'previous-work' ? 'text-emerald-400 font-semibold' : ''
           }`}
@@ -49,21 +58,24 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
         <a
           href="#experience"
-          onClick={() => onChangeView('portfolio')}
+          data-sfx="page-change"
+          onClick={() => handleNavClick('portfolio')}
           className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
         >
           Experience
         </a>
         <a
           href="#estimator"
-          onClick={() => onChangeView('portfolio')}
+          data-sfx="page-change"
+          onClick={() => handleNavClick('portfolio')}
           className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
         >
           Estimator
         </a>
         <button
           type="button"
-          onClick={() => onChangeView('inbox')}
+          data-sfx="page-change"
+          onClick={() => handleNavClick('inbox')}
           className={`hover:text-emerald-400 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
             activeView === 'inbox' ? 'text-emerald-400 font-semibold' : ''
           }`}
@@ -85,4 +97,5 @@ export const Navbar: React.FC<NavbarProps> = ({
     </header>
   );
 };
+
 

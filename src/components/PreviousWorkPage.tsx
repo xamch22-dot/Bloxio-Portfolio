@@ -20,8 +20,20 @@ import {
   calculateCommissionBreakdown,
   getDemosByCategory,
 } from '../utils/portfolioLogic';
+import { playPageChangeSfx } from '../utils/sfxEngine';
 
-export type PreviousWorkSubPage = 'all' | 'scripting' | 'animating' | 'ui-design';
+export type PreviousWorkSubPage =
+  | 'all'
+  | 'scripting'
+  | 'animating'
+  | 'ui-design'
+  | 'modeling';
+
+interface LightboxTarget {
+  title: string;
+  subtitle: string;
+  imageUrl: string;
+}
 
 interface PreviousWorkPageProps {
   initialSubPage?: PreviousWorkSubPage;
@@ -32,7 +44,7 @@ interface PreviousWorkPageProps {
 interface DemoCardProps {
   demo: PreviousWorkDemo;
   onBookCommission: (discipline: DisciplineId, prefilledSummary: string) => void;
-  onOpenLightbox: (demo: PreviousWorkDemo) => void;
+  onOpenLightbox: (target: LightboxTarget) => void;
 }
 
 const DemoShowcaseCard: React.FC<DemoCardProps> = ({
@@ -103,14 +115,18 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
       ? 'Book Custom Scripting'
       : demo.category === 'animating'
       ? 'Book Custom Animation'
-      : 'Book Custom UI Design';
+      : demo.category === 'ui-design'
+      ? 'Book Custom UI Design'
+      : 'Book Custom 3D Modeling';
 
   const highlightsHeading =
     demo.category === 'scripting'
       ? 'Included Core Systems:'
       : demo.category === 'animating'
       ? 'Animation Highlights:'
-      : 'UI Design Highlights:';
+      : demo.category === 'ui-design'
+      ? 'UI Design Highlights:'
+      : '3D Modeling Highlights:';
 
   return (
     <section
@@ -146,7 +162,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        {/* Left 7 Columns: High-Retention Video or Image Showcase */}
+        {/* Left 7 Columns: High-Retention Video, Multi-Image Gallery, or Single Image Showcase */}
         <div className="lg:col-span-7 space-y-4">
           {demo.mediaType === 'video' && demo.videoUrl ? (
             <>
@@ -221,6 +237,59 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                 </div>
               </div>
             </>
+          ) : demo.galleryImages && demo.galleryImages.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {demo.galleryImages.map((imgItem) => (
+                  <div
+                    key={imgItem.label}
+                    className="rounded-lg overflow-hidden border border-white/15 bg-zinc-950 flex flex-col justify-between"
+                  >
+                    <div className="aspect-square overflow-hidden bg-zinc-900">
+                      <img
+                        src={imgItem.url}
+                        alt={`${imgItem.label} — 3D Model by ${demo.author}`}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-3.5 border-t border-white/10 flex items-center justify-between gap-2 bg-zinc-950">
+                      <div className="min-w-0">
+                        <div className="font-display text-sm font-bold text-white truncate">
+                          {imgItem.label}
+                        </div>
+                        <div className="text-xs font-mono text-zinc-400 truncate mt-0.5">
+                          {imgItem.subtitle}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onOpenLightbox({
+                            title: imgItem.label,
+                            subtitle: `${demo.categoryLabel} · Created by ${demo.author} · ${imgItem.subtitle}`,
+                            imageUrl: imgItem.url,
+                          })
+                        }
+                        aria-label={`Inspect ${imgItem.label} in fullscreen`}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-mono text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                      >
+                        <Maximize2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Inspect</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
+                <div className="flex items-center gap-2">
+                  <span>Roblox Studio Viewport Renders (2 Models)</span>
+                  <span aria-hidden="true">·</span>
+                  <span className="text-emerald-400">{demo.craftTag}</span>
+                </div>
+              </div>
+            </>
           ) : (
             <>
               <div className="relative rounded-lg overflow-hidden border border-white/15 bg-zinc-950 shadow-2xl">
@@ -248,15 +317,23 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                   <span className="text-emerald-400">{demo.craftTag}</span>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => onOpenLightbox(demo)}
-                  aria-label={`Inspect ${demo.title} in fullscreen`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded transition-colors cursor-pointer whitespace-nowrap shrink-0"
-                >
-                  <Maximize2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Inspect Fullscreen UI</span>
-                </button>
+                {demo.imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onOpenLightbox({
+                        title: demo.title,
+                        subtitle: `${demo.categoryLabel} · Created by ${demo.author} · ${demo.craftTag}`,
+                        imageUrl: demo.imageUrl!,
+                      })
+                    }
+                    aria-label={`Inspect ${demo.title} in fullscreen`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Inspect Fullscreen UI</span>
+                  </button>
+                )}
               </div>
             </>
           )}
@@ -265,12 +342,14 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
         {/* Right 5 Columns: Description, Systems Included & Actions */}
         <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-              <span className="text-emerald-400 font-semibold">{demo.categoryLabel}</span>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-mono text-zinc-400">
+              <span className="text-emerald-400 font-semibold whitespace-nowrap">
+                {demo.categoryLabel}
+              </span>
               <span aria-hidden="true">·</span>
-              <span>Created by {demo.author}</span>
+              <span className="whitespace-nowrap">Created by {demo.author}</span>
               <span aria-hidden="true">·</span>
-              <span>{demo.craftTag}</span>
+              <span className="whitespace-nowrap">{demo.craftTag}</span>
             </div>
 
             <p className="text-sm sm:text-base text-zinc-200 leading-relaxed">
@@ -392,7 +471,7 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
   onBookCommissionFromDemo,
 }) => {
   const [activeSubPage, setActiveSubPage] = useState<PreviousWorkSubPage>(initialSubPage);
-  const [lightboxDemo, setLightboxDemo] = useState<PreviousWorkDemo | null>(null);
+  const [lightboxTarget, setLightboxTarget] = useState<LightboxTarget | null>(null);
 
   useEffect(() => {
     setActiveSubPage(initialSubPage);
@@ -408,7 +487,19 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
       ? 'Animation Work'
       : activeSubPage === 'ui-design'
       ? 'UI Design'
+      : activeSubPage === 'modeling'
+      ? '3D Modeling'
       : 'Previous Work (Demo)';
+
+  const handleSelectSubPage = (sub: PreviousWorkSubPage) => {
+    playPageChangeSfx();
+    setActiveSubPage(sub);
+  };
+
+  const handleBackClick = () => {
+    playPageChangeSfx();
+    onBackToPortfolio();
+  };
 
   return (
     <div className="min-h-[calc(100vh-61px)] bg-[#070908] text-zinc-100 py-14 lg:py-20 px-6 lg:px-12">
@@ -418,7 +509,8 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
           <div className="flex items-center gap-3 text-xs font-mono">
             <button
               type="button"
-              onClick={onBackToPortfolio}
+              data-sfx="page-change"
+              onClick={handleBackClick}
               className="inline-flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -434,7 +526,7 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             <span className="text-emerald-400">{subPageTitle}</span>
           </div>
 
-          {/* Dedicated Sub-Page Selector: All Demos, Scripting Work, Animation Work, UI Design */}
+          {/* Dedicated Sub-Page Selector: All Demos (4), Scripting Work, Animation Work, UI Design, 3D Modeling */}
           <div
             role="tablist"
             aria-label="Previous Work Sub-Pages"
@@ -443,21 +535,23 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             <button
               type="button"
               role="tab"
+              data-sfx="page-change"
               aria-selected={activeSubPage === 'all'}
-              onClick={() => setActiveSubPage('all')}
+              onClick={() => handleSelectSubPage('all')}
               className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'all'
                   ? 'bg-emerald-400 text-zinc-950 font-semibold'
                   : 'text-zinc-300 hover:text-white'
               }`}
             >
-              All Demos (3)
+              All Demos (4)
             </button>
             <button
               type="button"
               role="tab"
+              data-sfx="page-change"
               aria-selected={activeSubPage === 'scripting'}
-              onClick={() => setActiveSubPage('scripting')}
+              onClick={() => handleSelectSubPage('scripting')}
               className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'scripting'
                   ? 'bg-emerald-400 text-zinc-950 font-semibold'
@@ -469,8 +563,9 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             <button
               type="button"
               role="tab"
+              data-sfx="page-change"
               aria-selected={activeSubPage === 'animating'}
-              onClick={() => setActiveSubPage('animating')}
+              onClick={() => handleSelectSubPage('animating')}
               className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'animating'
                   ? 'bg-emerald-400 text-zinc-950 font-semibold'
@@ -482,8 +577,9 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             <button
               type="button"
               role="tab"
+              data-sfx="page-change"
               aria-selected={activeSubPage === 'ui-design'}
-              onClick={() => setActiveSubPage('ui-design')}
+              onClick={() => handleSelectSubPage('ui-design')}
               className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'ui-design'
                   ? 'bg-emerald-400 text-zinc-950 font-semibold'
@@ -492,6 +588,20 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             >
               UI Design
             </button>
+            <button
+              type="button"
+              role="tab"
+              data-sfx="page-change"
+              aria-selected={activeSubPage === 'modeling'}
+              onClick={() => handleSelectSubPage('modeling')}
+              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activeSubPage === 'modeling'
+                  ? 'bg-emerald-400 text-zinc-950 font-semibold'
+                  : 'text-zinc-300 hover:text-white'
+              }`}
+            >
+              3D Modeling
+            </button>
           </div>
         </div>
 
@@ -499,14 +609,15 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
         <div className="pt-10 pb-10 border-b border-white/10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="max-w-3xl">
             <p className="text-xs font-mono text-emerald-400 mb-3">
-              Previous Work (Demo) · Scripting, Animation &amp; UI Showcase
+              Previous Work (Demo) · Scripting, Animation, UI &amp; 3D Modeling Showcase
             </p>
             <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white text-balance">
               {subPageTitle}
             </h1>
             <p className="mt-4 text-base text-zinc-400 leading-relaxed">
-              Explore live recorded Roblox Studio demonstrations and polished interface designs crafted by{' '}
-              <strong className="text-white">balo_xio</strong> across Scripting, Animation, and UI Design.
+              Explore live recorded Roblox Studio demonstrations, polished interface designs, and game-ready
+              3D models crafted by <strong className="text-white">balo_xio</strong> across all four core
+              disciplines.
             </p>
           </div>
         </div>
@@ -518,20 +629,20 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
               key={demo.id}
               demo={demo}
               onBookCommission={onBookCommissionFromDemo}
-              onOpenLightbox={(d) => setLightboxDemo(d)}
+              onOpenLightbox={(t) => setLightboxTarget(t)}
             />
           ))}
         </div>
       </div>
 
       {/* Fullscreen Lightbox Modal for Image Demos */}
-      {lightboxDemo && lightboxDemo.imageUrl && (
+      {lightboxTarget && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={`${lightboxDemo.title} Fullscreen Preview`}
+          aria-label={`${lightboxTarget.title} Fullscreen Preview`}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6"
-          onClick={() => setLightboxDemo(null)}
+          onClick={() => setLightboxTarget(null)}
         >
           <div
             className="relative max-w-5xl w-full bg-zinc-950 border border-white/15 rounded-xl overflow-hidden shadow-2xl"
@@ -539,14 +650,12 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
               <div>
-                <h3 className="font-display text-lg font-bold text-white">{lightboxDemo.title}</h3>
-                <p className="text-xs font-mono text-zinc-400">
-                  {lightboxDemo.categoryLabel} · Created by {lightboxDemo.author} · {lightboxDemo.craftTag}
-                </p>
+                <h3 className="font-display text-lg font-bold text-white">{lightboxTarget.title}</h3>
+                <p className="text-xs font-mono text-zinc-400">{lightboxTarget.subtitle}</p>
               </div>
               <button
                 type="button"
-                onClick={() => setLightboxDemo(null)}
+                onClick={() => setLightboxTarget(null)}
                 aria-label="Close fullscreen preview"
                 className="p-2 text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded-md cursor-pointer"
               >
@@ -555,8 +664,8 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             </div>
             <div className="p-6 flex items-center justify-center bg-[#050706]">
               <img
-                src={lightboxDemo.imageUrl}
-                alt={lightboxDemo.title}
+                src={lightboxTarget.imageUrl}
+                alt={lightboxTarget.title}
                 referrerPolicy="no-referrer"
                 className="max-h-[75vh] w-auto object-contain rounded-lg"
               />

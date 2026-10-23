@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
@@ -257,6 +258,26 @@ async function startServer() {
       serverCommissions.splice(idx, 1);
     }
     res.json({ deleted: true });
+  });
+
+  // Download Full Website ZIP Archive
+  app.get('/api/download-zip', (_req, res) => {
+    const zipPath = path.join(__dirname, 'public', 'balo_xio-portfolio.zip');
+    if (!fs.existsSync(zipPath)) {
+      res.status(404).json({ error: 'ZIP archive not found' });
+      return;
+    }
+    res.download(zipPath, 'balo_xio-portfolio.zip');
+  });
+
+  // Download Single Standalone HTML File for Google Sites
+  app.get('/api/google-sites-html', (_req, res) => {
+    const htmlPath = path.join(__dirname, 'public', 'balo_xio-google-sites.html');
+    if (!fs.existsSync(htmlPath)) {
+      res.status(404).json({ error: 'HTML file not found' });
+      return;
+    }
+    res.download(htmlPath, 'balo_xio-google-sites.html');
   });
 
   if (process.env.NODE_ENV !== 'production') {

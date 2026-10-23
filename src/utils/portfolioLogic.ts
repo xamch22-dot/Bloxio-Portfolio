@@ -323,6 +323,12 @@ export function calculateCommissionBreakdown(input: CommissionInput): Commission
 
 export type PreviousWorkCategory = 'scripting' | 'animating' | 'ui-design' | 'modeling';
 
+export interface PreviousWorkGalleryImage {
+  url: string;
+  label: string;
+  subtitle: string;
+}
+
 export interface PreviousWorkDemo {
   id: string;
   index: string;
@@ -337,6 +343,7 @@ export interface PreviousWorkDemo {
   mediaType: 'video' | 'image';
   videoUrl?: string;
   imageUrl?: string;
+  galleryImages?: PreviousWorkGalleryImage[];
   tryAssetUrl?: string;
   assetId?: string;
   systemsIncluded: string[];
@@ -351,6 +358,12 @@ export const WALK_ANIMATION_VIDEO_URL =
 
 export const VIRAL_GAME_UI_IMAGE_URL =
   '/assets/aistudio/Gemini_Generated_Image_tmic7xtmic7xtmic_f9b1a615.jpg';
+
+export const MODELING_CHAIR_IMAGE_URL =
+  '/assets/aistudio/Screenshot_2026-10-23_003728_a3e711d6.png';
+
+export const MODELING_SEA_BEAST_IMAGE_URL =
+  '/assets/aistudio/Screenshot_2026-10-23_003801_e1c7aec3.png';
 
 export const PREVIOUS_WORK_DEMOS: PreviousWorkDemo[] = [
   {
@@ -478,12 +491,104 @@ export const PREVIOUS_WORK_DEMOS: PreviousWorkDemo[] = [
       },
     ],
   },
+  {
+    id: 'modeling-chair-and-sea-beast-balo-xio',
+    index: '04',
+    category: 'modeling',
+    categoryLabel: '3D Modeling',
+    disciplineId: 'modeling',
+    rateLabel: '3D Modeling Rate: $35 USD / 15,000 R$ (Commission) · 40% Upfront',
+    title: 'Highly Polished Chair & Sea Beast',
+    author: 'Balo_xio',
+    craftTag: 'Hard-Surface Props & Organic Creature Sculpting',
+    description:
+      'A dual 3D modeling showcase by Balo_xio demonstrating versatility across both detailed environment props and organic boss creatures—featuring a Highly Polished Chair with warm hand-painted wood grain and slatted joinery, alongside a menacing Sea Beast leviathan sculpted with glowing crimson eyes, jagged multi-row fangs, and optimized Roblox Studio mesh topology.',
+    mediaType: 'image',
+    imageUrl: MODELING_SEA_BEAST_IMAGE_URL,
+    galleryImages: [
+      {
+        url: MODELING_CHAIR_IMAGE_URL,
+        label: 'Highly Polished Chair',
+        subtitle: 'Detailed Slatted Hardwood Prop · Custom Wood Grain Texture',
+      },
+      {
+        url: MODELING_SEA_BEAST_IMAGE_URL,
+        label: 'Sea Beast',
+        subtitle: 'Organic Boss Leviathan · Sculpted Scales, Fangs & Glowing Eyes',
+      },
+    ],
+    systemsIncluded: [
+      'Highly Polished Chair',
+      'Sea Beast Boss Model',
+      'Clean Mesh Topology',
+      'UV Unwrapping & Texturing',
+      'Optimized Triangle Budget',
+      'Roblox Studio Import Ready',
+    ],
+    technicalHighlights: [
+      {
+        label: 'Highly Polished Chair (Environment Prop)',
+        detail: 'Crisp slatted backrest and seat geometry with warm, worn wood-grain texturing and smooth edge bevels for detailed interiors and exteriors.',
+      },
+      {
+        label: 'Sea Beast (Organic Boss Creature)',
+        detail: 'Sculpted serpentine sea monster featuring glowing crimson eyes, layered dorsal fin ridges, razor-sharp teeth, and an intimidating boss silhouette.',
+      },
+      {
+        label: 'Optimized Low & Mid-Poly Topology',
+        detail: 'Engineered in Blender for smooth Roblox client frame rates without sacrificing silhouette detail or surface shading.',
+      },
+      {
+        label: 'Clean UVs & Surface Appearance',
+        detail: 'Baked textures and surface maps imported cleanly into Roblox Studio with accurate scale and collision geometry.',
+      },
+    ],
+  },
 ];
 
 export function getDemosByCategory(category: PreviousWorkCategory | 'all'): PreviousWorkDemo[] {
   if (category === 'all') return PREVIOUS_WORK_DEMOS;
   return PREVIOUS_WORK_DEMOS.filter((demo) => demo.category === category);
 }
+
+export interface SfxTrimmedProfile {
+  id: 'click' | 'page-change';
+  youtubeUrl: string;
+  videoId: string;
+  title: string;
+  originalDurationSec: number;
+  activeStartSec: number;
+  activeEndSec: number;
+  trimmedDurationSec: number;
+  localTrimmedUrl: string;
+}
+
+export const SFX_AUDIO_CONFIG: Record<'click' | 'page-change', SfxTrimmedProfile> = {
+  click: {
+    id: 'click',
+    youtubeUrl: 'https://youtu.be/nUsHboYC5zc',
+    videoId: 'nUsHboYC5zc',
+    title: 'Click Sound Effect',
+    originalDurationSec: 6.0,
+    activeStartSec: 0.85,
+    activeEndSec: 0.922,
+    trimmedDurationSec: 0.072,
+    localTrimmedUrl: '/assets/sfx/click_trimmed.wav',
+  },
+  'page-change': {
+    id: 'page-change',
+    youtubeUrl: 'https://youtu.be/y8BpZl32S-Q',
+    videoId: 'y8BpZl32S-Q',
+    title: 'Camera Flash Sound Effect | Cinematic Photo Flash SFX',
+    originalDurationSec: 5.0,
+    activeStartSec: 0.45,
+    activeEndSec: 1.1,
+    trimmedDurationSec: 0.65,
+    localTrimmedUrl: '/assets/sfx/camera_flash_trimmed.wav',
+  },
+};
+
+
 
 
 

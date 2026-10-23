@@ -9,6 +9,9 @@ import {
   COMBAT_SYSTEM_ASSET_URL,
   WALK_ANIMATION_VIDEO_URL,
   VIRAL_GAME_UI_IMAGE_URL,
+  MODELING_CHAIR_IMAGE_URL,
+  MODELING_SEA_BEAST_IMAGE_URL,
+  SFX_AUDIO_CONFIG,
   getDemosByCategory,
   scrambleText,
   calculateCommissionBreakdown,
@@ -209,8 +212,44 @@ test('PREVIOUS_WORK_DEMOS contains Scripting Combat System and Animation Walk Cy
   assert.equal(uiDemo.imageUrl, VIRAL_GAME_UI_IMAGE_URL);
   assert.equal(uiDemo.description.includes('Viral Game UI made by Balo_xio'), true);
 
-  assert.equal(PREVIOUS_WORK_DEMOS.length, 3);
+  const modelingDemos = getDemosByCategory('modeling');
+  assert.equal(modelingDemos.length, 1);
+  const modelingDemo = modelingDemos[0];
+  assert.equal(modelingDemo.title, 'Highly Polished Chair & Sea Beast');
+  assert.equal(modelingDemo.galleryImages?.length, 2);
+  assert.equal(modelingDemo.galleryImages?.[0].url, MODELING_CHAIR_IMAGE_URL);
+  assert.equal(modelingDemo.galleryImages?.[0].label, 'Highly Polished Chair');
+  assert.equal(modelingDemo.galleryImages?.[1].url, MODELING_SEA_BEAST_IMAGE_URL);
+  assert.equal(modelingDemo.galleryImages?.[1].label, 'Sea Beast');
+
+  assert.equal(PREVIOUS_WORK_DEMOS.length, 4);
 });
+
+test('SFX_AUDIO_CONFIG defines exact trimmed active audio windows for click and page-change YouTube links', () => {
+  const clickCfg = SFX_AUDIO_CONFIG.click;
+  assert.equal(clickCfg.youtubeUrl, 'https://youtu.be/nUsHboYC5zc');
+  assert.equal(clickCfg.videoId, 'nUsHboYC5zc');
+  assert.equal(clickCfg.activeStartSec > 0, true);
+  assert.equal(clickCfg.activeEndSec < clickCfg.originalDurationSec, true);
+  assert.equal(
+    Math.abs(clickCfg.activeEndSec - clickCfg.activeStartSec - clickCfg.trimmedDurationSec) < 0.001,
+    true
+  );
+  assert.equal(clickCfg.localTrimmedUrl, '/assets/sfx/click_trimmed.wav');
+
+  const pageCfg = SFX_AUDIO_CONFIG['page-change'];
+  assert.equal(pageCfg.youtubeUrl, 'https://youtu.be/y8BpZl32S-Q');
+  assert.equal(pageCfg.videoId, 'y8BpZl32S-Q');
+  assert.equal(pageCfg.activeStartSec > 0, true);
+  assert.equal(pageCfg.activeEndSec < pageCfg.originalDurationSec, true);
+  assert.equal(
+    Math.abs(pageCfg.activeEndSec - pageCfg.activeStartSec - pageCfg.trimmedDurationSec) < 0.001,
+    true
+  );
+  assert.equal(pageCfg.localTrimmedUrl, '/assets/sfx/camera_flash_trimmed.wav');
+});
+
+
 
 
 
