@@ -496,6 +496,132 @@
     </footer>
 
     <!-- =====================================================================
+         ROBLOX GAMEPASS CREATION UNLOCK BOT MODAL
+         ===================================================================== -->
+    <div
+      id="gamepass-unlock-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="gp-modal-title"
+      class="hidden-view fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 sm:p-6 overflow-y-auto"
+    >
+      <div class="relative w-full max-w-2xl bg-zinc-950 border border-white/15 rounded-xl shadow-2xl overflow-hidden my-8">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-900/60">
+          <div>
+            <p class="text-xs font-mono text-emerald-400">
+              Roblox Gamepass Verification Bot · Instant Link Unlock
+            </p>
+            <h2 id="gp-modal-title" class="font-display text-xl font-bold text-white">
+              Buy Gamepass to Unlock Creation Link
+            </h2>
+          </div>
+          <button
+            type="button"
+            data-close-gamepass="true"
+            aria-label="Close Gamepass unlock modal"
+            class="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white bg-zinc-900 rounded border border-white/10 cursor-pointer"
+          >
+            Close [ESC]
+          </button>
+        </div>
+
+        <div class="p-6 space-y-5 max-h-[82vh] overflow-y-auto">
+          <!-- Selected Creation Summary Banner -->
+          <div class="p-4 rounded-lg bg-zinc-900/80 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div id="gp-creation-category" class="text-xs font-mono text-emerald-400">
+                SCRIPTING WORK
+              </div>
+              <div id="gp-creation-title" class="font-display text-lg font-bold text-white mt-0.5">
+                The Combat System By Balo_xio
+              </div>
+              <div id="gp-pass-id-label" class="text-xs font-mono text-zinc-400 mt-0.5">
+                Roblox Gamepass ID: #2053169441 · Unlocks Official Roblox Creator Store Link
+              </div>
+            </div>
+            <div class="sm:text-right shrink-0">
+              <div class="text-xs font-mono text-zinc-400">Gamepass Price</div>
+              <div id="gp-creation-price" class="font-display text-2xl font-bold text-emerald-400 tabular-nums">
+                3,500 R$
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1: Enter Roblox Username -->
+          <div class="space-y-2">
+            <label for="gp-roblox-username" class="block text-xs font-mono text-zinc-300">
+              Step 1. Enter Your Roblox Username (Bot Checks Your Inventory) *
+            </label>
+            <div class="flex gap-2">
+              <input
+                id="gp-roblox-username"
+                type="text"
+                placeholder="e.g. tpjerry6789"
+                class="flex-1 px-3.5 py-2.5 text-sm bg-zinc-900 border border-white/15 rounded-md text-white focus:outline-none focus:border-emerald-400"
+              />
+              <button
+                id="gp-lookup-btn"
+                type="button"
+                class="px-4 py-2.5 text-xs font-mono font-semibold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 rounded-md cursor-pointer whitespace-nowrap shrink-0"
+              >
+                Connect Account
+              </button>
+            </div>
+            <div id="gp-avatar-preview"></div>
+          </div>
+
+          <!-- Step 2: Redirect to Buy Gamepass & Return to Unlock Link -->
+          <div class="p-4 rounded-lg bg-zinc-900/50 border border-white/10 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-mono text-zinc-300">
+                Step 2. Purchase Gamepass on Roblox &amp; Verify to Unlock Link
+              </span>
+              <span id="gp-auto-listen-badge" class="text-[11px] font-mono text-emerald-400">
+                Auto-Check on Tab Return: Ready
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <a
+                id="gp-buy-redirect-link"
+                href="https://www.roblox.com/game-pass/2053169441"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 rounded-md transition-colors whitespace-nowrap"
+              >
+                <span id="gp-buy-btn-text">1. Buy Gamepass on Roblox (3,500 R$)</span>
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+              </a>
+
+              <button
+                id="gp-verify-btn"
+                type="button"
+                class="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-mono font-semibold text-white bg-zinc-800 hover:bg-zinc-700 border border-emerald-500/40 rounded-md transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <span>2. Verify Gamepass &amp; Unlock Link</span>
+              </button>
+            </div>
+
+            <div class="pt-1">
+              <label for="gp-claim-code" class="block text-[11px] font-mono text-zinc-400 mb-1">
+                Optional: Have a Private Inventory or Instant Claim Passcode?
+              </label>
+              <input
+                id="gp-claim-code"
+                type="text"
+                placeholder="Optional claim code (e.g. BALO-GAMEPASS-VERIFIED)"
+                class="w-full px-3 py-2 text-xs font-mono bg-zinc-950 border border-white/10 rounded text-zinc-200 focus:outline-none focus:border-emerald-400"
+              />
+            </div>
+          </div>
+
+          <!-- Bot Verification Status Banner -->
+          <div id="gp-bot-status" class="hidden-view"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================================
          UI DESIGN FULLSCREEN LIGHTBOX MODAL
          ===================================================================== -->
     <div
@@ -517,7 +643,7 @@
             aria-label="Close fullscreen preview"
             class="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white bg-zinc-900 border border-white/10 rounded-md cursor-pointer"
           >
-            ✕ Close
+            Close [ESC]
           </button>
         </div>
         <div class="p-6 flex items-center justify-center bg-[#050706]">

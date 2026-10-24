@@ -345,7 +345,13 @@ export interface PreviousWorkDemo {
   imageUrl?: string;
   galleryImages?: PreviousWorkGalleryImage[];
   tryAssetUrl?: string;
+  unlockLinkUrl: string;
   assetId?: string;
+  gamePassId: string;
+  gamePassPriceRobux: number;
+  gamePassUrl: string;
+  unlockFileName: string;
+  unlockFileContent: string;
   systemsIncluded: string[];
   technicalHighlights: { label: string; detail: string }[];
 }
@@ -381,7 +387,13 @@ export const PREVIOUS_WORK_DEMOS: PreviousWorkDemo[] = [
     mediaType: 'video',
     videoUrl: '/assets/aistudio/1023_0f48f1c9.mp4',
     tryAssetUrl: COMBAT_SYSTEM_ASSET_URL,
+    unlockLinkUrl: COMBAT_SYSTEM_ASSET_URL,
     assetId: '113210150229519',
+    gamePassId: '2053169441',
+    gamePassPriceRobux: 3500,
+    gamePassUrl: 'https://www.roblox.com/game-pass/2053169441',
+    unlockFileName: 'Roblox Creator Store Asset Link',
+    unlockFileContent: COMBAT_SYSTEM_ASSET_URL,
     systemsIncluded: [
       'Headshot System',
       'Hit Markers',
@@ -423,6 +435,12 @@ export const PREVIOUS_WORK_DEMOS: PreviousWorkDemo[] = [
       'A cinematic walk animation made by Balo_xio featuring synchronized cinematic camera animation, weighty R6 stride pacing, natural upper-torso counter-rotation, and smooth keyframe easing crafted for cutscenes and character entrances.',
     mediaType: 'video',
     videoUrl: WALK_ANIMATION_VIDEO_URL,
+    unlockLinkUrl: COMBAT_SYSTEM_ASSET_URL,
+    gamePassId: '2053169441',
+    gamePassPriceRobux: 800,
+    gamePassUrl: 'https://www.roblox.com/game-pass/2053169441',
+    unlockFileName: 'Roblox Creator Store Asset Link',
+    unlockFileContent: COMBAT_SYSTEM_ASSET_URL,
     systemsIncluded: [
       'Cinematic Walk Cycle',
       'Cinematic Camera Animation',
@@ -464,6 +482,12 @@ export const PREVIOUS_WORK_DEMOS: PreviousWorkDemo[] = [
       'A polished Viral Game UI made by Balo_xio—featuring a glossy sky-blue beveled shop header with custom 3D basket iconography, a high-contrast tactile close button, dual cyan-glow inset grid containers for gamepasses and item bundles, and responsive Scale layouts built for Desktop, Mobile, and Console.',
     mediaType: 'image',
     imageUrl: VIRAL_GAME_UI_IMAGE_URL,
+    unlockLinkUrl: COMBAT_SYSTEM_ASSET_URL,
+    gamePassId: '2053169441',
+    gamePassPriceRobux: 1000,
+    gamePassUrl: 'https://www.roblox.com/game-pass/2053169441',
+    unlockFileName: 'Roblox Creator Store Asset Link',
+    unlockFileContent: COMBAT_SYSTEM_ASSET_URL,
     systemsIncluded: [
       'Glossy Beveled Header',
       'Dual Cyan-Glow Item Grids',
@@ -505,6 +529,12 @@ export const PREVIOUS_WORK_DEMOS: PreviousWorkDemo[] = [
       'A dual 3D modeling showcase by Balo_xio demonstrating versatility across both detailed environment props and organic boss creatures—featuring a Highly Polished Chair with warm hand-painted wood grain and slatted joinery, alongside a menacing Sea Beast leviathan sculpted with glowing crimson eyes, jagged multi-row fangs, and optimized Roblox Studio mesh topology.',
     mediaType: 'image',
     imageUrl: MODELING_SEA_BEAST_IMAGE_URL,
+    unlockLinkUrl: COMBAT_SYSTEM_ASSET_URL,
+    gamePassId: '2053169441',
+    gamePassPriceRobux: 2500,
+    gamePassUrl: 'https://www.roblox.com/game-pass/2053169441',
+    unlockFileName: 'Roblox Creator Store Asset Link',
+    unlockFileContent: COMBAT_SYSTEM_ASSET_URL,
     galleryImages: [
       {
         url: MODELING_CHAIR_IMAGE_URL,
@@ -750,6 +780,35 @@ export function formatCommissionEmailPayload(
     message: alignedSummaryBlock,
   };
 }
+
+export const UNLOCKED_CREATIONS_STORAGE_KEY = 'balo_xio_unlocked_creations_v1';
+
+export function getRobloxGamepassCheckoutUrl(gamePassId: string): string {
+  const cleanId = String(gamePassId || '').replace(/[^0-9]/g, '');
+  return `https://www.roblox.com/game-pass/${cleanId || '2053169441'}`;
+}
+
+export function getRobloxInventoryCheckUrl(userId: string, gamePassId: string): string {
+  const cleanUser = String(userId || '').replace(/[^0-9]/g, '');
+  const cleanPass = String(gamePassId || '').replace(/[^0-9]/g, '');
+  return `https://inventory.roblox.com/v1/users/${cleanUser}/items/GamePass/${cleanPass}`;
+}
+
+export function evaluateGamepassOwnershipResponse(
+  inventoryApiPayload: unknown,
+  targetGamePassId: string
+): boolean {
+  if (!inventoryApiPayload || typeof inventoryApiPayload !== 'object') {
+    return false;
+  }
+  const record = inventoryApiPayload as { data?: Array<{ id?: number | string; instanceId?: number | string }> };
+  if (!Array.isArray(record.data) || record.data.length === 0) {
+    return false;
+  }
+  const cleanTarget = String(targetGamePassId || '').trim();
+  return record.data.some((item) => String(item.id) === cleanTarget);
+}
+
 
 
 

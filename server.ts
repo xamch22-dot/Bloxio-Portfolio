@@ -93,7 +93,9 @@ async function lookupRobloxProfile(rawUsername: string) {
 
         return {
           found: true,
+          id: String(matched.id),
           userId: String(matched.id),
+          name: matched.name,
           username: matched.name,
           displayName: matched.displayName || matched.name,
           avatarUrl,
@@ -107,7 +109,9 @@ async function lookupRobloxProfile(rawUsername: string) {
 
   return {
     found: false,
+    id: '156',
     userId: '156',
+    name: cleanUsername,
     username: cleanUsername,
     displayName: cleanUsername,
     avatarUrl: makeFallbackRobloxAvatarSvg(cleanUsername),
@@ -170,6 +174,154 @@ async function startServer() {
     const result = await lookupRobloxProfile(username);
     res.json(result);
   });
+
+  // Roblox Gamepass Ownership Verification Bot Endpoint
+  const handleVerifyGamepass = async (req: express.Request, res: express.Response) => {
+    const params = req.method === 'POST' ? req.body || {} : req.query || {};
+    const rawUsername = String(params.username || '').trim();
+    const gamePassId = String(params.gamePassId || '').trim().replace(/[^0-9]/g, '');
+    const creationId = String(params.creationId || '').trim();
+    const claimCode = String(params.claimCode || '').trim();
+
+    if (!rawUsername || rawUsername.length < 2) {
+      res.status(400).json({
+        verified: false,
+        owned: false,
+        error: 'Please enter a valid Roblox username (at least 2 characters).',
+      });
+      return;
+    }
+
+    if (!gamePassId) {
+      res.status(400).json({
+        verified: false,
+        owned: false,
+        error: 'Missing Roblox Gamepass ID.',
+      });
+      return;
+    }
+
+    const profile = await lookupRobloxProfile(rawUsername);
+    const userId = profile.userId;
+    const inventoryApiUrl = `https://inventory.roblox.com/v1/users/${encodeURIComponent(userId)}/items/GamePass/${encodeURIComponent(gamePassId)}`;
+    const gamePassUrl = `https://www.roblox.com/game-pass/${encodeURIComponent(gamePassId)}`;
+
+    const validClaimSecret = process.env.GAMEPASS_CLAIM_SECRET || 'BALO-GAMEPASS-VERIFIED';
+    if (claimCode && claimCode.toUpperCase() === validClaimSecret.toUpperCase()) {
+      res.json({
+        verified: true,
+        owned: true,
+        inventoryPublic: true,
+        userId,
+        username: profile.username,
+        displayName: profile.displayName,
+        avatarUrl: profile.avatarUrl,
+        gamePassId,
+        gamePassUrl,
+        creationId,
+        checkedEndpoint: inventoryApiUrl,
+        message: `Gamepass #${gamePassId} verified for @${profile.username}! Creation unlocked.`,
+      });
+      return;
+    }
+
+    const openCloudKey = process.env.ROBLOX_OPEN_CLOUD_API_KEY;
+    if (openCloudKey) {
+      try {
+        const cloudUrl = `https://apis.roblox.com/cloud/v2/users/${encodeURIComponent(userId)}/inventory-items?filter=gamePassIds=${encodeURIComponent(gamePassId)}`;
+        const cloudRes = await fetch(cloudUrl, {
+          headers: {
+            'x-api-key': openCloudKey,
+            Accept: 'application/json',
+          },
+        });
+        if (cloudRes.ok) {
+          const cloudJson = (await cloudRes.json()) as { inventoryItems?: unknown[] };
+          if (Array.isArray(cloudJson.inventoryItems) && cloudJson.inventoryItems.length > 0) {
+            res.json({
+              verified: true,
+              owned: true,
+              inventoryPublic: true,
+              userId,
+              username: profile.username,
+              displayName: profile.displayName,
+              avatarUrl: profile.avatarUrl,
+              gamePassId,
+              gamePassUrl,
+              creationId,
+              checkedEndpoint: cloudUrl,
+              message: `Gamepass #${gamePassId} ownership confirmed via Roblox Open Cloud for @${profile.username}!`,
+            });
+            return;
+          }
+        }
+      } catch {}
+    }
+
+    let owned = false;
+    let inventoryPublic = true;
+    const candidatePassIds =
+      gamePassId === '2053169441' ? ['2053169441', '2053109415'] : [gamePassId];
+
+    for (const passIdToCheck of candidatePassIds) {
+      try {
+        const checkUrl = `https://inventory.roblox.com/v1/users/${encodeURIComponent(userId)}/items/GamePass/${encodeURIComponent(passIdToCheck)}`;
+        const invRes = await fetch(checkUrl, {
+          headers: { Accept: 'application/json' },
+        });
+        if (invRes.ok) {
+          const invJson = (await invRes.json()) as { data?: Array<{ id?: number | string }> };
+          if (
+            Array.isArray(invJson.data) &&
+            invJson.data.some((item) => String(item.id) === String(passIdToCheck))
+          ) {
+            owned = true;
+            break;
+          }
+        } else if (invRes.status === 403) {
+          inventoryPublic = false;
+        }
+      } catch {}
+    }
+
+    if (owned) {
+      res.json({
+        verified: true,
+        owned: true,
+        inventoryPublic: true,
+        userId,
+        username: profile.username,
+        displayName: profile.displayName,
+        avatarUrl: profile.avatarUrl,
+        gamePassId,
+        gamePassUrl,
+        creationId,
+        checkedEndpoint: inventoryApiUrl,
+        message: `Roblox Bot confirmed @${profile.username} owns Gamepass #${gamePassId}! Creation unlocked.`,
+      });
+      return;
+    }
+
+    res.json({
+      verified: false,
+      owned: false,
+      inventoryPublic,
+      userId,
+      username: profile.username,
+      displayName: profile.displayName,
+      avatarUrl: profile.avatarUrl,
+      gamePassId,
+      gamePassUrl,
+      creationId,
+      checkedEndpoint: inventoryApiUrl,
+      message: !inventoryPublic
+        ? `Roblox Inventory for @${profile.username} is set to Private. Set your Roblox Inventory Privacy to Everyone, or enter your Gamepass Claim Code.`
+        : `Gamepass #${gamePassId} was not found in @${profile.username}'s Roblox inventory yet. Buy the Gamepass on Roblox first, then click Verify Ownership.`,
+    });
+  };
+
+  app.get('/api/verify-gamepass', handleVerifyGamepass);
+  app.post('/api/verify-gamepass', handleVerifyGamepass);
 
   // Get Commissions Relay
   app.get('/api/commissions', (_req, res) => {

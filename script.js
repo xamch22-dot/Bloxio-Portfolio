@@ -4,16 +4,35 @@ import {
   VIDEO_LOOP_START_SECONDS,
   DISCIPLINE_EXPERIENCES,
   PREVIOUS_WORK_DEMOS,
+  UNLOCKED_CREATIONS_STORAGE_KEY,
+  getRobloxGamepassCheckoutUrl,
   getPricingTiersForDiscipline,
   calculateCommissionBreakdown,
   scrambleText,
   getDemosByCategory,
 } from './src/utils/portfolioLogic';
 
+function loadUnlockedCreationsMap() {
+  try {
+    const raw = localStorage.getItem(UNLOCKED_CREATIONS_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveUnlockedCreationsMap(map) {
+  try {
+    localStorage.setItem(UNLOCKED_CREATIONS_STORAGE_KEY, JSON.stringify(map));
+  } catch {}
+}
+
 // Application State (Vanilla JS)
 const state = {
   activeView: 'portfolio', // 'portfolio' | 'previous-work'
-  demoSubPage: 'all', // 'all' | 'scripting' | 'animating' | 'ui-design'
+  demoSubPage: 'all', // 'all' | 'scripting' | 'animating' | 'ui-design' | 'modeling'
   selectedDiscipline: 'all-rounder', // 'all-rounder' | 'scripting' | 'ui-design' | 'modeling' | 'animating'
   selectedContract: 'commission', // 'commission' | 'short-term' | 'long-term'
   selectedCurrency: 'USD', // 'USD' | 'ROBUX'
@@ -21,6 +40,10 @@ const state = {
   activeSentenceIdx: 0,
   sentenceProgress: 0,
   sentenceStartTime: performance.now(),
+  unlockedCreations: loadUnlockedCreationsMap(),
+  activeGamepassDemo: null,
+  awaitingRobloxTabReturn: false,
+  lookedUpRobloxUser: null,
 };
 
 // Format helper
@@ -535,6 +558,10 @@ function renderPreviousWorkDemos() {
             </div>
           `;
 
+      const unlockRecord = state.unlockedCreations[demo.id] || null;
+      const isUnlocked = Boolean(unlockRecord);
+      const targetUnlockUrl = demo.unlockLinkUrl || demo.tryAssetUrl || 'https://create.roblox.com/store/asset/113210150229519?viewFromStudio=true&keyword=&searchId=18788722-cf9d-4565-9e61-ae99826d0e18';
+
       return `
         <section id="demo-${demo.category}" aria-labelledby="heading-${demo.id}" class="py-12 border-b border-white/10">
           <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -542,14 +569,28 @@ function renderPreviousWorkDemos() {
               <p class="text-xs font-mono text-emerald-400 mb-1.5">${demo.index}. ${demo.categoryLabel} Section</p>
               <h2 id="heading-${demo.id}" class="font-display text-2xl sm:text-4xl font-bold tracking-tight text-white text-balance">${demo.title}</h2>
             </div>
-            ${
-              demo.tryAssetUrl
-                ? `<a href="${demo.tryAssetUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto">
-                    <span>Try Combat System on Roblox</span>
-                    ${ARROW_UP_RIGHT_SVG}
-                  </a>`
-                : ''
-            }
+            <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+              ${
+                isUnlocked
+                  ? `<a
+                      href="${targetUnlockUrl}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0"
+                    >
+                      <span>Unlocked · Open Roblox Asset Link</span>
+                      ${ARROW_UP_RIGHT_SVG}
+                    </a>`
+                  : `<button
+                      type="button"
+                      data-open-gamepass="${demo.id}"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <span>Locked Link · Buy Gamepass (${formatNumber(demo.gamePassPriceRobux || 3500)} R$) to Unlock</span>
+                      ${ARROW_UP_RIGHT_SVG}
+                    </button>`
+              }
+            </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
@@ -580,19 +621,78 @@ function renderPreviousWorkDemos() {
               </div>
 
               <div class="pt-2 space-y-3">
-                ${
-                  demo.tryAssetUrl
-                    ? `<div class="flex flex-wrap items-center gap-3">
-                        <a href="${demo.tryAssetUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0">
-                          <span>Try Combat System (Roblox Studio)</span>
+                <div
+                  id="unlocked-link-box-${demo.id}"
+                  class="p-4 rounded-lg ${
+                    isUnlocked
+                      ? 'bg-emerald-950/35 border border-emerald-400/50'
+                      : 'bg-zinc-900/80 border border-white/15'
+                  } space-y-3"
+                >
+                  <div class="flex items-center justify-between gap-2 text-xs font-mono">
+                    <span class="${isUnlocked ? 'text-emerald-400' : 'text-amber-400'} font-semibold">
+                      ${
+                        isUnlocked
+                          ? `[UNLOCKED] ASSET LINK READY · @${unlockRecord.robloxUsername || 'VERIFIED'}`
+                          : `[LOCKED LINK] GAMEPASS #${demo.gamePassId || '2053169441'}`
+                      }
+                    </span>
+                    <span class="text-white font-bold tabular-nums">${formatNumber(demo.gamePassPriceRobux || 3500)} R$</span>
+                  </div>
+
+                  ${
+                    isUnlocked
+                      ? `
+                        <p class="text-xs text-zinc-200 leading-relaxed">
+                          Gamepass verified! Your official Roblox Creator Store link is now unlocked below:
+                        </p>
+                        <div class="p-3 rounded bg-zinc-950 border border-emerald-500/40">
+                          <div class="text-[11px] font-mono text-emerald-400 mb-1">Unlocked Roblox Creator Store Asset URL:</div>
+                          <a
+                            href="${targetUnlockUrl}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="block text-xs font-mono text-white hover:text-emerald-300 break-all underline underline-offset-4"
+                          >${targetUnlockUrl}</a>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                          <a
+                            href="${targetUnlockUrl}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 text-xs sm:text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap"
+                          >
+                            <span>Open Unlocked Asset Link</span>
+                            ${ARROW_UP_RIGHT_SVG}
+                          </a>
+                          <button
+                            type="button"
+                            data-copy-asset="${targetUnlockUrl}"
+                            class="inline-flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-mono font-medium text-zinc-200 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/15 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                          >
+                            <span>Copy Unlocked Link</span>
+                          </button>
+                        </div>
+                      `
+                      : `
+                        <p class="text-xs text-zinc-300 leading-relaxed">
+                          This Roblox Creator Store asset link is <strong class="text-white">locked</strong>. Purchase the Gamepass on Roblox and verify ownership—the buying menu will automatically close and unlock the link right here.
+                        </p>
+                        <div class="p-3 rounded bg-zinc-950/90 border border-white/10 flex items-center justify-between gap-2 text-xs font-mono text-zinc-400 select-none">
+                          <span class="truncate">https://create.roblox.com/store/asset/••••••••••••••• (Locked)</span>
+                          <span class="text-amber-400 shrink-0">LOCKED</span>
+                        </div>
+                        <button
+                          type="button"
+                          data-open-gamepass="${demo.id}"
+                          class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-xs sm:text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors cursor-pointer"
+                        >
+                          <span>Buy Gamepass (${formatNumber(demo.gamePassPriceRobux || 3500)} R$) to Unlock Link</span>
                           ${ARROW_UP_RIGHT_SVG}
-                        </a>
-                        <button type="button" data-copy-asset="${demo.tryAssetUrl}" class="inline-flex items-center justify-center gap-1.5 px-4 py-3.5 text-xs font-mono font-medium text-zinc-200 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/15 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer">
-                          <span>Copy Roblox Link</span>
                         </button>
-                      </div>`
-                    : ''
-                }
+                      `
+                  }
+                </div>
 
                 <div class="p-3.5 rounded-md bg-zinc-900/70 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div class="text-xs text-zinc-300 font-mono">${demo.rateLabel}</div>
@@ -603,16 +703,27 @@ function renderPreviousWorkDemos() {
 
           ${
             demo.tryAssetUrl
-              ? `<div class="mt-8 p-4 rounded-lg bg-zinc-900/50 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div class="space-y-1 min-w-0">
-                    <div class="text-xs font-mono text-emerald-400">Official Roblox Creator Store Link</div>
-                    <a href="${demo.tryAssetUrl}" target="_blank" rel="noopener noreferrer" class="block text-xs font-mono text-zinc-300 hover:text-white truncate underline underline-offset-4">${demo.tryAssetUrl}</a>
-                  </div>
-                  <a href="${demo.tryAssetUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0">
-                    <span>Open in Roblox Creator Store</span>
-                    ${ARROW_UP_RIGHT_SVG}
-                  </a>
-                </div>`
+              ? isUnlocked
+                ? `<div class="mt-8 p-4 rounded-lg bg-emerald-950/20 border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1 min-w-0">
+                      <div class="text-xs font-mono text-emerald-400">[UNLOCKED] Official Roblox Creator Store Link</div>
+                      <a href="${targetUnlockUrl}" target="_blank" rel="noopener noreferrer" class="block text-xs font-mono text-zinc-200 hover:text-white truncate underline underline-offset-4">${targetUnlockUrl}</a>
+                    </div>
+                    <a href="${targetUnlockUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0">
+                      <span>Open in Roblox Creator Store</span>
+                      ${ARROW_UP_RIGHT_SVG}
+                    </a>
+                  </div>`
+                : `<div class="mt-8 p-4 rounded-lg bg-zinc-900/50 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1 min-w-0">
+                      <div class="text-xs font-mono text-amber-400">[LOCKED] Official Roblox Creator Store Link</div>
+                      <div class="text-xs font-mono text-zinc-400 truncate">Link is locked — Buy &amp; verify Gamepass #${demo.gamePassId || '2053169441'} (${formatNumber(demo.gamePassPriceRobux || 3500)} R$) to unlock link</div>
+                    </div>
+                    <button type="button" data-open-gamepass="${demo.id}" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0 cursor-pointer">
+                      <span>Unlock Link (${formatNumber(demo.gamePassPriceRobux || 3500)} R$ Gamepass)</span>
+                      ${ARROW_UP_RIGHT_SVG}
+                    </button>
+                  </div>`
               : ''
           }
         </section>
@@ -656,16 +767,16 @@ function renderPreviousWorkDemos() {
     });
   });
 
-  // Copy asset link
+  // Copy unlocked asset link
   listContainer.querySelectorAll('[data-copy-asset]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const url = btn.getAttribute('data-copy-asset');
       try {
         await navigator.clipboard.writeText(url);
       } catch {}
-      btn.innerHTML = `<span class="text-emerald-400">Link Copied</span>`;
+      btn.innerHTML = `<span class="text-emerald-400">Link Copied!</span>`;
       setTimeout(() => {
-        btn.innerHTML = `<span>Copy Roblox Link</span>`;
+        btn.innerHTML = `<span>Copy Unlocked Link</span>`;
       }, 2000);
     });
   });
@@ -676,6 +787,15 @@ function renderPreviousWorkDemos() {
       const demoId = btn.getAttribute('data-open-lightbox');
       const found = PREVIOUS_WORK_DEMOS.find((d) => d.id === demoId);
       if (found) openImageLightbox(found);
+    });
+  });
+
+  // Open Roblox Gamepass Unlock Bot modal
+  listContainer.querySelectorAll('[data-open-gamepass]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const demoId = btn.getAttribute('data-open-gamepass');
+      const found = PREVIOUS_WORK_DEMOS.find((d) => d.id === demoId);
+      if (found) openGamepassModal(found);
     });
   });
 }
@@ -695,7 +815,225 @@ function openImageLightbox(demo) {
 }
 
 // ============================================================================
-// 6. INITIALIZE ALL EVENT LISTENERS ON DOM READY
+// 6. ROBLOX GAMEPASS CREATION UNLOCK BOT MODAL & AUTO-REDIRECT CHECKER
+// ============================================================================
+function setBotStatusBanner(type, message) {
+  const banner = document.getElementById('gp-bot-status');
+  if (!banner) return;
+  if (!message) {
+    banner.classList.add('hidden-view');
+    banner.innerHTML = '';
+    return;
+  }
+  banner.classList.remove('hidden-view');
+  const colorClasses =
+    type === 'success'
+      ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300'
+      : type === 'error'
+      ? 'bg-red-950/60 border-red-500/50 text-red-300'
+      : 'bg-zinc-900/90 border-white/15 text-zinc-200';
+  banner.className = `p-3.5 rounded-lg border text-xs font-mono leading-relaxed ${colorClasses}`;
+  banner.textContent = message;
+}
+
+function openGamepassModal(demo) {
+  state.activeGamepassDemo = demo;
+  state.awaitingRobloxTabReturn = false;
+
+  const modal = document.getElementById('gamepass-unlock-modal');
+  const catEl = document.getElementById('gp-creation-category');
+  const titleEl = document.getElementById('gp-creation-title');
+  const passIdEl = document.getElementById('gp-pass-id-label');
+  const priceEl = document.getElementById('gp-creation-price');
+  const buyLink = document.getElementById('gp-buy-redirect-link');
+  const buyBtnText = document.getElementById('gp-buy-btn-text');
+  const autoBadge = document.getElementById('gp-auto-listen-badge');
+
+  const gamePassId = demo.gamePassId || '2053169441';
+  const priceRobux = demo.gamePassPriceRobux || 3500;
+  const checkoutUrl = demo.gamePassUrl || getRobloxGamepassCheckoutUrl(gamePassId);
+
+  if (catEl) catEl.textContent = `${demo.categoryLabel.toUpperCase()} · ROBLOX GAMEPASS LINK UNLOCK`;
+  if (titleEl) titleEl.textContent = demo.title;
+  if (passIdEl) {
+    passIdEl.textContent = `Roblox Gamepass ID: #${gamePassId} · Unlocks Official Roblox Creator Store Link`;
+  }
+  if (priceEl) priceEl.textContent = `${formatNumber(priceRobux)} R$`;
+  if (buyLink) buyLink.href = checkoutUrl;
+  if (buyBtnText) buyBtnText.textContent = `1. Buy Gamepass on Roblox (${formatNumber(priceRobux)} R$)`;
+  if (autoBadge) autoBadge.textContent = 'Auto-Check on Tab Return: Ready';
+
+  setBotStatusBanner('', '');
+
+  if (modal) modal.classList.remove('hidden-view');
+}
+
+function closeGamepassModal() {
+  const modal = document.getElementById('gamepass-unlock-modal');
+  if (modal) modal.classList.add('hidden-view');
+  state.awaitingRobloxTabReturn = false;
+}
+
+async function lookupGamepassRobloxUser() {
+  const inputEl = document.getElementById('gp-roblox-username');
+  const previewEl = document.getElementById('gp-avatar-preview');
+  const lookupBtn = document.getElementById('gp-lookup-btn');
+  if (!inputEl || !previewEl) return null;
+
+  const username = inputEl.value.trim();
+  if (!username) {
+    setBotStatusBanner('error', 'Please enter your Roblox username first so the bot can find your account.');
+    inputEl.focus();
+    return null;
+  }
+
+  if (lookupBtn) lookupBtn.textContent = 'Checking...';
+  setBotStatusBanner('info', `[Bot]: Looking up Roblox profile @${username}...`);
+
+  try {
+    const res = await fetch(`/api/roblox-user?username=${encodeURIComponent(username)}`);
+    const data = await res.json();
+    const resolvedId = data?.id || data?.userId;
+    const resolvedName = data?.name || data?.username;
+    if (!res.ok || !data || !resolvedId) {
+      setBotStatusBanner('error', data?.error || `Could not find Roblox user "${username}".`);
+      previewEl.innerHTML = '';
+      return null;
+    }
+
+    const normalizedUser = {
+      ...data,
+      id: String(resolvedId),
+      userId: String(resolvedId),
+      name: String(resolvedName || username),
+      username: String(resolvedName || username),
+      displayName: String(data.displayName || resolvedName || username),
+    };
+    state.lookedUpRobloxUser = normalizedUser;
+    previewEl.innerHTML = `
+      <div class="mt-2 p-2.5 rounded-md bg-zinc-900 border border-emerald-500/30 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          ${
+            normalizedUser.avatarUrl
+              ? `<img src="${normalizedUser.avatarUrl}" alt="${normalizedUser.name}" class="w-9 h-9 rounded-full bg-zinc-800 border border-emerald-400/40 object-cover" />`
+              : `<div class="w-9 h-9 rounded-full bg-emerald-950 border border-emerald-400/40 flex items-center justify-center text-xs font-mono text-emerald-300">R$</div>`
+          }
+          <div>
+            <div class="text-xs font-semibold text-white">${normalizedUser.displayName} (@${normalizedUser.name})</div>
+            <div class="text-[11px] font-mono text-emerald-400">Roblox User ID: ${normalizedUser.id} · Connected to Bot</div>
+          </div>
+        </div>
+        <a href="${normalizedUser.profileUrl}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-mono text-zinc-400 hover:text-white underline">Profile -></a>
+      </div>
+    `;
+    setBotStatusBanner(
+      'info',
+      `[Bot Connected]: Found @${normalizedUser.name} (ID: ${normalizedUser.id}). Now click "1. Buy Gamepass on Roblox" or "2. Verify Gamepass & Unlock Link".`
+    );
+    return normalizedUser;
+  } catch {
+    setBotStatusBanner('error', 'Network error while contacting Roblox lookup API.');
+    return null;
+  } finally {
+    if (lookupBtn) lookupBtn.textContent = 'Connect Account';
+  }
+}
+
+async function verifyGamepassOwnership(isAutoFocusCheck = false) {
+  const demo = state.activeGamepassDemo;
+  if (!demo) return;
+
+  const inputEl = document.getElementById('gp-roblox-username');
+  const claimEl = document.getElementById('gp-claim-code');
+  const verifyBtn = document.getElementById('gp-verify-btn');
+
+  const username = inputEl ? inputEl.value.trim() : '';
+  const claimCode = claimEl ? claimEl.value.trim() : '';
+
+  if (!username) {
+    if (!isAutoFocusCheck) {
+      setBotStatusBanner(
+        'error',
+        'Please enter your Roblox username in Step 1 before verifying Gamepass ownership.'
+      );
+      if (inputEl) inputEl.focus();
+    }
+    return;
+  }
+
+  const gamePassId = demo.gamePassId || '2053169441';
+  if (verifyBtn) verifyBtn.innerHTML = `<span>Bot Checking Inventory...</span>`;
+  setBotStatusBanner(
+    'info',
+    `[Bot Verifying]: Checking Roblox Inventory of @${username} for Gamepass #${gamePassId}...`
+  );
+
+  try {
+    const res = await fetch('/api/verify-gamepass', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        userId:
+          state.lookedUpRobloxUser &&
+          (state.lookedUpRobloxUser.name || '').toLowerCase() === username.toLowerCase()
+            ? state.lookedUpRobloxUser.id
+            : undefined,
+        gamePassId,
+        claimCode,
+      }),
+    });
+
+    const data = await res.json();
+    if (data && (data.user || data.userId)) {
+      state.lookedUpRobloxUser = data.user || {
+        id: data.userId,
+        userId: data.userId,
+        name: data.username || username,
+        username: data.username || username,
+        displayName: data.displayName || data.username || username,
+        avatarUrl: data.avatarUrl,
+      };
+    }
+
+    if (res.ok && data && data.verified) {
+      const unlockRecord = {
+        demoId: demo.id,
+        gamePassId,
+        robloxUsername: data.username || data.user?.name || username,
+        robloxUserId: data.userId || data.user?.id || '',
+        verificationMethod: data.verificationMethod || 'Roblox Inventory API',
+        unlockedAt: data.verifiedAt || new Date().toISOString(),
+      };
+      state.unlockedCreations[demo.id] = unlockRecord;
+      saveUnlockedCreationsMap(state.unlockedCreations);
+      state.awaitingRobloxTabReturn = false;
+
+      // Shut the buying menu immediately and unlock the link on the page
+      closeGamepassModal();
+      renderPreviousWorkDemos();
+
+      const unlockedBox = document.getElementById(`unlocked-link-box-${demo.id}`);
+      if (unlockedBox) {
+        unlockedBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else {
+      setBotStatusBanner(
+        'error',
+        data?.message ||
+          data?.error ||
+          `Gamepass #${gamePassId} was not detected in @${username}'s public inventory yet.`
+      );
+    }
+  } catch {
+    setBotStatusBanner('error', 'Could not reach /api/verify-gamepass. Please try again.');
+  } finally {
+    if (verifyBtn) verifyBtn.innerHTML = `<span>2. Verify Gamepass & Unlock Link</span>`;
+  }
+}
+
+// ============================================================================
+// 7. INITIALIZE ALL EVENT LISTENERS ON DOM READY
 // ============================================================================
 function initApp() {
   initHeroVideoAndHackerSequence();
@@ -736,6 +1074,51 @@ function initApp() {
       const m = document.getElementById('ui-lightbox-modal');
       if (m) m.classList.add('hidden-view');
     });
+  });
+
+  // Gamepass Modal Controls
+  document.querySelectorAll('[data-close-gamepass]').forEach((btn) => {
+    btn.addEventListener('click', closeGamepassModal);
+  });
+
+  const gpLookupBtn = document.getElementById('gp-lookup-btn');
+  if (gpLookupBtn) {
+    gpLookupBtn.addEventListener('click', () => {
+      lookupGamepassRobloxUser();
+    });
+  }
+
+  const gpBuyLink = document.getElementById('gp-buy-redirect-link');
+  if (gpBuyLink) {
+    gpBuyLink.addEventListener('click', () => {
+      state.awaitingRobloxTabReturn = true;
+      const autoBadge = document.getElementById('gp-auto-listen-badge');
+      if (autoBadge) {
+        autoBadge.textContent = 'Listening for Tab Return from Roblox...';
+      }
+      setBotStatusBanner(
+        'info',
+        '[Redirected to Roblox Gamepass Page]: Complete your purchase on Roblox. When you switch back to this tab, the bot will automatically check your inventory and unlock the link!'
+      );
+    });
+  }
+
+  const gpVerifyBtn = document.getElementById('gp-verify-btn');
+  if (gpVerifyBtn) {
+    gpVerifyBtn.addEventListener('click', () => {
+      verifyGamepassOwnership(false);
+    });
+  }
+
+  // Auto-verify when user returns from the Roblox Gamepass tab
+  window.addEventListener('focus', () => {
+    if (state.awaitingRobloxTabReturn && state.activeGamepassDemo) {
+      const autoBadge = document.getElementById('gp-auto-listen-badge');
+      if (autoBadge) {
+        autoBadge.textContent = 'Returned from Roblox · Auto-Checking...';
+      }
+      verifyGamepassOwnership(true);
+    }
   });
 }
 

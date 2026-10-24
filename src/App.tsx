@@ -45,7 +45,9 @@ export default function App() {
             />
 
             <ExperienceSection
-              onSelectDisciplineForEstimate={(id) => setSelectedDiscipline(id)}
+              onSelectDisciplineForEstimate={(id) =>
+                setSelectedDiscipline(id as CommissionInput['disciplineId'])
+              }
               onOpenDemoSection={(sub) => handleOpenDemoView(sub)}
             />
 

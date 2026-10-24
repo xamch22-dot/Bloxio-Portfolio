@@ -51,7 +51,9 @@ export default async function handler(req, res) {
 
         res.status(200).json({
           found: true,
+          id: String(matched.id),
           userId: String(matched.id),
+          name: matched.name,
           username: matched.name,
           displayName: matched.displayName || matched.name,
           avatarUrl,
@@ -64,7 +66,9 @@ export default async function handler(req, res) {
 
   res.status(200).json({
     found: false,
+    id: '156',
     userId: '156',
+    name: cleanUsername,
     username: cleanUsername,
     displayName: cleanUsername,
     avatarUrl: makeFallbackRobloxAvatarSvg(cleanUsername),

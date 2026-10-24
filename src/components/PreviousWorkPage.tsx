@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
-  ArrowUpRight,
   ExternalLink,
   Copy,
   Check,
@@ -16,8 +15,8 @@ import {
 import {
   PREVIOUS_WORK_DEMOS,
   PreviousWorkDemo,
-  DisciplineId,
-  calculateCommissionBreakdown,
+  UNLOCKED_CREATIONS_STORAGE_KEY,
+  getRobloxGamepassCheckoutUrl,
   getDemosByCategory,
 } from '../utils/portfolioLogic';
 import { playPageChangeSfx } from '../utils/sfxEngine';
@@ -35,6 +34,15 @@ interface LightboxTarget {
   imageUrl: string;
 }
 
+export interface UnlockedCreationRecord {
+  demoId: string;
+  gamePassId: string;
+  robloxUsername: string;
+  robloxUserId: string;
+  verificationMethod: string;
+  unlockedAt: string;
+}
+
 interface PreviousWorkPageProps {
   initialSubPage?: PreviousWorkSubPage;
   onBackToPortfolio: () => void;
@@ -42,12 +50,16 @@ interface PreviousWorkPageProps {
 
 interface DemoCardProps {
   demo: PreviousWorkDemo;
+  unlockRecord?: UnlockedCreationRecord;
   onOpenLightbox: (target: LightboxTarget) => void;
+  onOpenGamepassModal: (demo: PreviousWorkDemo) => void;
 }
 
 const DemoShowcaseCard: React.FC<DemoCardProps> = ({
   demo,
+  unlockRecord,
   onOpenLightbox,
+  onOpenGamepassModal,
 }) => {
   const [copied, setCopied] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -55,10 +67,16 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
   const [imageError, setImageError] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const isUnlocked = Boolean(unlockRecord);
+  const targetUnlockUrl =
+    demo.unlockLinkUrl ||
+    demo.tryAssetUrl ||
+    'https://create.roblox.com/store/asset/113210150229519?viewFromStudio=true&keyword=&searchId=18788722-cf9d-4565-9e61-ae99826d0e18';
+
   const handleCopyAssetLink = async () => {
-    if (!demo.tryAssetUrl) return;
+    if (!isUnlocked) return;
     try {
-      await navigator.clipboard.writeText(demo.tryAssetUrl);
+      await navigator.clipboard.writeText(targetUnlockUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -124,16 +142,27 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
           </h2>
         </div>
 
-        {demo.tryAssetUrl && (
+        {isUnlocked ? (
           <a
-            href={demo.tryAssetUrl}
+            href={targetUnlockUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto"
           >
-            <span>Try Combat System on Roblox</span>
+            <span>Unlocked · Open Roblox Asset Link</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onOpenGamepassModal(demo)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto cursor-pointer"
+          >
+            <span>
+              Locked Link · Buy Gamepass ({demo.gamePassPriceRobux.toLocaleString('en-US')} R$) to Unlock
+            </span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </button>
         )}
       </div>
 
@@ -362,37 +391,105 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
 
           {/* Action Row */}
           <div className="pt-2 space-y-3">
-            {demo.tryAssetUrl && (
-              <div className="flex flex-wrap items-center gap-3">
-                <a
-                  href={demo.tryAssetUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0"
+            <div
+              id={`unlocked-link-box-${demo.id}`}
+              className={`p-4 rounded-lg space-y-3 ${
+                isUnlocked
+                  ? 'bg-emerald-950/35 border border-emerald-400/50'
+                  : 'bg-zinc-900/80 border border-white/15'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2 text-xs font-mono">
+                <span
+                  className={`font-semibold ${
+                    isUnlocked ? 'text-emerald-400' : 'text-amber-400'
+                  }`}
                 >
-                  <span>Try Combat System (Roblox Studio)</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-
-                <button
-                  type="button"
-                  onClick={handleCopyAssetLink}
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-3.5 text-xs font-mono font-medium text-zinc-200 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/15 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 text-emerald-400" />
-                      <span>Link Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      <span>Copy Roblox Link</span>
-                    </>
-                  )}
-                </button>
+                  {isUnlocked
+                    ? `[UNLOCKED] ASSET LINK READY · @${unlockRecord?.robloxUsername || 'VERIFIED'}`
+                    : `[LOCKED LINK] GAMEPASS #${demo.gamePassId || '2053169441'}`}
+                </span>
+                <span className="text-white font-bold tabular-nums">
+                  {demo.gamePassPriceRobux.toLocaleString('en-US')} R$
+                </span>
               </div>
-            )}
+
+              {isUnlocked ? (
+                <>
+                  <p className="text-xs text-zinc-200 leading-relaxed">
+                    Gamepass verified! Your official Roblox Creator Store link is now unlocked below:
+                  </p>
+                  <div className="p-3 rounded bg-zinc-950 border border-emerald-500/40">
+                    <div className="text-[11px] font-mono text-emerald-400 mb-1">
+                      Unlocked Roblox Creator Store Asset URL:
+                    </div>
+                    <a
+                      href={targetUnlockUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-xs font-mono text-white hover:text-emerald-300 break-all underline underline-offset-4"
+                    >
+                      {targetUnlockUrl}
+                    </a>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <a
+                      href={targetUnlockUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0"
+                    >
+                      <span>Open Unlocked Asset Link</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={handleCopyAssetLink}
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-3.5 text-xs font-mono font-medium text-zinc-200 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/15 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-400" />
+                          <span>Link Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>Copy Unlocked Link</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs text-zinc-300 leading-relaxed">
+                    This Roblox Creator Store asset link is{' '}
+                    <strong className="text-white">locked</strong>. Purchase the Gamepass on Roblox
+                    and verify ownership—the buying menu will automatically close and unlock the
+                    link right here.
+                  </p>
+                  <div className="p-3 rounded bg-zinc-950/90 border border-white/10 flex items-center justify-between gap-2 text-xs font-mono text-zinc-400 select-none">
+                    <span className="truncate">
+                      https://create.roblox.com/store/asset/••••••••••••••• (Locked)
+                    </span>
+                    <span className="text-amber-400 shrink-0">LOCKED</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onOpenGamepassModal(demo)}
+                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-xs sm:text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors cursor-pointer"
+                  >
+                    <span>
+                      Buy Gamepass ({demo.gamePassPriceRobux.toLocaleString('en-US')} R$) to Unlock
+                      Link
+                    </span>
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+            </div>
 
             <div className="p-3.5 rounded-md bg-zinc-900/70 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="text-xs text-zinc-300 font-mono">{demo.rateLabel}</div>
@@ -402,36 +499,71 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
       </div>
 
       {/* Direct Store URL Reference Strip for Scripting Combat System */}
-      {demo.tryAssetUrl && (
-        <div className="mt-8 p-4 rounded-lg bg-zinc-900/50 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1 min-w-0">
-            <div className="text-xs font-mono text-emerald-400">
-              Official Roblox Creator Store Link
+      {demo.tryAssetUrl &&
+        (isUnlocked ? (
+          <div className="mt-8 p-4 rounded-lg bg-emerald-950/20 border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1 min-w-0">
+              <div className="text-xs font-mono text-emerald-400">
+                [UNLOCKED] Official Roblox Creator Store Link
+              </div>
+              <a
+                href={targetUnlockUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-xs font-mono text-zinc-200 hover:text-white truncate underline underline-offset-4"
+              >
+                {targetUnlockUrl}
+              </a>
             </div>
+
             <a
-              href={demo.tryAssetUrl}
+              href={targetUnlockUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-xs font-mono text-zinc-300 hover:text-white truncate underline underline-offset-4"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0"
             >
-              {demo.tryAssetUrl}
+              <span>Open in Roblox Creator Store</span>
+              <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
+        ) : (
+          <div className="mt-8 p-4 rounded-lg bg-zinc-900/50 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1 min-w-0">
+              <div className="text-xs font-mono text-amber-400">
+                [LOCKED] Official Roblox Creator Store Link
+              </div>
+              <div className="text-xs font-mono text-zinc-400 truncate">
+                Link is locked — Buy &amp; verify Gamepass #{demo.gamePassId || '2053169441'} (
+                {demo.gamePassPriceRobux.toLocaleString('en-US')} R$) to unlock link
+              </div>
+            </div>
 
-          <a
-            href={demo.tryAssetUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0"
-          >
-            <span>Open in Roblox Creator Store</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </div>
-      )}
+            <button
+              type="button"
+              onClick={() => onOpenGamepassModal(demo)}
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <span>
+                Unlock Link ({demo.gamePassPriceRobux.toLocaleString('en-US')} R$ Gamepass)
+              </span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ))}
     </section>
   );
 };
+
+function loadInitialUnlockedMap(): Record<string, UnlockedCreationRecord> {
+  try {
+    const raw = localStorage.getItem(UNLOCKED_CREATIONS_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
 
 export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
   initialSubPage = 'all',
@@ -439,10 +571,97 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
 }) => {
   const [activeSubPage, setActiveSubPage] = useState<PreviousWorkSubPage>(initialSubPage);
   const [lightboxTarget, setLightboxTarget] = useState<LightboxTarget | null>(null);
+  const [unlockedMap, setUnlockedMap] = useState<Record<string, UnlockedCreationRecord>>(() =>
+    loadInitialUnlockedMap()
+  );
+  const [activeGamepassDemo, setActiveGamepassDemo] = useState<PreviousWorkDemo | null>(null);
+  const [robloxUsername, setRobloxUsername] = useState('');
+  const [claimCode, setClaimCode] = useState('');
+  const [botStatus, setBotStatus] = useState<{
+    type: 'info' | 'error' | 'success';
+    message: string;
+  } | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
     setActiveSubPage(initialSubPage);
   }, [initialSubPage]);
+
+  const handleOpenGamepassModal = (demo: PreviousWorkDemo) => {
+    setActiveGamepassDemo(demo);
+    setBotStatus(null);
+  };
+
+  const handleVerifyGamepass = async () => {
+    if (!activeGamepassDemo) return;
+    const cleanUser = robloxUsername.trim();
+    if (!cleanUser) {
+      setBotStatus({
+        type: 'error',
+        message: 'Please enter your Roblox username in Step 1 before verifying Gamepass ownership.',
+      });
+      return;
+    }
+
+    setIsVerifying(true);
+    setBotStatus({
+      type: 'info',
+      message: `[Bot Verifying]: Checking Roblox Inventory of @${cleanUser} for Gamepass #${activeGamepassDemo.gamePassId}...`,
+    });
+
+    try {
+      const res = await fetch('/api/verify-gamepass', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: cleanUser,
+          gamePassId: activeGamepassDemo.gamePassId,
+          claimCode: claimCode.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data && data.verified) {
+        const record: UnlockedCreationRecord = {
+          demoId: activeGamepassDemo.id,
+          gamePassId: activeGamepassDemo.gamePassId,
+          robloxUsername: data.username || cleanUser,
+          robloxUserId: String(data.userId || ''),
+          verificationMethod: data.verificationMethod || 'Roblox Inventory API',
+          unlockedAt: data.verifiedAt || new Date().toISOString(),
+        };
+        const nextMap = { ...unlockedMap, [activeGamepassDemo.id]: record };
+        setUnlockedMap(nextMap);
+        try {
+          localStorage.setItem(UNLOCKED_CREATIONS_STORAGE_KEY, JSON.stringify(nextMap));
+        } catch {}
+
+        const targetId = activeGamepassDemo.id;
+        // Shut the buying menu modal immediately and unlock the link on the card
+        setActiveGamepassDemo(null);
+        setBotStatus(null);
+
+        setTimeout(() => {
+          const el = document.getElementById(`unlocked-link-box-${targetId}`);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 80);
+      } else {
+        setBotStatus({
+          type: 'error',
+          message:
+            data?.message ||
+            data?.error ||
+            `Gamepass #${activeGamepassDemo.gamePassId} was not detected in @${cleanUser}'s public inventory yet.`,
+        });
+      }
+    } catch {
+      setBotStatus({
+        type: 'error',
+        message: 'Could not reach /api/verify-gamepass. Please try again.',
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   const visibleDemos =
     activeSubPage === 'all' ? PREVIOUS_WORK_DEMOS : getDemosByCategory(activeSubPage);
@@ -493,7 +712,6 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             <span className="text-emerald-400">{subPageTitle}</span>
           </div>
 
-          {/* Dedicated Sub-Page Selector: All Demos (4), Scripting Work, Animation Work, UI Design, 3D Modeling */}
           <div
             role="tablist"
             aria-label="Previous Work Sub-Pages"
@@ -595,11 +813,145 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             <DemoShowcaseCard
               key={demo.id}
               demo={demo}
+              unlockRecord={unlockedMap[demo.id]}
               onOpenLightbox={(t) => setLightboxTarget(t)}
+              onOpenGamepassModal={(d) => handleOpenGamepassModal(d)}
             />
           ))}
         </div>
       </div>
+
+      {/* Gamepass Buying & Bot Verification Modal (Closes immediately on verification and unlocks link) */}
+      {activeGamepassDemo && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Buy Gamepass to Unlock Creation Link"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 sm:p-6 overflow-y-auto"
+          onClick={() => setActiveGamepassDemo(null)}
+        >
+          <div
+            className="relative w-full max-w-2xl bg-zinc-950 border border-white/15 rounded-xl shadow-2xl overflow-hidden my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-900/60">
+              <div>
+                <p className="text-xs font-mono text-emerald-400">
+                  Roblox Gamepass Verification Bot · Instant Link Unlock
+                </p>
+                <h2 className="font-display text-xl font-bold text-white">
+                  Buy Gamepass to Unlock Creation Link
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveGamepassDemo(null)}
+                aria-label="Close Gamepass unlock modal"
+                className="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white bg-zinc-900 rounded border border-white/10 cursor-pointer"
+              >
+                Close [ESC]
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="p-4 rounded-lg bg-zinc-900/80 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="text-xs font-mono text-emerald-400">
+                    {activeGamepassDemo.categoryLabel.toUpperCase()} · ROBLOX GAMEPASS LINK UNLOCK
+                  </div>
+                  <div className="font-display text-lg font-bold text-white mt-0.5">
+                    {activeGamepassDemo.title}
+                  </div>
+                  <div className="text-xs font-mono text-zinc-400 mt-0.5">
+                    Roblox Gamepass ID: #{activeGamepassDemo.gamePassId} · Unlocks Official Roblox
+                    Creator Store Link
+                  </div>
+                </div>
+                <div className="sm:text-right shrink-0">
+                  <div className="text-xs font-mono text-zinc-400">Gamepass Price</div>
+                  <div className="font-display text-2xl font-bold text-emerald-400 tabular-nums">
+                    {activeGamepassDemo.gamePassPriceRobux.toLocaleString('en-US')} R$
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-mono text-zinc-300">
+                  Step 1. Enter Your Roblox Username (Bot Checks Your Inventory) *
+                </label>
+                <input
+                  type="text"
+                  value={robloxUsername}
+                  onChange={(e) => setRobloxUsername(e.target.value)}
+                  placeholder="e.g. tpjerry6789"
+                  className="w-full px-3.5 py-2.5 text-sm bg-zinc-900 border border-white/15 rounded-md text-white focus:outline-none focus:border-emerald-400"
+                />
+              </div>
+
+              <div className="p-4 rounded-lg bg-zinc-900/50 border border-white/10 space-y-3">
+                <div className="text-xs font-mono text-zinc-300">
+                  Step 2. Purchase Gamepass on Roblox &amp; Verify to Unlock Link
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <a
+                    href={
+                      activeGamepassDemo.gamePassUrl ||
+                      getRobloxGamepassCheckoutUrl(activeGamepassDemo.gamePassId)
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    <span>
+                      1. Buy Gamepass on Roblox (
+                      {activeGamepassDemo.gamePassPriceRobux.toLocaleString('en-US')} R$)
+                    </span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+
+                  <button
+                    type="button"
+                    disabled={isVerifying}
+                    onClick={handleVerifyGamepass}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-mono font-semibold text-white bg-zinc-800 hover:bg-zinc-700 border border-emerald-500/40 rounded-md transition-colors cursor-pointer whitespace-nowrap"
+                  >
+                    <span>
+                      {isVerifying
+                        ? 'Bot Checking Inventory...'
+                        : '2. Verify Gamepass & Unlock Link'}
+                    </span>
+                  </button>
+                </div>
+
+                <div className="pt-1">
+                  <label className="block text-[11px] font-mono text-zinc-400 mb-1">
+                    Optional: Have a Private Inventory or Instant Claim Passcode?
+                  </label>
+                  <input
+                    type="text"
+                    value={claimCode}
+                    onChange={(e) => setClaimCode(e.target.value)}
+                    placeholder="Optional claim code (e.g. BALO-GAMEPASS-VERIFIED)"
+                    className="w-full px-3 py-2 text-xs font-mono bg-zinc-950 border border-white/10 rounded text-zinc-200 focus:outline-none focus:border-emerald-400"
+                  />
+                </div>
+              </div>
+
+              {botStatus && (
+                <div
+                  className={`p-3.5 rounded-lg border text-xs font-mono leading-relaxed ${
+                    botStatus.type === 'error'
+                      ? 'bg-red-950/60 border-red-500/50 text-red-300'
+                      : 'bg-zinc-900/90 border-white/15 text-zinc-200'
+                  }`}
+                >
+                  {botStatus.message}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Fullscreen Lightbox Modal for Image Demos */}
       {lightboxTarget && (

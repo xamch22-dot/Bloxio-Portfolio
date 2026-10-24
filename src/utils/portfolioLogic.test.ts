@@ -20,6 +20,9 @@ import {
   getDemosByCategory,
   scrambleText,
   calculateCommissionBreakdown,
+  getRobloxGamepassCheckoutUrl,
+  getRobloxInventoryCheckUrl,
+  evaluateGamepassOwnershipResponse,
 } from './portfolioLogic';
 
 test('HACKER_SENTENCES contains exact 5 corrected sentences and 1000ms animation duration', () => {
@@ -311,8 +314,35 @@ test('formatCommissionEmailPayload targets https://formspree.io/f/mqppkrdd and x
   );
 });
 
+test('Roblox Gamepass checkout URL, inventory check URL, and ownership evaluator work accurately', () => {
+  assert.equal(
+    getRobloxGamepassCheckoutUrl('2053169441'),
+    'https://www.roblox.com/game-pass/2053169441'
+  );
+  assert.equal(
+    getRobloxInventoryCheckUrl('8627411391', '2053169441'),
+    'https://inventory.roblox.com/v1/users/8627411391/items/GamePass/2053169441'
+  );
 
+  // Owned response from Roblox Inventory API
+  const ownedPayload = {
+    previousPageCursor: null,
+    nextPageCursor: null,
+    data: [{ type: 'GamePass', id: 2053169441, name: 'A Combat System By Balo_xio', instanceId: null }],
+  };
+  assert.equal(evaluateGamepassOwnershipResponse(ownedPayload, '2053169441'), true);
+  assert.equal(evaluateGamepassOwnershipResponse(ownedPayload, '999999999'), false);
+  assert.equal(evaluateGamepassOwnershipResponse({ data: [] }, '2053169441'), false);
+  assert.equal(evaluateGamepassOwnershipResponse(null, '2053169441'), false);
 
-
-
-
+  // Every creation demo has a configured Gamepass ID, price, and unlockable link
+  assert.equal(
+    COMBAT_SYSTEM_ASSET_URL,
+    'https://create.roblox.com/store/asset/113210150229519?viewFromStudio=true&keyword=&searchId=18788722-cf9d-4565-9e61-ae99826d0e18'
+  );
+  for (const demo of PREVIOUS_WORK_DEMOS) {
+    assert.equal(demo.gamePassId, '2053169441');
+    assert.equal((demo.gamePassPriceRobux || 0) > 0, true);
+    assert.equal(demo.unlockLinkUrl, COMBAT_SYSTEM_ASSET_URL);
+  }
+});
