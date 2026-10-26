@@ -23,7 +23,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070908] text-zinc-100 flex flex-col">
+    <div className="min-h-screen bg-[#09090B] text-[#F4F1EA] flex flex-col">
       <Navbar
         activeView={activeView}
         onChangeView={(v) => {
@@ -59,11 +59,11 @@ export default function App() {
         )}
       </main>
 
-      <footer className="border-t border-white/10 py-10 px-6 lg:px-12 bg-[#070908]">
-        <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
+      <footer className="border-t border-white/10 py-10 px-6 lg:px-12 bg-[#070709]">
+        <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-400">
           <div>
-            <span className="text-white font-semibold">balo_xio portfolio</span>
-            <span aria-hidden="true" className="mx-2">·</span>
+            <span className="text-white font-semibold">balo_xio</span>
+            <span aria-hidden="true" className="mx-2 text-zinc-600">/</span>
             <span>Scripter (3+ Yrs) · UI Designer (2+ Yrs) · Modeler (2+ Yrs) · Animator (1+ Yr)</span>
           </div>
           <div className="flex flex-wrap items-center gap-4">
@@ -74,21 +74,21 @@ export default function App() {
             >
               Overview
             </a>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true" className="text-zinc-600">·</span>
             <button
               type="button"
               onClick={() => handleOpenDemoView('all')}
-              className="text-zinc-400 hover:text-emerald-400 underline underline-offset-4 cursor-pointer"
+              className="text-zinc-400 hover:text-[#DFC08A] underline underline-offset-4 cursor-pointer"
             >
               Previous Work (Demo)
             </button>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true" className="text-zinc-600">·</span>
             <a
               href="#estimator"
               onClick={() => setActiveView('portfolio')}
               className="text-zinc-400 hover:text-white underline underline-offset-4"
             >
-              Commission Estimator
+              Specification Ledger
             </a>
           </div>
         </div>
@@ -96,6 +96,3 @@ export default function App() {
     </div>
   );
 }
-
-
-

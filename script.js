@@ -1,6 +1,4 @@
 import {
-  HACKER_SENTENCES,
-  SENTENCE_ANIMATION_DURATION_MS,
   VIDEO_LOOP_START_SECONDS,
   DISCIPLINE_EXPERIENCES,
   PREVIOUS_WORK_DEMOS,
@@ -8,7 +6,6 @@ import {
   getRobloxGamepassCheckoutUrl,
   getPricingTiersForDiscipline,
   calculateCommissionBreakdown,
-  scrambleText,
   getDemosByCategory,
 } from './src/utils/portfolioLogic';
 
@@ -37,16 +34,12 @@ const state = {
   selectedContract: 'commission', // 'commission' | 'short-term' | 'long-term'
   selectedCurrency: 'USD', // 'USD' | 'ROBUX'
   heroMuted: true,
-  activeSentenceIdx: 0,
-  sentenceProgress: 0,
-  sentenceStartTime: performance.now(),
   unlockedCreations: loadUnlockedCreationsMap(),
   activeGamepassDemo: null,
   awaitingRobloxTabReturn: false,
   lookedUpRobloxUser: null,
 };
 
-// Format helper
 function formatNumber(n) {
   return Number(n).toLocaleString('en-US');
 }
@@ -66,18 +59,21 @@ function setView(viewName, optionalDemoSubPage) {
   if (viewPortfolio) viewPortfolio.classList.toggle('hidden-view', state.activeView !== 'portfolio');
   if (viewPreviousWork) viewPreviousWork.classList.toggle('hidden-view', state.activeView !== 'previous-work');
 
-  // Update top nav active states
   const navOverview = document.getElementById('nav-overview');
   const navPrevWork = document.getElementById('nav-previous-work');
 
   if (navOverview) {
-    navOverview.className = `hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 ${
-      state.activeView === 'portfolio' ? 'text-white' : 'text-zinc-400'
+    navOverview.className = `hover:text-[#DFC08A] transition-colors whitespace-nowrap shrink-0 ${
+      state.activeView === 'portfolio'
+        ? 'text-white font-semibold underline underline-offset-8 decoration-[#DFC08A]'
+        : 'text-zinc-400'
     }`;
   }
   if (navPrevWork) {
-    navPrevWork.className = `hover:text-emerald-400 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-      state.activeView === 'previous-work' ? 'text-emerald-400 font-semibold' : 'text-zinc-400'
+    navPrevWork.className = `hover:text-[#DFC08A] transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+      state.activeView === 'previous-work'
+        ? 'text-[#DFC08A] font-semibold underline underline-offset-8 decoration-[#DFC08A]'
+        : 'text-zinc-400'
     }`;
   }
 
@@ -88,12 +84,11 @@ function setView(viewName, optionalDemoSubPage) {
 }
 
 // ============================================================================
-// 2. HERO BACKGROUND VIDEO (2.0s LOOP) & 5-SENTENCE HACKER TEXT ANIMATION
+// 2. HERO BACKGROUND VIDEO (2.0s LOOP) & AUDIO TOGGLE
 // ============================================================================
-function initHeroVideoAndHackerSequence() {
+function initHeroVideoControls() {
   const video = document.getElementById('hero-bg-video');
   const audioBtn = document.getElementById('hero-audio-btn');
-  const replayBtn = document.getElementById('hero-replay-btn');
 
   if (video) {
     const enforceStart = () => {
@@ -129,8 +124,8 @@ function initHeroVideoAndHackerSequence() {
         state.heroMuted ? 'Unmute background video sound' : 'Mute background video sound'
       );
       audioBtn.innerHTML = state.heroMuted
-        ? `<span>Video Audio: Muted</span>`
-        : `<span class="text-emerald-400">Video Audio: On</span>`;
+        ? `<span>Reel Audio // Muted</span>`
+        : `<span class="text-[#DFC08A]">Reel Audio // Active</span>`;
       if (!state.heroMuted) {
         if (video.currentTime < VIDEO_LOOP_START_SECONDS) {
           video.currentTime = VIDEO_LOOP_START_SECONDS;
@@ -138,56 +133,6 @@ function initHeroVideoAndHackerSequence() {
         video.play().catch(() => {});
       }
     });
-  }
-
-  if (replayBtn) {
-    replayBtn.addEventListener('click', () => {
-      state.activeSentenceIdx = 0;
-      state.sentenceProgress = 0;
-      state.sentenceStartTime = performance.now();
-      updateHeroSentenceDOM();
-    });
-  }
-
-  const tick = (now) => {
-    const elapsed = now - state.sentenceStartTime;
-    const decodeWindowMs = 420;
-    state.sentenceProgress = Math.min(1, elapsed / decodeWindowMs);
-    updateHeroSentenceDOM();
-
-    const totalStepMs =
-      state.activeSentenceIdx === HACKER_SENTENCES.length - 1
-        ? SENTENCE_ANIMATION_DURATION_MS + 1200
-        : SENTENCE_ANIMATION_DURATION_MS;
-
-    if (elapsed >= totalStepMs) {
-      state.activeSentenceIdx = (state.activeSentenceIdx + 1) % HACKER_SENTENCES.length;
-      state.sentenceProgress = 0;
-      state.sentenceStartTime = now;
-      updateHeroSentenceDOM();
-    }
-    requestAnimationFrame(tick);
-  };
-
-  requestAnimationFrame(tick);
-}
-
-function updateHeroSentenceDOM() {
-  const currentObj = HACKER_SENTENCES[state.activeSentenceIdx] || HACKER_SENTENCES[0];
-  const decoded = scrambleText(currentObj.sentence, state.sentenceProgress);
-
-  const headlineEl = document.getElementById('hero-animated-headline');
-  const yearsEl = document.getElementById('hero-role-years');
-  const specEl = document.getElementById('hero-role-spec');
-
-  if (headlineEl && headlineEl.textContent !== decoded) {
-    headlineEl.textContent = decoded;
-  }
-  if (yearsEl && yearsEl.textContent !== currentObj.yearsLabel) {
-    yearsEl.textContent = currentObj.yearsLabel;
-  }
-  if (specEl && specEl.textContent !== currentObj.shortSpec) {
-    specEl.textContent = currentObj.shortSpec;
   }
 }
 
@@ -215,7 +160,7 @@ function renderExperienceGrid() {
         (item, i) =>
           `<span>${item}</span>${
             i < disc.deliverables.length - 1
-              ? '<span aria-hidden="true" class="text-emerald-500">·</span>'
+              ? '<span aria-hidden="true" class="text-[#DFC08A]">/</span>'
               : ''
           }`
       )
@@ -228,10 +173,10 @@ function renderExperienceGrid() {
         <div>
           <div class="flex items-baseline justify-between gap-4">
             <div class="flex items-baseline gap-3">
-              <span class="font-mono text-xs text-emerald-400 tabular-nums">${disc.index}.</span>
+              <span class="font-mono text-xs text-[#DFC08A] tabular-nums">${disc.index} /</span>
               <h3 class="font-display text-2xl sm:text-3xl font-bold text-white">${disc.title}</h3>
             </div>
-            <span class="font-display text-xl sm:text-2xl font-bold text-emerald-400 tabular-nums">${
+            <span class="font-display text-xl sm:text-2xl font-bold pro-gradient-text tabular-nums">${
               disc.yearsDisplay
             }</span>
           </div>
@@ -241,15 +186,15 @@ function renderExperienceGrid() {
             ${deliverablesHtml}
           </div>
         </div>
-        <div class="mt-6 pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-4 text-xs">
-          <span class="font-mono text-zinc-400">${disc.tools}</span>
-          <div class="flex items-center gap-4">
-            <button type="button" data-open-demo="${disc.id}" class="inline-flex items-center gap-1 font-mono font-medium text-zinc-200 hover:text-emerald-400 underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer">
+        <div class="mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs">
+          <span class="font-mono text-zinc-500 uppercase tracking-wider">${disc.tools}</span>
+          <div class="flex items-center gap-5">
+            <button type="button" data-open-demo="${disc.id}" class="inline-flex items-center gap-1 font-mono uppercase tracking-wider font-medium text-zinc-200 hover:text-[#DFC08A] underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer">
               <span>${demoLabel}</span>
               ${ARROW_UP_RIGHT_SVG}
             </button>
-            <a href="#estimator" data-select-discipline="${disc.id}" class="inline-flex items-center gap-1 font-medium text-emerald-400 hover:text-emerald-300 transition-colors whitespace-nowrap shrink-0">
-              <span>Select ${disc.title}</span>
+            <a href="#estimator" data-select-discipline="${disc.id}" class="inline-flex items-center gap-1 font-mono uppercase tracking-wider font-medium text-[#DFC08A] hover:text-white transition-colors whitespace-nowrap shrink-0">
+              <span>Select Track</span>
               ${ARROW_UP_RIGHT_SVG}
             </a>
           </div>
@@ -275,7 +220,7 @@ function renderExperienceGrid() {
 }
 
 // ============================================================================
-// 4. INTERACTIVE RATE & 40% UPFRONT ESTIMATOR
+// 4. ARCHITECTURAL SPECIFICATION MATRIX & 40% UPFRONT LEDGER ESTIMATOR
 // ============================================================================
 function renderRateEstimator() {
   const roleContainer = document.getElementById('estimator-roles');
@@ -283,30 +228,47 @@ function renderRateEstimator() {
   const currencyContainer = document.getElementById('estimator-currencies');
 
   const roles = [
-    { id: 'all-rounder', label: 'All-Rounder (Full Pack)' },
-    { id: 'scripting', label: 'Scripting (3+ Yrs)' },
-    { id: 'ui-design', label: 'UI Design (2+ Yrs)' },
-    { id: 'modeling', label: '3D Modeling (2+ Yrs)' },
-    { id: 'animating', label: 'Animating (1+ Yr)' },
+    { id: 'all-rounder', index: '01', label: 'Full Pack (All-Rounder)', sub: 'Scripting + UI + 3D + Animation', tenure: 'Complete Studio Pipeline' },
+    { id: 'scripting', index: '02', label: 'Scripting Systems', sub: 'Luau Frameworks, Combat & DataStores', tenure: '3+ Years Experience' },
+    { id: 'ui-design', index: '03', label: 'UI Design & HUDs', sub: 'Responsive Scale Layouts & Motion', tenure: '2+ Years Experience' },
+    { id: 'modeling', index: '04', label: '3D Modeling', sub: 'Hard-Surface Weapons & Environment Assets', tenure: '2+ Years Experience' },
+    { id: 'animating', index: '05', label: 'Keyframe Animation', sub: 'Moon Animator 2 R6 & R15 Combat Rigs', tenure: '1+ Year Experience' },
   ];
 
   if (roleContainer) {
     roleContainer.innerHTML = roles
-      .map(
-        (r) => `
+      .map((r) => {
+        const isActive = state.selectedDiscipline === r.id;
+        return `
         <button
           type="button"
           data-role-btn="${r.id}"
-          class="px-3.5 py-2 text-xs font-medium rounded-md border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-            state.selectedDiscipline === r.id
-              ? 'bg-emerald-400 text-zinc-950 border-emerald-400 font-semibold'
-              : 'bg-zinc-900/80 text-zinc-300 border-white/10 hover:border-white/25 hover:text-white'
+          class="w-full px-6 py-4 text-left transition-all cursor-pointer flex items-center justify-between gap-4 border-l-2 ${
+            isActive
+              ? 'border-[#DFC08A] studio-active-row text-white'
+              : 'border-transparent bg-transparent text-zinc-400 hover:bg-white/[0.02] hover:text-zinc-200'
           }"
         >
-          ${r.label}
+          <div class="flex items-baseline gap-4 min-w-0">
+            <span class="font-mono text-xs tabular-nums ${isActive ? 'text-[#DFC08A] font-semibold' : 'text-zinc-500'}">${r.index}</span>
+            <div class="min-w-0">
+              <div class="font-display text-base font-bold ${isActive ? 'text-white' : 'text-zinc-200'}">${r.label}</div>
+              <div class="text-xs font-mono ${isActive ? 'text-zinc-300' : 'text-zinc-500'} mt-0.5 truncate">${r.sub}</div>
+            </div>
+          </div>
+          <div class="text-right shrink-0 flex items-center gap-4">
+            <span class="hidden sm:inline-block text-[11px] font-mono text-zinc-500">${r.tenure}</span>
+            <span class="font-mono text-[11px] uppercase tracking-widest px-2.5 py-1 border ${
+              isActive
+                ? 'border-[#DFC08A] text-[#DFC08A] bg-[#DFC08A]/10 font-semibold'
+                : 'border-white/10 text-zinc-500'
+            }">
+              ${isActive ? 'Selected' : 'Select'}
+            </span>
+          </div>
         </button>
-      `
-      )
+      `;
+      })
       .join('');
 
     roleContainer.querySelectorAll('[data-role-btn]').forEach((btn) => {
@@ -320,25 +282,39 @@ function renderRateEstimator() {
   const tiers = getPricingTiersForDiscipline(state.selectedDiscipline);
   if (contractContainer) {
     contractContainer.innerHTML = Object.values(tiers)
-      .map(
-        (tier) => `
+      .map((tier, idx) => {
+        const isActive = state.selectedContract === tier.id;
+        return `
         <button
           type="button"
           data-contract-btn="${tier.id}"
-          class="p-4 text-left rounded-md border transition-colors cursor-pointer ${
-            state.selectedContract === tier.id
-              ? 'bg-emerald-950/35 border-emerald-400 text-white'
-              : 'bg-zinc-900/60 border-white/10 text-zinc-300 hover:border-white/25'
+          class="relative p-5 text-left transition-all cursor-pointer flex flex-col justify-between ${
+            isActive
+              ? 'studio-active-cell text-white'
+              : 'bg-transparent text-zinc-400 hover:bg-white/[0.02] hover:text-zinc-200'
           }"
         >
-          <div class="font-display text-sm font-bold text-white">${tier.label}</div>
-          <div class="font-mono text-xs text-emerald-400 mt-1 tabular-nums">
+          ${
+            isActive
+              ? '<div class="absolute top-0 inset-x-0 h-[2px] studio-btn-gradient"></div>'
+              : ''
+          }
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-[11px] uppercase tracking-widest ${isActive ? 'text-[#DFC08A]' : 'text-zinc-500'}">Scope 0${idx + 1}</span>
+              ${isActive ? '<span class="font-mono text-[10px] uppercase tracking-widest text-[#DFC08A]">Active</span>' : ''}
+            </div>
+            <div class="font-display text-base font-bold text-white mt-1.5">${tier.label}</div>
+            <div class="text-xs text-zinc-400 mt-1 leading-relaxed">${tier.subtitle}</div>
+          </div>
+          <div class="font-mono text-xs font-semibold ${
+            isActive ? 'text-[#DFC08A]' : 'text-zinc-300'
+          } mt-5 pt-3 border-t border-white/10 tabular-nums">
             $${tier.usdTotal} USD / ${formatNumber(tier.robuxTotal)} R$
           </div>
-          <div class="text-xs text-zinc-400 mt-1">${tier.subtitle}</div>
         </button>
-      `
-      )
+      `;
+      })
       .join('');
 
     contractContainer.querySelectorAll('[data-contract-btn]').forEach((btn) => {
@@ -351,21 +327,22 @@ function renderRateEstimator() {
 
   if (currencyContainer) {
     currencyContainer.innerHTML = ['USD', 'ROBUX']
-      .map(
-        (curr) => `
+      .map((curr) => {
+        const isActive = state.selectedCurrency === curr;
+        return `
         <button
           type="button"
           data-currency-btn="${curr}"
-          class="px-5 py-2.5 text-xs font-mono font-semibold rounded-md border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-            state.selectedCurrency === curr
-              ? 'bg-emerald-400 text-zinc-950 border-emerald-400'
-              : 'bg-zinc-900/80 text-zinc-300 border-white/10 hover:border-white/25 hover:text-white'
+          class="px-5 py-2.5 text-xs font-mono uppercase tracking-wider font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+            isActive
+              ? 'studio-btn-gradient'
+              : 'text-zinc-400 hover:text-white'
           }"
         >
           ${curr === 'USD' ? 'USD ($)' : 'Robux (R$)'}
         </button>
-      `
-      )
+      `;
+      })
       .join('');
 
     currencyContainer.querySelectorAll('[data-currency-btn]').forEach((btn) => {
@@ -402,7 +379,7 @@ function renderRateEstimator() {
 }
 
 // ============================================================================
-// 5. PREVIOUS WORK (DEMO) PAGE RENDERER (SCRIPTING, ANIMATION, UI DESIGN)
+// 5. PREVIOUS WORK (DEMO) PAGE RENDERER (SCRIPTING, ANIMATION, UI DESIGN, MODELING)
 // ============================================================================
 function renderPreviousWorkDemos() {
   const tabsContainer = document.getElementById('previous-work-tabs');
@@ -442,10 +419,10 @@ function renderPreviousWorkDemos() {
           role="tab"
           aria-selected="${state.demoSubPage === t.id}"
           data-demo-tab="${t.id}"
-          class="px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+          class="px-4 py-2 text-xs font-mono uppercase tracking-wider transition-all whitespace-nowrap shrink-0 cursor-pointer border-r border-white/10 last:border-r-0 ${
             state.demoSubPage === t.id
-              ? 'bg-emerald-400 text-zinc-950 font-semibold'
-              : 'text-zinc-300 hover:text-white'
+              ? 'studio-btn-gradient font-semibold'
+              : 'text-zinc-400 hover:text-white'
           }"
         >
           ${t.label}
@@ -483,9 +460,9 @@ function renderPreviousWorkDemos() {
       const systemsHtml = demo.systemsIncluded
         .map(
           (sys, idx) =>
-            `<span class="text-emerald-400">${sys}</span>${
+            `<span class="text-[#DFC08A]">${sys}</span>${
               idx < demo.systemsIncluded.length - 1
-                ? '<span aria-hidden="true" class="text-zinc-500">·</span>'
+                ? '<span aria-hidden="true" class="text-zinc-600">/</span>'
                 : ''
             }`
         )
@@ -494,9 +471,9 @@ function renderPreviousWorkDemos() {
       const techRowsHtml = demo.technicalHighlights
         .map(
           (item) => `
-          <div class="py-3">
-            <div class="text-xs font-mono font-semibold text-white">${item.label}</div>
-            <div class="text-xs text-zinc-400 mt-0.5 leading-relaxed">${item.detail}</div>
+          <div class="py-3.5">
+            <div class="text-xs font-mono font-semibold text-white uppercase tracking-wider">${item.label}</div>
+            <div class="text-xs text-zinc-400 mt-1 leading-relaxed">${item.detail}</div>
           </div>
         `
         )
@@ -505,7 +482,7 @@ function renderPreviousWorkDemos() {
       const mediaColumnHtml =
         demo.mediaType === 'video' && demo.videoUrl
           ? `
-            <div class="relative rounded-lg overflow-hidden border border-white/15 bg-black shadow-2xl">
+            <div class="relative overflow-hidden border border-white/15 bg-black">
               <video
                 id="video-${demo.id}"
                 src="${demo.videoUrl}"
@@ -514,44 +491,85 @@ function renderPreviousWorkDemos() {
                 muted
                 playsinline
                 controls
-                class="w-full aspect-video object-cover bg-zinc-950"
+                class="w-full aspect-video object-cover bg-[#09090B]"
               ></video>
             </div>
             <div class="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
               <div class="flex items-center gap-2">
                 <span>Roblox Studio Live Capture</span>
-                <span aria-hidden="true">·</span>
-                <span class="text-emerald-400">${
+                <span aria-hidden="true">/</span>
+                <span class="text-[#DFC08A]">${
                   demo.assetId ? `Asset ID: ${demo.assetId}` : demo.craftTag
                 }</span>
               </div>
               <div class="flex items-center gap-2">
-                <button type="button" data-video-toggle="${demo.id}" class="px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded cursor-pointer">Pause</button>
-                <button type="button" data-video-mute="${demo.id}" class="px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded cursor-pointer">Unmute Audio</button>
-                <button type="button" data-video-replay="${demo.id}" class="px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded cursor-pointer">Replay</button>
+                <button type="button" data-video-toggle="${demo.id}" class="px-3 py-1.5 text-xs text-zinc-200 bg-[#121216] hover:bg-[#1A1A20] border border-white/15 cursor-pointer">Pause</button>
+                <button type="button" data-video-mute="${demo.id}" class="px-3 py-1.5 text-xs text-zinc-200 bg-[#121216] hover:bg-[#1A1A20] border border-white/15 cursor-pointer">Unmute Audio</button>
+                <button type="button" data-video-replay="${demo.id}" class="px-3 py-1.5 text-xs text-zinc-200 bg-[#121216] hover:bg-[#1A1A20] border border-white/15 cursor-pointer">Replay</button>
+              </div>
+            </div>
+          `
+          : demo.galleryImages && demo.galleryImages.length > 0
+          ? `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              ${demo.galleryImages
+                .map(
+                  (imgItem, gIdx) => `
+                  <div class="overflow-hidden border border-white/15 bg-[#0C0C0E] flex flex-col justify-between">
+                    <div class="aspect-square overflow-hidden bg-[#121216]">
+                      <img
+                        src="${imgItem.url}"
+                        alt="${imgItem.label} — 3D Model by ${demo.author}"
+                        referrerpolicy="no-referrer"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div class="p-3.5 border-t border-white/10 flex items-center justify-between gap-2 bg-[#0C0C0E]">
+                      <div class="min-w-0">
+                        <div class="font-display text-sm font-bold text-white truncate">${imgItem.label}</div>
+                        <div class="text-xs font-mono text-zinc-400 truncate mt-0.5">${imgItem.subtitle}</div>
+                      </div>
+                      <button
+                        type="button"
+                        data-open-gallery="${demo.id}:${gIdx}"
+                        class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-mono text-zinc-200 bg-[#141418] hover:bg-[#1C1C22] border border-white/15 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                      >
+                        <span class="text-[#DFC08A]">Inspect</span>
+                      </button>
+                    </div>
+                  </div>
+                `
+                )
+                .join('')}
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
+              <div class="flex items-center gap-2">
+                <span>Roblox Studio Viewport Renders (2 Models)</span>
+                <span aria-hidden="true">/</span>
+                <span class="text-[#DFC08A]">${demo.craftTag}</span>
               </div>
             </div>
           `
           : `
-            <div class="relative rounded-lg overflow-hidden border border-white/15 bg-zinc-950 shadow-2xl">
+            <div class="relative overflow-hidden border border-white/15 bg-[#0C0C0E]">
               <img
                 src="${demo.imageUrl}"
                 alt="${demo.title} — ${demo.craftTag} by ${demo.author}"
                 referrerpolicy="no-referrer"
-                class="w-full h-auto object-contain bg-zinc-950"
+                class="w-full h-auto object-contain bg-[#0C0C0E]"
               />
             </div>
             <div class="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
               <div class="flex items-center gap-2">
-                <span>High-Resolution Roblox Showcase</span>
-                <span aria-hidden="true">·</span>
-                <span class="text-emerald-400">${demo.craftTag}</span>
+                <span>High-Resolution Studio Capture</span>
+                <span aria-hidden="true">/</span>
+                <span class="text-[#DFC08A]">${demo.craftTag}</span>
               </div>
               <button
                 type="button"
                 data-open-lightbox="${demo.id}"
                 aria-label="Inspect ${demo.title} in fullscreen"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded transition-colors cursor-pointer"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-200 bg-[#121216] hover:bg-[#1A1A20] border border-white/15 transition-colors cursor-pointer"
               >
                 <span>Inspect Fullscreen</span>
               </button>
@@ -560,13 +578,16 @@ function renderPreviousWorkDemos() {
 
       const unlockRecord = state.unlockedCreations[demo.id] || null;
       const isUnlocked = Boolean(unlockRecord);
-      const targetUnlockUrl = demo.unlockLinkUrl || demo.tryAssetUrl || 'https://create.roblox.com/store/asset/113210150229519?viewFromStudio=true&keyword=&searchId=18788722-cf9d-4565-9e61-ae99826d0e18';
+      const targetUnlockUrl =
+        demo.unlockLinkUrl ||
+        demo.tryAssetUrl ||
+        'https://create.roblox.com/store/asset/113210150229519?viewFromStudio=true&keyword=&searchId=18788722-cf9d-4565-9e61-ae99826d0e18';
 
       return `
         <section id="demo-${demo.category}" aria-labelledby="heading-${demo.id}" class="py-12 border-b border-white/10">
           <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <p class="text-xs font-mono text-emerald-400 mb-1.5">${demo.index}. ${demo.categoryLabel} Section</p>
+              <p class="text-xs font-mono uppercase tracking-widest text-[#DFC08A] mb-1.5">${demo.index} // ${demo.categoryLabel}</p>
               <h2 id="heading-${demo.id}" class="font-display text-2xl sm:text-4xl font-bold tracking-tight text-white text-balance">${demo.title}</h2>
             </div>
             <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
@@ -576,7 +597,7 @@ function renderPreviousWorkDemos() {
                       href="${targetUnlockUrl}"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient transition-all whitespace-nowrap shrink-0"
                     >
                       <span>Unlocked · Open Roblox Asset Link</span>
                       ${ARROW_UP_RIGHT_SVG}
@@ -584,9 +605,9 @@ function renderPreviousWorkDemos() {
                   : `<button
                       type="button"
                       data-open-gamepass="${demo.id}"
-                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient transition-all whitespace-nowrap shrink-0 cursor-pointer"
                     >
-                      <span>Locked Link · Buy Gamepass (${formatNumber(demo.gamePassPriceRobux || 3500)} R$) to Unlock</span>
+                      <span>Locked Link · Buy Gamepass (${formatNumber(demo.gamePassPriceRobux || 3500)} R$)</span>
                       ${ARROW_UP_RIGHT_SVG}
                     </button>`
               }
@@ -601,15 +622,15 @@ function renderPreviousWorkDemos() {
             <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
               <div class="space-y-4">
                 <div class="flex items-center gap-2 text-xs font-mono text-zinc-400">
-                  <span class="text-emerald-400 font-semibold">${demo.categoryLabel}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>Created by ${demo.author}</span>
-                  <span aria-hidden="true">·</span>
+                  <span class="text-[#DFC08A] font-semibold uppercase">${demo.categoryLabel}</span>
+                  <span aria-hidden="true">/</span>
+                  <span>By ${demo.author}</span>
+                  <span aria-hidden="true">/</span>
                   <span>${demo.craftTag}</span>
                 </div>
                 <p class="text-sm sm:text-base text-zinc-200 leading-relaxed">${demo.description}</p>
                 <div class="pt-1">
-                  <div class="text-xs font-mono text-zinc-400 mb-2">${highlightsHeading}</div>
+                  <div class="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2">${highlightsHeading}</div>
                   <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs font-mono text-zinc-200">
                     ${systemsHtml}
                   </div>
@@ -623,14 +644,14 @@ function renderPreviousWorkDemos() {
               <div class="pt-2 space-y-3">
                 <div
                   id="unlocked-link-box-${demo.id}"
-                  class="p-4 rounded-lg ${
+                  class="p-5 border ${
                     isUnlocked
-                      ? 'bg-emerald-950/35 border border-emerald-400/50'
-                      : 'bg-zinc-900/80 border border-white/15'
+                      ? 'studio-active-cell border-[#DFC08A]/60'
+                      : 'bg-[#0C0C0E] border-white/15'
                   } space-y-3"
                 >
                   <div class="flex items-center justify-between gap-2 text-xs font-mono">
-                    <span class="${isUnlocked ? 'text-emerald-400' : 'text-amber-400'} font-semibold">
+                    <span class="text-[#DFC08A] font-semibold uppercase tracking-wider">
                       ${
                         isUnlocked
                           ? `[UNLOCKED] ASSET LINK READY · @${unlockRecord.robloxUsername || 'VERIFIED'}`
@@ -644,15 +665,15 @@ function renderPreviousWorkDemos() {
                     isUnlocked
                       ? `
                         <p class="text-xs text-zinc-200 leading-relaxed">
-                          Gamepass verified! Your official Roblox Creator Store link is now unlocked below:
+                          Gamepass verified. Your official Roblox Creator Store link is unlocked below:
                         </p>
-                        <div class="p-3 rounded bg-zinc-950 border border-emerald-500/40">
-                          <div class="text-[11px] font-mono text-emerald-400 mb-1">Unlocked Roblox Creator Store Asset URL:</div>
+                        <div class="p-3 bg-[#09090B] border border-[#DFC08A]/40">
+                          <div class="text-[11px] font-mono text-[#DFC08A] mb-1">Unlocked Roblox Creator Store Asset URL:</div>
                           <a
                             href="${targetUnlockUrl}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="block text-xs font-mono text-white hover:text-emerald-300 break-all underline underline-offset-4"
+                            class="block text-xs font-mono text-white hover:text-[#DFC08A] break-all underline underline-offset-4"
                           >${targetUnlockUrl}</a>
                         </div>
                         <div class="flex flex-wrap items-center gap-2.5">
@@ -660,7 +681,7 @@ function renderPreviousWorkDemos() {
                             href="${targetUnlockUrl}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 text-xs sm:text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap"
+                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient transition-all whitespace-nowrap"
                           >
                             <span>Open Unlocked Asset Link</span>
                             ${ARROW_UP_RIGHT_SVG}
@@ -668,9 +689,9 @@ function renderPreviousWorkDemos() {
                           <button
                             type="button"
                             data-copy-asset="${targetUnlockUrl}"
-                            class="inline-flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-mono font-medium text-zinc-200 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/15 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                            class="inline-flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-mono uppercase tracking-wider font-medium text-zinc-200 hover:text-white bg-[#141418] hover:bg-[#1C1C22] border border-white/15 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                           >
-                            <span>Copy Unlocked Link</span>
+                            <span>Copy Link</span>
                           </button>
                         </div>
                       `
@@ -678,14 +699,14 @@ function renderPreviousWorkDemos() {
                         <p class="text-xs text-zinc-300 leading-relaxed">
                           This Roblox Creator Store asset link is <strong class="text-white">locked</strong>. Purchase the Gamepass on Roblox and verify ownership—the buying menu will automatically close and unlock the link right here.
                         </p>
-                        <div class="p-3 rounded bg-zinc-950/90 border border-white/10 flex items-center justify-between gap-2 text-xs font-mono text-zinc-400 select-none">
+                        <div class="p-3 bg-[#09090B] border border-white/10 flex items-center justify-between gap-2 text-xs font-mono text-zinc-500 select-none">
                           <span class="truncate">https://create.roblox.com/store/asset/••••••••••••••• (Locked)</span>
-                          <span class="text-amber-400 shrink-0">LOCKED</span>
+                          <span class="text-[#DFC08A] shrink-0">LOCKED</span>
                         </div>
                         <button
                           type="button"
                           data-open-gamepass="${demo.id}"
-                          class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-xs sm:text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors cursor-pointer"
+                          class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient transition-all cursor-pointer"
                         >
                           <span>Buy Gamepass (${formatNumber(demo.gamePassPriceRobux || 3500)} R$) to Unlock Link</span>
                           ${ARROW_UP_RIGHT_SVG}
@@ -694,8 +715,8 @@ function renderPreviousWorkDemos() {
                   }
                 </div>
 
-                <div class="p-3.5 rounded-md bg-zinc-900/70 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div class="text-xs text-zinc-300 font-mono">${demo.rateLabel}</div>
+                <div class="p-3.5 bg-[#0C0C0E] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="text-xs text-zinc-400 font-mono">${demo.rateLabel}</div>
                 </div>
               </div>
             </div>
@@ -704,22 +725,22 @@ function renderPreviousWorkDemos() {
           ${
             demo.tryAssetUrl
               ? isUnlocked
-                ? `<div class="mt-8 p-4 rounded-lg bg-emerald-950/20 border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                ? `<div class="mt-8 p-4 studio-active-cell border border-[#DFC08A]/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="space-y-1 min-w-0">
-                      <div class="text-xs font-mono text-emerald-400">[UNLOCKED] Official Roblox Creator Store Link</div>
+                      <div class="text-xs font-mono text-[#DFC08A]">[UNLOCKED] Official Roblox Creator Store Link</div>
                       <a href="${targetUnlockUrl}" target="_blank" rel="noopener noreferrer" class="block text-xs font-mono text-zinc-200 hover:text-white truncate underline underline-offset-4">${targetUnlockUrl}</a>
                     </div>
-                    <a href="${targetUnlockUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0">
+                    <a href="${targetUnlockUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider font-semibold text-[#DFC08A] hover:text-white whitespace-nowrap shrink-0">
                       <span>Open in Roblox Creator Store</span>
                       ${ARROW_UP_RIGHT_SVG}
                     </a>
                   </div>`
-                : `<div class="mt-8 p-4 rounded-lg bg-zinc-900/50 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                : `<div class="mt-8 p-4 bg-[#0C0C0E] border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="space-y-1 min-w-0">
-                      <div class="text-xs font-mono text-amber-400">[LOCKED] Official Roblox Creator Store Link</div>
+                      <div class="text-xs font-mono text-[#DFC08A]">[LOCKED] Official Roblox Creator Store Link</div>
                       <div class="text-xs font-mono text-zinc-400 truncate">Link is locked — Buy &amp; verify Gamepass #${demo.gamePassId || '2053169441'} (${formatNumber(demo.gamePassPriceRobux || 3500)} R$) to unlock link</div>
                     </div>
-                    <button type="button" data-open-gamepass="${demo.id}" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0 cursor-pointer">
+                    <button type="button" data-open-gamepass="${demo.id}" class="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider font-semibold text-[#DFC08A] hover:text-white whitespace-nowrap shrink-0 cursor-pointer">
                       <span>Unlock Link (${formatNumber(demo.gamePassPriceRobux || 3500)} R$ Gamepass)</span>
                       ${ARROW_UP_RIGHT_SVG}
                     </button>
@@ -774,9 +795,9 @@ function renderPreviousWorkDemos() {
       try {
         await navigator.clipboard.writeText(url);
       } catch {}
-      btn.innerHTML = `<span class="text-emerald-400">Link Copied!</span>`;
+      btn.innerHTML = `<span class="text-[#DFC08A]">Link Copied!</span>`;
       setTimeout(() => {
-        btn.innerHTML = `<span>Copy Unlocked Link</span>`;
+        btn.innerHTML = `<span>Copy Link</span>`;
       }, 2000);
     });
   });
@@ -787,6 +808,25 @@ function renderPreviousWorkDemos() {
       const demoId = btn.getAttribute('data-open-lightbox');
       const found = PREVIOUS_WORK_DEMOS.find((d) => d.id === demoId);
       if (found) openImageLightbox(found);
+    });
+  });
+
+  // Lightbox for 3D Modeling gallery images
+  listContainer.querySelectorAll('[data-open-gallery]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const raw = btn.getAttribute('data-open-gallery') || '';
+      const [demoId, idxStr] = raw.split(':');
+      const found = PREVIOUS_WORK_DEMOS.find((d) => d.id === demoId);
+      const item = found?.galleryImages?.[Number(idxStr)];
+      if (found && item) {
+        openImageLightbox({
+          title: item.label,
+          categoryLabel: found.categoryLabel,
+          author: found.author,
+          craftTag: item.subtitle,
+          imageUrl: item.url,
+        });
+      }
     });
   });
 
@@ -828,11 +868,11 @@ function setBotStatusBanner(type, message) {
   banner.classList.remove('hidden-view');
   const colorClasses =
     type === 'success'
-      ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300'
+      ? 'studio-active-cell border-[#DFC08A] text-[#DFC08A]'
       : type === 'error'
-      ? 'bg-red-950/60 border-red-500/50 text-red-300'
-      : 'bg-zinc-900/90 border-white/15 text-zinc-200';
-  banner.className = `p-3.5 rounded-lg border text-xs font-mono leading-relaxed ${colorClasses}`;
+      ? 'bg-rose-950/60 border-rose-500/50 text-rose-300'
+      : 'bg-[#121216] border-white/15 text-zinc-200';
+  banner.className = `p-3.5 border text-xs font-mono leading-relaxed ${colorClasses}`;
   banner.textContent = message;
 }
 
@@ -853,14 +893,14 @@ function openGamepassModal(demo) {
   const priceRobux = demo.gamePassPriceRobux || 3500;
   const checkoutUrl = demo.gamePassUrl || getRobloxGamepassCheckoutUrl(gamePassId);
 
-  if (catEl) catEl.textContent = `${demo.categoryLabel.toUpperCase()} · ROBLOX GAMEPASS LINK UNLOCK`;
+  if (catEl) catEl.textContent = `${demo.categoryLabel.toUpperCase()} // ROBLOX GAMEPASS LINK UNLOCK`;
   if (titleEl) titleEl.textContent = demo.title;
   if (passIdEl) {
     passIdEl.textContent = `Roblox Gamepass ID: #${gamePassId} · Unlocks Official Roblox Creator Store Link`;
   }
   if (priceEl) priceEl.textContent = `${formatNumber(priceRobux)} R$`;
   if (buyLink) buyLink.href = checkoutUrl;
-  if (buyBtnText) buyBtnText.textContent = `1. Buy Gamepass on Roblox (${formatNumber(priceRobux)} R$)`;
+  if (buyBtnText) buyBtnText.textContent = `1. Buy Gamepass (${formatNumber(priceRobux)} R$)`;
   if (autoBadge) autoBadge.textContent = 'Auto-Check on Tab Return: Ready';
 
   setBotStatusBanner('', '');
@@ -911,16 +951,16 @@ async function lookupGamepassRobloxUser() {
     };
     state.lookedUpRobloxUser = normalizedUser;
     previewEl.innerHTML = `
-      <div class="mt-2 p-2.5 rounded-md bg-zinc-900 border border-emerald-500/30 flex items-center justify-between gap-3">
+      <div class="mt-2 p-2.5 bg-[#121216] border border-[#DFC08A]/40 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           ${
             normalizedUser.avatarUrl
-              ? `<img src="${normalizedUser.avatarUrl}" alt="${normalizedUser.name}" class="w-9 h-9 rounded-full bg-zinc-800 border border-emerald-400/40 object-cover" />`
-              : `<div class="w-9 h-9 rounded-full bg-emerald-950 border border-emerald-400/40 flex items-center justify-center text-xs font-mono text-emerald-300">R$</div>`
+              ? `<img src="${normalizedUser.avatarUrl}" alt="${normalizedUser.name}" class="w-9 h-9 bg-zinc-800 border border-[#DFC08A]/40 object-cover" />`
+              : `<div class="w-9 h-9 bg-zinc-900 border border-[#DFC08A]/40 flex items-center justify-center text-xs font-mono text-[#DFC08A]">R$</div>`
           }
           <div>
             <div class="text-xs font-semibold text-white">${normalizedUser.displayName} (@${normalizedUser.name})</div>
-            <div class="text-[11px] font-mono text-emerald-400">Roblox User ID: ${normalizedUser.id} · Connected to Bot</div>
+            <div class="text-[11px] font-mono text-[#DFC08A]">Roblox User ID: ${normalizedUser.id} · Connected to Bot</div>
           </div>
         </div>
         <a href="${normalizedUser.profileUrl}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-mono text-zinc-400 hover:text-white underline">Profile -></a>
@@ -928,7 +968,7 @@ async function lookupGamepassRobloxUser() {
     `;
     setBotStatusBanner(
       'info',
-      `[Bot Connected]: Found @${normalizedUser.name} (ID: ${normalizedUser.id}). Now click "1. Buy Gamepass on Roblox" or "2. Verify Gamepass & Unlock Link".`
+      `[Bot Connected]: Found @${normalizedUser.name} (ID: ${normalizedUser.id}). Now click "1. Buy Gamepass" or "2. Verify & Unlock Link".`
     );
     return normalizedUser;
   } catch {
@@ -954,7 +994,7 @@ async function verifyGamepassOwnership(isAutoFocusCheck = false) {
     if (!isAutoFocusCheck) {
       setBotStatusBanner(
         'error',
-        'Please enter your Roblox username in Step 1 before verifying Gamepass ownership.'
+        'Please enter your Roblox username in Step 01 before verifying Gamepass ownership.'
       );
       if (inputEl) inputEl.focus();
     }
@@ -1028,7 +1068,7 @@ async function verifyGamepassOwnership(isAutoFocusCheck = false) {
   } catch {
     setBotStatusBanner('error', 'Could not reach /api/verify-gamepass. Please try again.');
   } finally {
-    if (verifyBtn) verifyBtn.innerHTML = `<span>2. Verify Gamepass & Unlock Link</span>`;
+    if (verifyBtn) verifyBtn.innerHTML = `<span>2. Verify & Unlock Link</span>`;
   }
 }
 
@@ -1036,7 +1076,7 @@ async function verifyGamepassOwnership(isAutoFocusCheck = false) {
 // 7. INITIALIZE ALL EVENT LISTENERS ON DOM READY
 // ============================================================================
 function initApp() {
-  initHeroVideoAndHackerSequence();
+  initHeroVideoControls();
   renderExperienceGrid();
   renderRateEstimator();
   renderPreviousWorkDemos();
@@ -1046,6 +1086,17 @@ function initApp() {
     el.addEventListener('click', () => {
       const target = el.getAttribute('data-nav-view');
       setView(target, target === 'previous-work' ? 'all' : undefined);
+    });
+  });
+
+  // Quick discipline links in Experience section header
+  document.querySelectorAll('[data-select-discipline]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const disc = el.getAttribute('data-select-discipline');
+      if (disc) {
+        state.selectedDiscipline = disc;
+        renderRateEstimator();
+      }
     });
   });
 
@@ -1061,9 +1112,9 @@ function initApp() {
       try {
         await navigator.clipboard.writeText(est.summaryText);
       } catch {}
-      copyRateBtn.textContent = 'Rate Copied';
+      copyRateBtn.textContent = 'Official Quote Summary Copied!';
       setTimeout(() => {
-        copyRateBtn.textContent = 'Copy Rate';
+        copyRateBtn.textContent = 'Copy Official Quote Summary';
       }, 2000);
     });
   }

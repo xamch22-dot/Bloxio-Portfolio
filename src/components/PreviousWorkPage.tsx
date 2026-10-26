@@ -128,10 +128,9 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
       aria-labelledby={`heading-${demo.id}`}
       className="py-12 border-b border-white/10"
     >
-      {/* Section Kicker */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-mono text-emerald-400 mb-1.5">
+          <p className="text-xs font-mono text-sky-400 mb-1.5">
             {demo.index}. {demo.categoryLabel} Section
           </p>
           <h2
@@ -147,7 +146,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
             href={targetUnlockUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap shrink-0 self-start sm:self-auto"
           >
             <span>Unlocked · Open Roblox Asset Link</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -156,7 +155,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
           <button
             type="button"
             onClick={() => onOpenGamepassModal(demo)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap shrink-0 self-start sm:self-auto cursor-pointer"
           >
             <span>
               Locked Link · Buy Gamepass ({demo.gamePassPriceRobux.toLocaleString('en-US')} R$) to Unlock
@@ -167,11 +166,10 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        {/* Left 7 Columns: High-Retention Video, Multi-Image Gallery, or Single Image Showcase */}
         <div className="lg:col-span-7 space-y-4">
           {demo.mediaType === 'video' && demo.videoUrl ? (
             <>
-              <div className="relative rounded-lg overflow-hidden border border-white/15 bg-black shadow-2xl">
+              <div className="relative rounded-xl overflow-hidden border border-white/15 bg-black shadow-2xl">
                 <video
                   ref={videoRef}
                   src={demo.videoUrl}
@@ -182,16 +180,15 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                   controls
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
-                  className="w-full aspect-video object-cover bg-zinc-950"
+                  className="w-full aspect-video object-cover bg-slate-950"
                 />
               </div>
 
-              {/* Video Controls & Metadata Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-slate-400">
                 <div className="flex items-center gap-2">
                   <span>Roblox Studio Live Capture</span>
                   <span aria-hidden="true">·</span>
-                  <span className="text-emerald-400">
+                  <span className="text-sky-400">
                     {demo.assetId ? `Asset ID: ${demo.assetId}` : demo.craftTag}
                   </span>
                 </div>
@@ -201,7 +198,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                     type="button"
                     onClick={togglePlay}
                     aria-label={`${isPlaying ? 'Pause' : 'Play'} ${demo.title} video`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-200 bg-slate-900 hover:bg-slate-800 border border-white/10 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
                   >
                     {isPlaying ? (
                       <Pause className="w-3.5 h-3.5" />
@@ -215,16 +212,16 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                     type="button"
                     onClick={toggleMute}
                     aria-label={`${isMuted ? 'Unmute' : 'Mute'} ${demo.title} audio`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-200 bg-slate-900 hover:bg-slate-800 border border-white/10 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
                   >
                     {isMuted ? (
                       <>
-                        <VolumeX className="w-3.5 h-3.5 text-zinc-400" />
+                        <VolumeX className="w-3.5 h-3.5 text-slate-400" />
                         <span>Unmute Audio</span>
                       </>
                     ) : (
                       <>
-                        <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <Volume2 className="w-3.5 h-3.5 text-sky-400" />
                         <span>Audio On</span>
                       </>
                     )}
@@ -234,7 +231,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                     type="button"
                     onClick={restartVideo}
                     aria-label={`Replay ${demo.title} video`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-200 bg-slate-900 hover:bg-slate-800 border border-white/10 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Replay</span>
@@ -248,9 +245,9 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                 {demo.galleryImages.map((imgItem) => (
                   <div
                     key={imgItem.label}
-                    className="rounded-lg overflow-hidden border border-white/15 bg-zinc-950 flex flex-col justify-between"
+                    className="rounded-xl overflow-hidden border border-white/15 bg-slate-950 flex flex-col justify-between"
                   >
-                    <div className="aspect-square overflow-hidden bg-zinc-900">
+                    <div className="aspect-square overflow-hidden bg-slate-900">
                       <img
                         src={imgItem.url}
                         alt={`${imgItem.label} — 3D Model by ${demo.author}`}
@@ -258,12 +255,12 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="p-3.5 border-t border-white/10 flex items-center justify-between gap-2 bg-zinc-950">
+                    <div className="p-3.5 border-t border-white/10 flex items-center justify-between gap-2 bg-slate-950">
                       <div className="min-w-0">
                         <div className="font-display text-sm font-bold text-white truncate">
                           {imgItem.label}
                         </div>
-                        <div className="text-xs font-mono text-zinc-400 truncate mt-0.5">
+                        <div className="text-xs font-mono text-slate-400 truncate mt-0.5">
                           {imgItem.subtitle}
                         </div>
                       </div>
@@ -277,9 +274,9 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                           })
                         }
                         aria-label={`Inspect ${imgItem.label} in fullscreen`}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-mono text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-mono text-slate-200 bg-slate-900 hover:bg-slate-800 border border-white/10 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
                       >
-                        <Maximize2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <Maximize2 className="w-3.5 h-3.5 text-sky-400" />
                         <span>Inspect</span>
                       </button>
                     </div>
@@ -287,39 +284,38 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                 ))}
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-slate-400">
                 <div className="flex items-center gap-2">
                   <span>Roblox Studio Viewport Renders (2 Models)</span>
                   <span aria-hidden="true">·</span>
-                  <span className="text-emerald-400">{demo.craftTag}</span>
+                  <span className="text-sky-400">{demo.craftTag}</span>
                 </div>
               </div>
             </>
           ) : (
             <>
-              <div className="relative rounded-lg overflow-hidden border border-white/15 bg-zinc-950 shadow-2xl">
+              <div className="relative rounded-xl overflow-hidden border border-white/15 bg-slate-950 shadow-2xl">
                 {!imageError && demo.imageUrl ? (
                   <img
                     src={demo.imageUrl}
                     alt={`${demo.title} — ${demo.craftTag} by ${demo.author}`}
                     referrerPolicy="no-referrer"
                     onError={() => setImageError(true)}
-                    className="w-full h-auto object-contain bg-zinc-950"
+                    className="w-full h-auto object-contain bg-slate-950"
                   />
                 ) : (
-                  <div className="w-full aspect-[4/3] flex flex-col items-center justify-center bg-zinc-900 text-zinc-400 p-8 text-center">
+                  <div className="w-full aspect-[4/3] flex flex-col items-center justify-center bg-slate-900 text-slate-400 p-8 text-center">
                     <span className="font-display text-lg font-bold text-white">{demo.title}</span>
-                    <span className="text-xs font-mono text-emerald-400 mt-1">{demo.craftTag}</span>
+                    <span className="text-xs font-mono text-sky-400 mt-1">{demo.craftTag}</span>
                   </div>
                 )}
               </div>
 
-              {/* Image Inspection Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-slate-400">
                 <div className="flex items-center gap-2">
                   <span>High-Resolution Roblox UI Frame</span>
                   <span aria-hidden="true">·</span>
-                  <span className="text-emerald-400">{demo.craftTag}</span>
+                  <span className="text-sky-400">{demo.craftTag}</span>
                 </div>
 
                 {demo.imageUrl && (
@@ -333,9 +329,9 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                       })
                     }
                     aria-label={`Inspect ${demo.title} in fullscreen`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-200 bg-slate-900 hover:bg-slate-800 border border-white/10 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
                   >
-                    <Maximize2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <Maximize2 className="w-3.5 h-3.5 text-sky-400" />
                     <span>Inspect Fullscreen UI</span>
                   </button>
                 )}
@@ -344,11 +340,10 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
           )}
         </div>
 
-        {/* Right 5 Columns: Description, Systems Included & Actions */}
         <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
           <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-mono text-zinc-400">
-              <span className="text-emerald-400 font-semibold whitespace-nowrap">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-mono text-slate-400">
+              <span className="text-sky-400 font-semibold whitespace-nowrap">
                 {demo.categoryLabel}
               </span>
               <span aria-hidden="true">·</span>
@@ -357,19 +352,18 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
               <span className="whitespace-nowrap">{demo.craftTag}</span>
             </div>
 
-            <p className="text-sm sm:text-base text-zinc-200 leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
               {demo.description}
             </p>
 
-            {/* Unboxed Systems List (Zero-Pill Discipline) */}
             <div className="pt-1">
-              <div className="text-xs font-mono text-zinc-400 mb-2">{highlightsHeading}</div>
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs font-mono text-zinc-200">
+              <div className="text-xs font-mono text-slate-400 mb-2">{highlightsHeading}</div>
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs font-mono text-slate-200">
                 {demo.systemsIncluded.map((sys, idx) => (
                   <React.Fragment key={sys}>
-                    <span className="text-emerald-400">{sys}</span>
+                    <span className="text-sky-400">{sys}</span>
                     {idx < demo.systemsIncluded.length - 1 && (
-                      <span aria-hidden="true" className="text-zinc-500">
+                      <span aria-hidden="true" className="text-slate-500">
                         ·
                       </span>
                     )}
@@ -379,30 +373,28 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
             </div>
           </div>
 
-          {/* Technical Breakdown Rows */}
           <div className="border-t border-white/10 divide-y divide-white/10">
             {demo.technicalHighlights.map((item) => (
               <div key={item.label} className="py-3">
                 <div className="text-xs font-mono font-semibold text-white">{item.label}</div>
-                <div className="text-xs text-zinc-400 mt-0.5 leading-relaxed">{item.detail}</div>
+                <div className="text-xs text-slate-400 mt-0.5 leading-relaxed">{item.detail}</div>
               </div>
             ))}
           </div>
 
-          {/* Action Row */}
           <div className="pt-2 space-y-3">
             <div
               id={`unlocked-link-box-${demo.id}`}
-              className={`p-4 rounded-lg space-y-3 ${
+              className={`p-4 rounded-2xl space-y-3 ${
                 isUnlocked
-                  ? 'bg-emerald-950/35 border border-emerald-400/50'
-                  : 'bg-zinc-900/80 border border-white/15'
+                  ? 'bg-sky-950/35 border border-sky-400/50'
+                  : 'bg-[#0C1326]/90 border border-white/15'
               }`}
             >
               <div className="flex items-center justify-between gap-2 text-xs font-mono">
                 <span
                   className={`font-semibold ${
-                    isUnlocked ? 'text-emerald-400' : 'text-amber-400'
+                    isUnlocked ? 'text-sky-400' : 'text-amber-400'
                   }`}
                 >
                   {isUnlocked
@@ -416,18 +408,18 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
 
               {isUnlocked ? (
                 <>
-                  <p className="text-xs text-zinc-200 leading-relaxed">
+                  <p className="text-xs text-slate-200 leading-relaxed">
                     Gamepass verified! Your official Roblox Creator Store link is now unlocked below:
                   </p>
-                  <div className="p-3 rounded bg-zinc-950 border border-emerald-500/40">
-                    <div className="text-[11px] font-mono text-emerald-400 mb-1">
+                  <div className="p-3 rounded-xl bg-slate-950 border border-sky-500/40">
+                    <div className="text-[11px] font-mono text-sky-400 mb-1">
                       Unlocked Roblox Creator Store Asset URL:
                     </div>
                     <a
                       href={targetUnlockUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block text-xs font-mono text-white hover:text-emerald-300 break-all underline underline-offset-4"
+                      className="block text-xs font-mono text-white hover:text-sky-300 break-all underline underline-offset-4"
                     >
                       {targetUnlockUrl}
                     </a>
@@ -437,7 +429,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                       href={targetUnlockUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors whitespace-nowrap shrink-0"
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap shrink-0"
                     >
                       <span>Open Unlocked Asset Link</span>
                       <ExternalLink className="w-4 h-4" />
@@ -446,11 +438,11 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                     <button
                       type="button"
                       onClick={handleCopyAssetLink}
-                      className="inline-flex items-center justify-center gap-1.5 px-4 py-3.5 text-xs font-mono font-medium text-zinc-200 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/15 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-3.5 text-xs font-mono font-medium text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-white/15 rounded-xl transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       {copied ? (
                         <>
-                          <Check className="w-4 h-4 text-emerald-400" />
+                          <Check className="w-4 h-4 text-sky-400" />
                           <span>Link Copied!</span>
                         </>
                       ) : (
@@ -464,13 +456,13 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                 </>
               ) : (
                 <>
-                  <p className="text-xs text-zinc-300 leading-relaxed">
+                  <p className="text-xs text-slate-300 leading-relaxed">
                     This Roblox Creator Store asset link is{' '}
                     <strong className="text-white">locked</strong>. Purchase the Gamepass on Roblox
                     and verify ownership—the buying menu will automatically close and unlock the
                     link right here.
                   </p>
-                  <div className="p-3 rounded bg-zinc-950/90 border border-white/10 flex items-center justify-between gap-2 text-xs font-mono text-zinc-400 select-none">
+                  <div className="p-3 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between gap-2 text-xs font-mono text-slate-400 select-none">
                     <span className="truncate">
                       https://create.roblox.com/store/asset/••••••••••••••• (Locked)
                     </span>
@@ -479,7 +471,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                   <button
                     type="button"
                     onClick={() => onOpenGamepassModal(demo)}
-                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-xs sm:text-sm font-semibold text-zinc-950 bg-emerald-400 rounded-md hover:bg-emerald-300 transition-colors cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all cursor-pointer"
                   >
                     <span>
                       Buy Gamepass ({demo.gamePassPriceRobux.toLocaleString('en-US')} R$) to Unlock
@@ -491,26 +483,25 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
               )}
             </div>
 
-            <div className="p-3.5 rounded-md bg-zinc-900/70 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="text-xs text-zinc-300 font-mono">{demo.rateLabel}</div>
+            <div className="p-3.5 rounded-xl bg-[#0C1326]/70 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="text-xs text-slate-300 font-mono">{demo.rateLabel}</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Direct Store URL Reference Strip for Scripting Combat System */}
       {demo.tryAssetUrl &&
         (isUnlocked ? (
-          <div className="mt-8 p-4 rounded-lg bg-emerald-950/20 border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="mt-8 p-4 rounded-xl bg-sky-950/25 border border-sky-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1 min-w-0">
-              <div className="text-xs font-mono text-emerald-400">
+              <div className="text-xs font-mono text-sky-400">
                 [UNLOCKED] Official Roblox Creator Store Link
               </div>
               <a
                 href={targetUnlockUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-xs font-mono text-zinc-200 hover:text-white truncate underline underline-offset-4"
+                className="block text-xs font-mono text-slate-200 hover:text-white truncate underline underline-offset-4"
               >
                 {targetUnlockUrl}
               </a>
@@ -520,19 +511,19 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
               href={targetUnlockUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-sky-400 hover:text-sky-300 whitespace-nowrap shrink-0"
             >
               <span>Open in Roblox Creator Store</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
         ) : (
-          <div className="mt-8 p-4 rounded-lg bg-zinc-900/50 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="mt-8 p-4 rounded-xl bg-[#0C1326]/60 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1 min-w-0">
               <div className="text-xs font-mono text-amber-400">
                 [LOCKED] Official Roblox Creator Store Link
               </div>
-              <div className="text-xs font-mono text-zinc-400 truncate">
+              <div className="text-xs font-mono text-slate-400 truncate">
                 Link is locked — Buy &amp; verify Gamepass #{demo.gamePassId || '2053169441'} (
                 {demo.gamePassPriceRobux.toLocaleString('en-US')} R$) to unlock link
               </div>
@@ -541,7 +532,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
             <button
               type="button"
               onClick={() => onOpenGamepassModal(demo)}
-              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-emerald-400 hover:text-emerald-300 whitespace-nowrap shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-sky-400 hover:text-sky-300 whitespace-nowrap shrink-0 cursor-pointer"
             >
               <span>
                 Unlock Link ({demo.gamePassPriceRobux.toLocaleString('en-US')} R$ Gamepass)
@@ -636,7 +627,6 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
         } catch {}
 
         const targetId = activeGamepassDemo.id;
-        // Shut the buying menu modal immediately and unlock the link on the card
         setActiveGamepassDemo(null);
         setBotStatus(null);
 
@@ -688,34 +678,33 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
   };
 
   return (
-    <div className="min-h-[calc(100vh-61px)] bg-[#070908] text-zinc-100 py-14 lg:py-20 px-6 lg:px-12">
+    <div className="min-h-[calc(100vh-61px)] bg-[#060913] text-slate-100 py-14 lg:py-20 px-6 lg:px-12">
       <div className="max-w-[1280px] mx-auto">
-        {/* Top Breadcrumb & Sub-Page Switcher */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-white/10">
           <div className="flex items-center gap-3 text-xs font-mono">
             <button
               type="button"
               data-sfx="page-change"
               onClick={handleBackClick}
-              className="inline-flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Home</span>
             </button>
-            <span aria-hidden="true" className="text-zinc-600">
+            <span aria-hidden="true" className="text-slate-600">
               /
             </span>
-            <span className="text-zinc-300">Previous Work (Demo)</span>
-            <span aria-hidden="true" className="text-zinc-600">
+            <span className="text-slate-300">Previous Work (Demo)</span>
+            <span aria-hidden="true" className="text-slate-600">
               /
             </span>
-            <span className="text-emerald-400">{subPageTitle}</span>
+            <span className="text-sky-400">{subPageTitle}</span>
           </div>
 
           <div
             role="tablist"
             aria-label="Previous Work Sub-Pages"
-            className="inline-flex flex-wrap items-center gap-1 p-1 bg-zinc-900 border border-white/10 rounded-md self-start sm:self-auto"
+            className="inline-flex flex-wrap items-center gap-1 p-1.5 bg-[#0B1120] border border-white/10 rounded-xl self-start sm:self-auto"
           >
             <button
               type="button"
@@ -723,10 +712,10 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
               data-sfx="page-change"
               aria-selected={activeSubPage === 'all'}
               onClick={() => handleSelectSubPage('all')}
-              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'all'
-                  ? 'bg-emerald-400 text-zinc-950 font-semibold'
-                  : 'text-zinc-300 hover:text-white'
+                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
+                  : 'text-slate-300 hover:text-white'
               }`}
             >
               All Demos (4)
@@ -737,10 +726,10 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
               data-sfx="page-change"
               aria-selected={activeSubPage === 'scripting'}
               onClick={() => handleSelectSubPage('scripting')}
-              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'scripting'
-                  ? 'bg-emerald-400 text-zinc-950 font-semibold'
-                  : 'text-zinc-300 hover:text-white'
+                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
+                  : 'text-slate-300 hover:text-white'
               }`}
             >
               Scripting Work
@@ -751,10 +740,10 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
               data-sfx="page-change"
               aria-selected={activeSubPage === 'animating'}
               onClick={() => handleSelectSubPage('animating')}
-              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'animating'
-                  ? 'bg-emerald-400 text-zinc-950 font-semibold'
-                  : 'text-zinc-300 hover:text-white'
+                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
+                  : 'text-slate-300 hover:text-white'
               }`}
             >
               Animation Work
@@ -765,10 +754,10 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
               data-sfx="page-change"
               aria-selected={activeSubPage === 'ui-design'}
               onClick={() => handleSelectSubPage('ui-design')}
-              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'ui-design'
-                  ? 'bg-emerald-400 text-zinc-950 font-semibold'
-                  : 'text-zinc-300 hover:text-white'
+                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
+                  : 'text-slate-300 hover:text-white'
               }`}
             >
               UI Design
@@ -779,10 +768,10 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
               data-sfx="page-change"
               aria-selected={activeSubPage === 'modeling'}
               onClick={() => handleSelectSubPage('modeling')}
-              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'modeling'
-                  ? 'bg-emerald-400 text-zinc-950 font-semibold'
-                  : 'text-zinc-300 hover:text-white'
+                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
+                  : 'text-slate-300 hover:text-white'
               }`}
             >
               3D Modeling
@@ -790,16 +779,15 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
           </div>
         </div>
 
-        {/* Page Header */}
         <div className="pt-10 pb-10 border-b border-white/10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="max-w-3xl">
-            <p className="text-xs font-mono text-emerald-400 mb-3">
+            <p className="text-xs font-mono uppercase tracking-wider text-sky-400 mb-3">
               Previous Work (Demo) · Scripting, Animation, UI &amp; 3D Modeling Showcase
             </p>
             <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white text-balance">
               {subPageTitle}
             </h1>
-            <p className="mt-4 text-base text-zinc-400 leading-relaxed">
+            <p className="mt-4 text-base text-slate-400 leading-relaxed">
               Explore live recorded Roblox Studio demonstrations, polished interface designs, and game-ready
               3D models crafted by <strong className="text-white">balo_xio</strong> across all four core
               disciplines.
@@ -807,7 +795,6 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
           </div>
         </div>
 
-        {/* Render Visible Demo Sections */}
         <div>
           {visibleDemos.map((demo) => (
             <DemoShowcaseCard
@@ -821,7 +808,6 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
         </div>
       </div>
 
-      {/* Gamepass Buying & Bot Verification Modal (Closes immediately on verification and unlocks link) */}
       {activeGamepassDemo && (
         <div
           role="dialog"
@@ -831,12 +817,12 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
           onClick={() => setActiveGamepassDemo(null)}
         >
           <div
-            className="relative w-full max-w-2xl bg-zinc-950 border border-white/15 rounded-xl shadow-2xl overflow-hidden my-8"
+            className="relative w-full max-w-2xl bg-[#090E1C] border border-sky-400/25 rounded-2xl shadow-2xl overflow-hidden my-8"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-900/60">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#0D1528]">
               <div>
-                <p className="text-xs font-mono text-emerald-400">
+                <p className="text-xs font-mono text-sky-400">
                   Roblox Gamepass Verification Bot · Instant Link Unlock
                 </p>
                 <h2 className="font-display text-xl font-bold text-white">
@@ -847,36 +833,36 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
                 type="button"
                 onClick={() => setActiveGamepassDemo(null)}
                 aria-label="Close Gamepass unlock modal"
-                className="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white bg-zinc-900 rounded border border-white/10 cursor-pointer"
+                className="px-3 py-1.5 text-xs font-mono text-slate-300 hover:text-white bg-slate-900 rounded-lg border border-white/10 cursor-pointer"
               >
                 Close [ESC]
               </button>
             </div>
 
             <div className="p-6 space-y-5">
-              <div className="p-4 rounded-lg bg-zinc-900/80 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="p-4 rounded-xl bg-[#0D1528] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <div className="text-xs font-mono text-emerald-400">
+                  <div className="text-xs font-mono text-sky-400">
                     {activeGamepassDemo.categoryLabel.toUpperCase()} · ROBLOX GAMEPASS LINK UNLOCK
                   </div>
                   <div className="font-display text-lg font-bold text-white mt-0.5">
                     {activeGamepassDemo.title}
                   </div>
-                  <div className="text-xs font-mono text-zinc-400 mt-0.5">
+                  <div className="text-xs font-mono text-slate-400 mt-0.5">
                     Roblox Gamepass ID: #{activeGamepassDemo.gamePassId} · Unlocks Official Roblox
                     Creator Store Link
                   </div>
                 </div>
                 <div className="sm:text-right shrink-0">
-                  <div className="text-xs font-mono text-zinc-400">Gamepass Price</div>
-                  <div className="font-display text-2xl font-bold text-emerald-400 tabular-nums">
+                  <div className="text-xs font-mono text-slate-400">Gamepass Price</div>
+                  <div className="font-display text-2xl font-bold text-sky-400 tabular-nums">
                     {activeGamepassDemo.gamePassPriceRobux.toLocaleString('en-US')} R$
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="block text-xs font-mono text-zinc-300">
+                <label className="block text-xs font-mono text-slate-300">
                   Step 1. Enter Your Roblox Username (Bot Checks Your Inventory) *
                 </label>
                 <input
@@ -884,12 +870,12 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
                   value={robloxUsername}
                   onChange={(e) => setRobloxUsername(e.target.value)}
                   placeholder="e.g. tpjerry6789"
-                  className="w-full px-3.5 py-2.5 text-sm bg-zinc-900 border border-white/15 rounded-md text-white focus:outline-none focus:border-emerald-400"
+                  className="w-full px-3.5 py-2.5 text-sm bg-slate-900 border border-white/15 rounded-xl text-white focus:outline-none focus:border-sky-400"
                 />
               </div>
 
-              <div className="p-4 rounded-lg bg-zinc-900/50 border border-white/10 space-y-3">
-                <div className="text-xs font-mono text-zinc-300">
+              <div className="p-4 rounded-xl bg-[#0D1528]/70 border border-white/10 space-y-3">
+                <div className="text-xs font-mono text-slate-300">
                   Step 2. Purchase Gamepass on Roblox &amp; Verify to Unlock Link
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -900,7 +886,7 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
                     }
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 rounded-md transition-colors whitespace-nowrap"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 rounded-xl transition-all whitespace-nowrap"
                   >
                     <span>
                       1. Buy Gamepass on Roblox (
@@ -913,7 +899,7 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
                     type="button"
                     disabled={isVerifying}
                     onClick={handleVerifyGamepass}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-mono font-semibold text-white bg-zinc-800 hover:bg-zinc-700 border border-emerald-500/40 rounded-md transition-colors cursor-pointer whitespace-nowrap"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-mono font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-sky-400/40 rounded-xl transition-colors cursor-pointer whitespace-nowrap"
                   >
                     <span>
                       {isVerifying
@@ -924,7 +910,7 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
                 </div>
 
                 <div className="pt-1">
-                  <label className="block text-[11px] font-mono text-zinc-400 mb-1">
+                  <label className="block text-[11px] font-mono text-slate-400 mb-1">
                     Optional: Have a Private Inventory or Instant Claim Passcode?
                   </label>
                   <input
@@ -932,17 +918,17 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
                     value={claimCode}
                     onChange={(e) => setClaimCode(e.target.value)}
                     placeholder="Optional claim code (e.g. BALO-GAMEPASS-VERIFIED)"
-                    className="w-full px-3 py-2 text-xs font-mono bg-zinc-950 border border-white/10 rounded text-zinc-200 focus:outline-none focus:border-emerald-400"
+                    className="w-full px-3 py-2 text-xs font-mono bg-slate-950 border border-white/10 rounded-lg text-slate-200 focus:outline-none focus:border-sky-400"
                   />
                 </div>
               </div>
 
               {botStatus && (
                 <div
-                  className={`p-3.5 rounded-lg border text-xs font-mono leading-relaxed ${
+                  className={`p-3.5 rounded-xl border text-xs font-mono leading-relaxed ${
                     botStatus.type === 'error'
-                      ? 'bg-red-950/60 border-red-500/50 text-red-300'
-                      : 'bg-zinc-900/90 border-white/15 text-zinc-200'
+                      ? 'bg-rose-950/60 border-rose-500/50 text-rose-300'
+                      : 'bg-slate-900/90 border-white/15 text-slate-200'
                   }`}
                 >
                   {botStatus.message}
@@ -953,7 +939,6 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
         </div>
       )}
 
-      {/* Fullscreen Lightbox Modal for Image Demos */}
       {lightboxTarget && (
         <div
           role="dialog"
@@ -963,24 +948,24 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
           onClick={() => setLightboxTarget(null)}
         >
           <div
-            className="relative max-w-5xl w-full bg-zinc-950 border border-white/15 rounded-xl overflow-hidden shadow-2xl"
+            className="relative max-w-5xl w-full bg-[#090E1C] border border-white/15 rounded-2xl overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
               <div>
                 <h3 className="font-display text-lg font-bold text-white">{lightboxTarget.title}</h3>
-                <p className="text-xs font-mono text-zinc-400">{lightboxTarget.subtitle}</p>
+                <p className="text-xs font-mono text-slate-400">{lightboxTarget.subtitle}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setLightboxTarget(null)}
                 aria-label="Close fullscreen preview"
-                className="p-2 text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded-md cursor-pointer"
+                className="p-2 text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-white/10 rounded-lg cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-6 flex items-center justify-center bg-[#050706]">
+            <div className="p-6 flex items-center justify-center bg-[#050811]">
               <img
                 src={lightboxTarget.imageUrl}
                 alt={lightboxTarget.title}

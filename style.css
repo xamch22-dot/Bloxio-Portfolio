@@ -3,14 +3,19 @@
 @layer base {
   :root {
     --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Fraunces', Georgia, serif;
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
 
   body {
     font-family: var(--font-sans);
-    background-color: #070908;
-    color: #f4f4f5;
+    background-color: #09090B;
+    background-image:
+      radial-gradient(ellipse 90% 45% at 50% -5%, rgba(216, 180, 120, 0.09), rgba(244, 239, 230, 0.025) 45%, transparent 75%),
+      linear-gradient(180deg, #09090B 0%, #0C0C0E 50%, #09090B 100%);
+    background-attachment: fixed;
+    color: #F4F1EA;
     overflow-x: hidden;
     margin: 0;
   }
@@ -19,33 +24,71 @@
     font-family: var(--font-display);
   }
 
+  .font-serif-editorial {
+    font-family: var(--font-serif);
+  }
+
   code, pre, .font-mono {
     font-family: var(--font-mono);
   }
 }
 
-/* Selective partial blur so background video code on the left doesn't clash with portfolio text, while the character on the right stays clear */
+/* Warm cinema monochrome/tungsten grade on the raw video so no green tint appears */
+.hero-video-grade {
+  filter: grayscale(0.75) sepia(0.35) contrast(1.08) brightness(0.85);
+}
+
+/* Selective partial blur on the left area while keeping the character on the right sharp */
 .selective-video-blur {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(7px) saturate(0.8) contrast(1.05);
+  -webkit-backdrop-filter: blur(7px) saturate(0.8) contrast(1.05);
   mask-image: linear-gradient(
     90deg,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.88) 44%,
-    rgba(0, 0, 0, 0.25) 75%,
+    rgba(0, 0, 0, 0.92) 48%,
+    rgba(0, 0, 0, 0.35) 75%,
     rgba(0, 0, 0, 0) 100%
   );
   -webkit-mask-image: linear-gradient(
     90deg,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.88) 44%,
-    rgba(0, 0, 0, 0.25) 75%,
+    rgba(0, 0, 0, 0.92) 48%,
+    rgba(0, 0, 0, 0.35) 75%,
     rgba(0, 0, 0, 0) 100%
   );
 }
 
-.hacker-text-shadow {
-  text-shadow: 0 0 20px rgba(34, 197, 94, 0.32);
+/* Brushed Platinum to Warm Champagne Bronze editorial gradient */
+.pro-gradient-text {
+  background: linear-gradient(125deg, #FFFFFF 0%, #F4EFE6 36%, #DFC08A 72%, #C4934B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Tactile Warm Champagne-Gold to Anodized Bronze interactive gradient */
+.studio-btn-gradient {
+  background: linear-gradient(135deg, #EFE9DC 0%, #DFC28E 52%, #C99A52 100%);
+  color: #09090B;
+}
+
+.studio-btn-gradient:hover {
+  background: linear-gradient(135deg, #FFFFFF 0%, #EAD3A7 55%, #D5A862 100%);
+  color: #09090B;
+}
+
+/* Subtle top-lit anodized metal surface sheen */
+.studio-surface-gradient {
+  background: linear-gradient(180deg, rgba(244, 239, 230, 0.045) 0%, rgba(244, 239, 230, 0.008) 100%);
+}
+
+/* Warm active row gradient for the architectural specification matrix */
+.studio-active-row {
+  background: linear-gradient(90deg, rgba(216, 180, 120, 0.14) 0%, rgba(216, 180, 120, 0.03) 65%, transparent 100%);
+}
+
+.studio-active-cell {
+  background: linear-gradient(180deg, rgba(216, 180, 120, 0.14) 0%, rgba(216, 180, 120, 0.02) 100%);
 }
 
 .hidden-view {
