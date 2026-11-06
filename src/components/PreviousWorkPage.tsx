@@ -21,12 +21,7 @@ import {
 } from '../utils/portfolioLogic';
 import { playPageChangeSfx } from '../utils/sfxEngine';
 
-export type PreviousWorkSubPage =
-  | 'all'
-  | 'scripting'
-  | 'animating'
-  | 'ui-design'
-  | 'modeling';
+export type PreviousWorkSubPage = 'all' | 'scripting' | 'ui-design';
 
 interface LightboxTarget {
   title: string;
@@ -114,13 +109,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
   };
 
   const highlightsHeading =
-    demo.category === 'scripting'
-      ? 'Included Core Systems:'
-      : demo.category === 'animating'
-      ? 'Animation Highlights:'
-      : demo.category === 'ui-design'
-      ? 'UI Design Highlights:'
-      : '3D Modeling Highlights:';
+    demo.category === 'scripting' ? 'Included Core Systems:' : 'UI Design Highlights:';
 
   return (
     <section
@@ -146,7 +135,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
             href={targetUnlockUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap shrink-0 self-start sm:self-auto"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-white studio-btn-gradient rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap shrink-0 self-start sm:self-auto"
           >
             <span>Unlocked · Open Roblox Asset Link</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -155,7 +144,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
           <button
             type="button"
             onClick={() => onOpenGamepassModal(demo)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap shrink-0 self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-white studio-btn-gradient rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap shrink-0 self-start sm:self-auto cursor-pointer"
           >
             <span>
               Locked Link · Buy Gamepass ({demo.gamePassPriceRobux.toLocaleString('en-US')} R$) to Unlock
@@ -245,17 +234,17 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                 {demo.galleryImages.map((imgItem) => (
                   <div
                     key={imgItem.label}
-                    className="rounded-xl overflow-hidden border border-white/15 bg-slate-950 flex flex-col justify-between"
+                    className="rounded-xl overflow-hidden border border-white/15 bg-[#121520] flex flex-col justify-between"
                   >
-                    <div className="aspect-square overflow-hidden bg-slate-900">
+                    <div className="aspect-[16/10] p-3 flex items-center justify-center overflow-hidden bg-[#0D0F17]">
                       <img
                         src={imgItem.url}
-                        alt={`${imgItem.label} — 3D Model by ${demo.author}`}
+                        alt={`${imgItem.label} — UI Design by ${demo.author}`}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
+                        className="max-w-full max-h-full object-contain rounded-lg"
                       />
                     </div>
-                    <div className="p-3.5 border-t border-white/10 flex items-center justify-between gap-2 bg-slate-950">
+                    <div className="p-3.5 border-t border-white/10 flex items-center justify-between gap-2 bg-[#141724]">
                       <div className="min-w-0">
                         <div className="font-display text-sm font-bold text-white truncate">
                           {imgItem.label}
@@ -276,7 +265,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                         aria-label={`Inspect ${imgItem.label} in fullscreen`}
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-mono text-slate-200 bg-slate-900 hover:bg-slate-800 border border-white/10 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
                       >
-                        <Maximize2 className="w-3.5 h-3.5 text-sky-400" />
+                        <Maximize2 className="w-3.5 h-3.5 text-orange-300" />
                         <span>Inspect</span>
                       </button>
                     </div>
@@ -286,9 +275,9 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
 
               <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-slate-400">
                 <div className="flex items-center gap-2">
-                  <span>Roblox Studio Viewport Renders (2 Models)</span>
+                  <span>Roblox Studio UI Showcase ({demo.galleryImages.length} UI Assets)</span>
                   <span aria-hidden="true">·</span>
-                  <span className="text-sky-400">{demo.craftTag}</span>
+                  <span className="text-orange-300">{demo.craftTag}</span>
                 </div>
               </div>
             </>
@@ -429,7 +418,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                       href={targetUnlockUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap shrink-0"
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-white studio-btn-gradient rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all whitespace-nowrap shrink-0"
                     >
                       <span>Open Unlocked Asset Link</span>
                       <ExternalLink className="w-4 h-4" />
@@ -471,7 +460,7 @@ const DemoShowcaseCard: React.FC<DemoCardProps> = ({
                   <button
                     type="button"
                     onClick={() => onOpenGamepassModal(demo)}
-                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-xs sm:text-sm font-semibold text-white studio-btn-gradient rounded-xl hover:from-sky-400 hover:to-indigo-500 transition-all cursor-pointer"
                   >
                     <span>
                       Buy Gamepass ({demo.gamePassPriceRobux.toLocaleString('en-US')} R$) to Unlock
@@ -659,12 +648,8 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
   const subPageTitle =
     activeSubPage === 'scripting'
       ? 'Scripting Work'
-      : activeSubPage === 'animating'
-      ? 'Animation Work'
       : activeSubPage === 'ui-design'
       ? 'UI Design'
-      : activeSubPage === 'modeling'
-      ? '3D Modeling'
       : 'Previous Work (Demo)';
 
   const handleSelectSubPage = (sub: PreviousWorkSubPage) => {
@@ -698,7 +683,7 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
             <span aria-hidden="true" className="text-slate-600">
               /
             </span>
-            <span className="text-sky-400">{subPageTitle}</span>
+            <span className="text-orange-300">{subPageTitle}</span>
           </div>
 
           <div
@@ -714,11 +699,11 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
               onClick={() => handleSelectSubPage('all')}
               className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'all'
-                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
+                  ? 'studio-btn-gradient text-white font-semibold'
                   : 'text-slate-300 hover:text-white'
               }`}
             >
-              All Demos (4)
+              All Demos (2)
             </button>
             <button
               type="button"
@@ -728,7 +713,7 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
               onClick={() => handleSelectSubPage('scripting')}
               className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'scripting'
-                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
+                  ? 'studio-btn-gradient text-white font-semibold'
                   : 'text-slate-300 hover:text-white'
               }`}
             >
@@ -738,59 +723,30 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
               type="button"
               role="tab"
               data-sfx="page-change"
-              aria-selected={activeSubPage === 'animating'}
-              onClick={() => handleSelectSubPage('animating')}
-              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
-                activeSubPage === 'animating'
-                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              Animation Work
-            </button>
-            <button
-              type="button"
-              role="tab"
-              data-sfx="page-change"
               aria-selected={activeSubPage === 'ui-design'}
               onClick={() => handleSelectSubPage('ui-design')}
               className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSubPage === 'ui-design'
-                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
+                  ? 'studio-btn-gradient text-white font-semibold'
                   : 'text-slate-300 hover:text-white'
               }`}
             >
-              UI Design
-            </button>
-            <button
-              type="button"
-              role="tab"
-              data-sfx="page-change"
-              aria-selected={activeSubPage === 'modeling'}
-              onClick={() => handleSelectSubPage('modeling')}
-              className={`px-3.5 py-1.5 text-xs font-mono font-medium rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
-                activeSubPage === 'modeling'
-                  ? 'bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              3D Modeling
+              UI Design (6 Assets)
             </button>
           </div>
         </div>
 
         <div className="pt-10 pb-10 border-b border-white/10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="max-w-3xl">
-            <p className="text-xs font-mono uppercase tracking-wider text-sky-400 mb-3">
-              Previous Work (Demo) · Scripting, Animation, UI &amp; 3D Modeling Showcase
+            <p className="text-xs font-mono uppercase tracking-wider text-orange-300 mb-3">
+              Previous Work (Demo) · Scripting &amp; UI Design Showcase
             </p>
             <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white text-balance">
               {subPageTitle}
             </h1>
             <p className="mt-4 text-base text-slate-400 leading-relaxed">
-              Explore live recorded Roblox Studio demonstrations, polished interface designs, and game-ready
-              3D models crafted by <strong className="text-white">balo_xio</strong> across all four core
-              disciplines.
+              Explore live recorded Roblox Studio combat scripting demonstrations and custom studded
+              &amp; front-page game UI assets crafted by <strong className="text-white">balo_xio</strong>.
             </p>
           </div>
         </div>
@@ -886,7 +842,7 @@ export const PreviousWorkPage: React.FC<PreviousWorkPageProps> = ({
                     }
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 rounded-xl transition-all whitespace-nowrap"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold text-white studio-btn-gradient hover:from-sky-400 hover:to-indigo-500 rounded-xl transition-all whitespace-nowrap"
                   >
                     <span>
                       1. Buy Gamepass on Roblox (

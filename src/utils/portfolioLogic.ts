@@ -29,40 +29,13 @@ export const HACKER_SENTENCES: HackerSentence[] = [
     sentence: 'I am a UI Designer.',
     highlightWord: 'UI Designer',
     yearsLabel: '2+ Years in UI Design',
-    shortSpec: 'Responsive Scale Layouts · TweenService Motion · Custom HUDs',
-  },
-  {
-    id: 'animator',
-    order: 3,
-    rawRole: 'Animator',
-    sentence: 'I am an Animator.',
-    highlightWord: 'Animator',
-    yearsLabel: '1+ Year of Animating',
-    shortSpec: 'Moon Animator 2 & Blender · R6 & R15 Combat · Smooth Movement',
-  },
-  {
-    id: 'modeler',
-    order: 4,
-    rawRole: 'Modeler',
-    sentence: 'I am a Modeler.',
-    highlightWord: 'Modeler',
-    yearsLabel: '2+ Years of Modeling',
-    shortSpec: 'Blender 3D · Low & Mid-Poly Game Meshes · Clean Topology & UVs',
-  },
-  {
-    id: 'all-rounder',
-    order: 5,
-    rawRole: 'All-Rounder',
-    sentence: 'I am an All-Rounder.',
-    highlightWord: 'All-Rounder',
-    yearsLabel: 'Complete Roblox Production',
-    shortSpec: 'Scripting + UI + Modeling + Animation · Unified Studio Workflow',
+    shortSpec: 'Responsive Scale Layouts · Studded & Glossy Menus · Custom HUDs',
     isCulmination: true,
   },
 ];
 
 export interface DisciplineExperience {
-  id: string;
+  id: 'scripting' | 'ui-design';
   index: string;
   title: string;
   yearsNumeric: number;
@@ -82,10 +55,10 @@ export const DISCIPLINE_EXPERIENCES: DisciplineExperience[] = [
     yearsDisplay: '3+ Years',
     headline: '3+ years of Luau scripting and server-authoritative game systems.',
     description:
-      'Building modular client-server frameworks, responsive gameplay and ability mechanics, secure DataStore/ProfileService persistence, and exploit-resistant sanity checks.',
+      'Building modular client-server frameworks, responsive combat and ability mechanics, secure DataStore/ProfileService persistence, and exploit-resistant sanity checks.',
     deliverables: [
       'Modular Luau Frameworks',
-      'Gameplay & Ability Mechanics',
+      'Combat & Raycast Systems',
       'ProfileService DataStores',
       'Server Sanity Validation',
     ],
@@ -97,54 +70,20 @@ export const DISCIPLINE_EXPERIENCES: DisciplineExperience[] = [
     title: 'UI Design',
     yearsNumeric: 2,
     yearsDisplay: '2+ Years',
-    headline: '2+ years of experience in UI design and scripted interface motion.',
+    headline: '2+ years of experience in custom Roblox UI design and studded/glossy game menus.',
     description:
-      'Crafting clean, high-contrast interfaces scaled properly across Desktop, Mobile, and Console screens with smooth TweenService and spring animations.',
+      'Crafting high-retention shop menus, studded classic-modern frames, custom glossy buttons, item slot tiles, and responsive Scale layouts across Desktop, Mobile, and Console.',
     deliverables: [
+      'Studded & Glossy Shop Frames',
+      'Custom Buttons & Item Tiles',
+      'Lucky Block & Gamepass Stores',
       'Scale & AspectRatio Layouts',
-      'Inventory, Shop & HUD Menus',
-      'TweenService Micro-Interactions',
-      'Clean Vector Iconography',
     ],
-    tools: 'Figma · Roblox UI Editor · TweenService · Fusion',
-  },
-  {
-    id: 'modeling',
-    index: '03',
-    title: '3D Modeling',
-    yearsNumeric: 2,
-    yearsDisplay: '2+ Years',
-    headline: '2+ years of 3D modeling optimized for smooth Roblox frame rates.',
-    description:
-      'Modeling stylized and hard-surface weapons, environment props, modular map kits, and accessories with clean topology and optimized UV maps.',
-    deliverables: [
-      'Weapons & Interactive Props',
-      'Modular Map Assets',
-      'Clean Topology & UV Unwrapping',
-      'Optimized Collision Geometry',
-    ],
-    tools: 'Blender 4.0 · Substance Painter · Roblox Mesh Importer',
-  },
-  {
-    id: 'animating',
-    index: '04',
-    title: 'Animating',
-    yearsNumeric: 1,
-    yearsDisplay: '1+ Year',
-    headline: '1+ year of animating R6, R15, and custom weapon rigs.',
-    description:
-      'Creating snappy melee combos, weighty movement cycles, equip/idle sequences, and keyframe-synced animations ready for immediate game integration.',
-    deliverables: [
-      'R6 & R15 Action Combos',
-      'Movement, Dash & Idle Loops',
-      'Custom Motor6D Weapon Rigs',
-      'KeyframeMarker Event Syncing',
-    ],
-    tools: 'Moon Animator 2 · Blender Rigging · Roblox Animation Editor',
+    tools: 'Roblox UI Editor · Figma · TweenService · Custom Sprites',
   },
 ];
 
-export type DisciplineId = 'scripting' | 'ui-design' | 'modeling' | 'animating' | 'all-rounder';
+export type DisciplineId = 'scripting' | 'ui-design';
 export type ContractType = 'commission' | 'short-term' | 'long-term';
 export type CurrencyMode = 'USD' | 'ROBUX';
 
@@ -169,21 +108,21 @@ export const CONTRACT_META: Record<
 > = {
   commission: {
     id: 'commission',
-    label: 'Single Commission',
-    subtitle: 'One-off task, asset, UI, animation, or script',
-    delivery: '1–3 Days',
+    label: 'Per Task',
+    subtitle: 'Paid per single task only — covers 1 individual task (no multi-task bundles)',
+    delivery: '1–3 Days / Task',
   },
   'short-term': {
     id: 'short-term',
     label: 'Short-Term Project',
-    subtitle: 'Focused short-term sprint or multi-asset pack',
+    subtitle: 'Focused multi-task sprint or complete feature pack',
     delivery: '1–2 Weeks',
   },
   'long-term': {
     id: 'long-term',
     label: 'Long-Term Contract',
-    subtitle: 'Full ongoing development & studio commitment',
-    delivery: 'Long-Term Milestone',
+    subtitle: 'Full ongoing game production & dedicated studio commitment',
+    delivery: 'Ongoing Milestones',
   },
 };
 
@@ -191,37 +130,22 @@ export const DISCIPLINE_PRICING_TABLE: Record<
   DisciplineId,
   Record<ContractType, { usdTotal: number; robuxTotal: number }>
 > = {
-  'all-rounder': {
-    commission: { usdTotal: 20, robuxTotal: 5000 },
-    'short-term': { usdTotal: 70, robuxTotal: 20000 },
-    'long-term': { usdTotal: 250, robuxTotal: 100000 },
-  },
   scripting: {
     commission: { usdTotal: 15, robuxTotal: 5000 },
     'short-term': { usdTotal: 75, robuxTotal: 15000 },
     'long-term': { usdTotal: 140, robuxTotal: 65000 },
-  },
-  animating: {
-    commission: { usdTotal: 10, robuxTotal: 2000 },
-    'short-term': { usdTotal: 37, robuxTotal: 8000 },
-    'long-term': { usdTotal: 120, robuxTotal: 13000 },
   },
   'ui-design': {
     commission: { usdTotal: 10, robuxTotal: 1500 },
     'short-term': { usdTotal: 34, robuxTotal: 7000 },
     'long-term': { usdTotal: 95, robuxTotal: 12000 },
   },
-  modeling: {
-    commission: { usdTotal: 35, robuxTotal: 15000 },
-    'short-term': { usdTotal: 75, robuxTotal: 20000 },
-    'long-term': { usdTotal: 130, robuxTotal: 80000 },
-  },
 };
 
 export function getPricingTiersForDiscipline(
   disciplineId: DisciplineId
 ): Record<ContractType, ContractPricingTier> {
-  const prices = DISCIPLINE_PRICING_TABLE[disciplineId] ?? DISCIPLINE_PRICING_TABLE['all-rounder'];
+  const prices = DISCIPLINE_PRICING_TABLE[disciplineId] ?? DISCIPLINE_PRICING_TABLE.scripting;
   return {
     commission: {
       ...CONTRACT_META.commission,
@@ -239,7 +163,7 @@ export function getPricingTiersForDiscipline(
 }
 
 export const CONTRACT_PRICING_TIERS: Record<ContractType, ContractPricingTier> =
-  getPricingTiersForDiscipline('all-rounder');
+  getPricingTiersForDiscipline('scripting');
 
 export interface CommissionEstimate {
   totalAmount: number;
@@ -259,10 +183,6 @@ export interface CommissionEstimate {
 
 const CLEAN_HACKER_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
-/**
- * Full-width hacker-green decode generator for a 1-second (1000ms) sentence transition.
- * Preserves full sentence length while resolving characters left-to-right.
- */
 export function scrambleText(target: string, progress: number): string {
   const clamped = Math.max(0, Math.min(1, progress));
   if (clamped >= 1) return target;
@@ -294,10 +214,16 @@ export function calculateCommissionBreakdown(input: CommissionInput): Commission
   const currencySymbol = input.currency === 'USD' ? '$' : 'R$ ';
   const currencyLabel = input.currency === 'USD' ? 'USD' : 'Robux';
 
+  const scopePolicyLine =
+    input.contractType === 'commission'
+      ? 'Task Scope Policy: Paid Per Task Only (Strictly 1 single task per payment — additional tasks billed separately)'
+      : `Task Scope Policy: ${tier.subtitle}`;
+
   const summaryText = [
-    `Developer: balo_xio (16+ Roblox All-Rounder)`,
+    `Developer: balo_xio (16+ Roblox Scripter & UI Designer)`,
     `Specialization: ${input.disciplineId.toUpperCase()}`,
     `Engagement: ${tier.label} ($${tier.usdTotal} USD / R$ ${tier.robuxTotal.toLocaleString('en-US')} Robux)`,
+    scopePolicyLine,
     `Selected Currency Total: ${currencySymbol}${totalAmount.toLocaleString('en-US')} ${currencyLabel}`,
     `40% Upfront Deposit (Required): ${currencySymbol}${upfrontAmount.toLocaleString('en-US')} ${currencyLabel}`,
     `60% Completion Balance: ${currencySymbol}${completionAmount.toLocaleString('en-US')} ${currencyLabel}`,
@@ -321,7 +247,7 @@ export function calculateCommissionBreakdown(input: CommissionInput): Commission
   };
 }
 
-export type PreviousWorkCategory = 'scripting' | 'animating' | 'ui-design' | 'modeling';
+export type PreviousWorkCategory = 'scripting' | 'ui-design';
 
 export interface PreviousWorkGalleryImage {
   url: string;
@@ -359,17 +285,23 @@ export interface PreviousWorkDemo {
 export const COMBAT_SYSTEM_ASSET_URL =
   'https://create.roblox.com/store/asset/113210150229519?viewFromStudio=true&keyword=&searchId=18788722-cf9d-4565-9e61-ae99826d0e18';
 
-export const WALK_ANIMATION_VIDEO_URL =
-  '/assets/aistudio/Roblox_Studio_2026.10.17_-_00.32.45.06_d4d05cec.mp4';
+export const UI_GUNS_FRAME_IMAGE_URL =
+  '/assets/aistudio/Screenshot_2026-11-04_170408_bce1d72f.png';
+
+export const UI_RAINBOW_STORE_IMAGE_URL =
+  '/assets/aistudio/Screenshot_2026-10-31_164703_b9f72a73.png';
+
+export const UI_GREEN_SHOP_HEADER_IMAGE_URL =
+  '/assets/aistudio/Screenshot_2026-11-04_182243_9e238062.png';
+
+export const UI_CLOSE_BUTTON_IMAGE_URL =
+  '/assets/aistudio/Close_button_49cea447.png';
+
+export const UI_GOLD_SLOT_IMAGE_URL =
+  '/assets/aistudio/Screenshot_2026-11-04_160941_25d4441e.png';
 
 export const VIRAL_GAME_UI_IMAGE_URL =
   '/assets/aistudio/Gemini_Generated_Image_tmic7xtmic7xtmic_f9b1a615.jpg';
-
-export const MODELING_CHAIR_IMAGE_URL =
-  '/assets/aistudio/Screenshot_2026-10-23_003728_a3e711d6.png';
-
-export const MODELING_SEA_BEAST_IMAGE_URL =
-  '/assets/aistudio/Screenshot_2026-10-23_003801_e1c7aec3.png';
 
 export const PREVIOUS_WORK_DEMOS: PreviousWorkDemo[] = [
   {
@@ -378,7 +310,7 @@ export const PREVIOUS_WORK_DEMOS: PreviousWorkDemo[] = [
     category: 'scripting',
     categoryLabel: 'Scripting Work',
     disciplineId: 'scripting',
-    rateLabel: 'Scripting Rate: $15 USD / 5,000 R$ (Commission) · 40% Upfront',
+    rateLabel: 'Scripting Rate: $15 USD / 5,000 R$ (Per Task · 1 Task Only) · 40% Upfront',
     title: 'The Combat System By Balo_xio',
     author: 'Balo_xio',
     craftTag: 'Luau Framework',
@@ -422,155 +354,81 @@ export const PREVIOUS_WORK_DEMOS: PreviousWorkDemo[] = [
     ],
   },
   {
-    id: 'walk-animation-balo-xio',
-    index: '02',
-    category: 'animating',
-    categoryLabel: 'Animation Work',
-    disciplineId: 'animating',
-    rateLabel: 'Animation Rate: $10 USD / 2,000 R$ (Commission) · 40% Upfront',
-    title: 'A Walk Animation Made By Balo_xio',
-    author: 'Balo_xio',
-    craftTag: 'Cinematic Walk & Camera Track',
-    description:
-      'A cinematic walk animation made by Balo_xio featuring synchronized cinematic camera animation, weighty R6 stride pacing, natural upper-torso counter-rotation, and smooth keyframe easing crafted for cutscenes and character entrances.',
-    mediaType: 'video',
-    videoUrl: WALK_ANIMATION_VIDEO_URL,
-    unlockLinkUrl: COMBAT_SYSTEM_ASSET_URL,
-    gamePassId: '2053169441',
-    gamePassPriceRobux: 800,
-    gamePassUrl: 'https://www.roblox.com/game-pass/2053169441',
-    unlockFileName: 'Roblox Creator Store Asset Link',
-    unlockFileContent: COMBAT_SYSTEM_ASSET_URL,
-    systemsIncluded: [
-      'Cinematic Walk Cycle',
-      'Cinematic Camera Animation',
-      'R6 Rig Keyframing',
-      'UpperTorso & Limb Arcs',
-      'Smooth Easing Curves',
-      'Cutscene-Ready Framing',
-    ],
-    technicalHighlights: [
-      {
-        label: 'Synchronized Cinematic Camera Track',
-        detail: 'Dedicated camera keyframe track animated in lockstep with the character stride for dramatic pullback and immersive cutscene framing.',
-      },
-      {
-        label: 'Weighty Stride & Pacing',
-        detail: 'Natural foot plant timing, subtle hip shift, and balanced arm swing that give the R6 rig grounded physical presence.',
-      },
-      {
-        label: 'UpperTorso & Head Attitude',
-        detail: 'Controlled torso sway and confident head posture tailored for boss intros, story cutscenes, and stylized walk cycles.',
-      },
-      {
-        label: 'Clean Roblox Studio Timeline Export',
-        detail: 'Keyframed cleanly with separated Camera, UpperTorso, and limb tracks ready for immediate in-game playback.',
-      },
-    ],
-  },
-  {
     id: 'viral-game-ui-balo-xio',
-    index: '03',
+    index: '02',
     category: 'ui-design',
     categoryLabel: 'UI Design',
     disciplineId: 'ui-design',
-    rateLabel: 'UI Design Rate: $10 USD / 1,500 R$ (Commission) · 40% Upfront',
-    title: 'Viral Game UI',
+    rateLabel: 'UI Design Rate: $10 USD / 1,500 R$ (Per Task · 1 Task Only) · 40% Upfront',
+    title: 'Custom Studded & Front-Page Game UI Pack',
     author: 'Balo_xio',
-    craftTag: 'Front-Page Shop & Inventory Frame',
+    craftTag: 'Studded Menus, Store Frames & Custom UI Components',
     description:
-      'A polished Viral Game UI made by Balo_xio—featuring a glossy sky-blue beveled shop header with custom 3D basket iconography, a high-contrast tactile close button, dual cyan-glow inset grid containers for gamepasses and item bundles, and responsive Scale layouts built for Desktop, Mobile, and Console.',
+      'A complete Roblox UI Design showcase by Balo_xio featuring custom studded game frames and front-page store interfaces—including the Studded Sky-Blue "Guns" Inventory Window, the Rainbow Lucky Block & Server Luck x2 Store Menu, the Studded Emerald "Shop" Header Bar in Roblox Studio, the Glossy Studded Gold Item Slot Tile, and the Studded Red [X] Close Button.',
     mediaType: 'image',
-    imageUrl: VIRAL_GAME_UI_IMAGE_URL,
+    imageUrl: UI_GUNS_FRAME_IMAGE_URL,
     unlockLinkUrl: COMBAT_SYSTEM_ASSET_URL,
     gamePassId: '2053169441',
     gamePassPriceRobux: 1000,
     gamePassUrl: 'https://www.roblox.com/game-pass/2053169441',
     unlockFileName: 'Roblox Creator Store Asset Link',
     unlockFileContent: COMBAT_SYSTEM_ASSET_URL,
-    systemsIncluded: [
-      'Glossy Beveled Header',
-      'Dual Cyan-Glow Item Grids',
-      'Custom 3D Shop Iconography',
-      'Tactile Close Button',
-      'Responsive Scale & AspectRatio',
-      'TweenService Motion Ready',
-    ],
-    technicalHighlights: [
-      {
-        label: 'Front-Page Simulator & Shop Aesthetic',
-        detail: 'High-retention sky-blue glossy header with specular highlights, 3D red shopping basket emblem, and bold red close button.',
-      },
-      {
-        label: 'Dual Cyan-Glow Inset Grid Containers',
-        detail: 'Two-tier dark grid sections engineered for featured Gamepass banners on top and scrolling item or pet slots below.',
-      },
-      {
-        label: 'Cross-Device Scale & AspectRatio',
-        detail: 'Structured for UIScale, UIStroke, and UIAspectRatioConstraint hierarchy so menus remain crisp across PC, Mobile, and Console.',
-      },
-      {
-        label: 'TweenService Pop-In & Hover Ready',
-        detail: 'Cleanly separated frame layers ready for spring-based menu opening, button press feedback, and purchase animations.',
-      },
-    ],
-  },
-  {
-    id: 'modeling-chair-and-sea-beast-balo-xio',
-    index: '04',
-    category: 'modeling',
-    categoryLabel: '3D Modeling',
-    disciplineId: 'modeling',
-    rateLabel: '3D Modeling Rate: $35 USD / 15,000 R$ (Commission) · 40% Upfront',
-    title: 'Highly Polished Chair & Sea Beast',
-    author: 'Balo_xio',
-    craftTag: 'Hard-Surface Props & Organic Creature Sculpting',
-    description:
-      'A dual 3D modeling showcase by Balo_xio demonstrating versatility across both detailed environment props and organic boss creatures—featuring a Highly Polished Chair with warm hand-painted wood grain and slatted joinery, alongside a menacing Sea Beast leviathan sculpted with glowing crimson eyes, jagged multi-row fangs, and optimized Roblox Studio mesh topology.',
-    mediaType: 'image',
-    imageUrl: MODELING_SEA_BEAST_IMAGE_URL,
-    unlockLinkUrl: COMBAT_SYSTEM_ASSET_URL,
-    gamePassId: '2053169441',
-    gamePassPriceRobux: 2500,
-    gamePassUrl: 'https://www.roblox.com/game-pass/2053169441',
-    unlockFileName: 'Roblox Creator Store Asset Link',
-    unlockFileContent: COMBAT_SYSTEM_ASSET_URL,
     galleryImages: [
       {
-        url: MODELING_CHAIR_IMAGE_URL,
-        label: 'Highly Polished Chair',
-        subtitle: 'Detailed Slatted Hardwood Prop · Custom Wood Grain Texture',
+        url: UI_GUNS_FRAME_IMAGE_URL,
+        label: 'Studded "Guns" Inventory Frame',
+        subtitle: 'Sky-Blue Studded Header · Revolver Icon · Translucent Canvas',
       },
       {
-        url: MODELING_SEA_BEAST_IMAGE_URL,
-        label: 'Sea Beast',
-        subtitle: 'Organic Boss Leviathan · Sculpted Scales, Fangs & Glowing Eyes',
+        url: UI_RAINBOW_STORE_IMAGE_URL,
+        label: 'Rainbow Lucky Block & Server Luck Store',
+        subtitle: 'Multi-Tier Robux Purchase Cards · Server Luck x2 Banner',
+      },
+      {
+        url: UI_GREEN_SHOP_HEADER_IMAGE_URL,
+        label: 'Studded Green "Shop" Header Bar',
+        subtitle: 'Roblox Studio Viewport · 3D Basket Icon & Red Close Button',
+      },
+      {
+        url: UI_GOLD_SLOT_IMAGE_URL,
+        label: 'Studded Gold Item Slot Tile',
+        subtitle: 'Glossy Beveled Golden Stud Texture · Diagonal Specular Sheen',
+      },
+      {
+        url: UI_CLOSE_BUTTON_IMAGE_URL,
+        label: 'Studded Red Close [X] Button',
+        subtitle: 'Tactile Pixel-Outlined X · Glossy Studded Crimson Button',
+      },
+      {
+        url: VIRAL_GAME_UI_IMAGE_URL,
+        label: 'Viral Simulator Shop Frame',
+        subtitle: 'Dual Cyan-Glow Item Grids · High-Contrast Beveled Header',
       },
     ],
     systemsIncluded: [
-      'Highly Polished Chair',
-      'Sea Beast Boss Model',
-      'Clean Mesh Topology',
-      'UV Unwrapping & Texturing',
-      'Optimized Triangle Budget',
-      'Roblox Studio Import Ready',
+      'Studded "Guns" Window Frame',
+      'Rainbow Lucky Block Store UI',
+      'Studded Green "Shop" Header',
+      'Studded Gold Item Slot Tile',
+      'Studded Red Close [X] Button',
+      'Responsive Scale & AspectRatio',
     ],
     technicalHighlights: [
       {
-        label: 'Highly Polished Chair (Environment Prop)',
-        detail: 'Crisp slatted backrest and seat geometry with warm, worn wood-grain texturing and smooth edge bevels for detailed interiors and exteriors.',
+        label: 'Studded "Guns" & "Shop" Header Frames',
+        detail: 'Classic-meets-modern Roblox stud-textured headers in sky blue and emerald green with crisp black strokes, custom weapon/basket icons, and translucent dark body frames.',
       },
       {
-        label: 'Sea Beast (Organic Boss Creature)',
-        detail: 'Sculpted serpentine sea monster featuring glowing crimson eyes, layered dorsal fin ridges, razor-sharp teeth, and an intimidating boss silhouette.',
+        label: 'Rainbow Lucky Block & Server Luck Store UI',
+        detail: 'High-conversion monetization layout featuring drop-rate percentage previews, Buy 1 / Buy 3 / Buy 8 Robux buttons, and a Server Luck x2 boost banner.',
       },
       {
-        label: 'Optimized Low & Mid-Poly Topology',
-        detail: 'Engineered in Blender for smooth Roblox client frame rates without sacrificing silhouette detail or surface shading.',
+        label: 'Custom Studded Gold Slot & Red Close [X] Components',
+        detail: 'Reusable high-gloss studded square components with diagonal light reflections and beveled bottom edges built for tactile button press feedback.',
       },
       {
-        label: 'Clean UVs & Surface Appearance',
-        detail: 'Baked textures and surface maps imported cleanly into Roblox Studio with accurate scale and collision geometry.',
+        label: 'Cross-Device Scale & AspectRatio Hierarchy',
+        detail: 'Engineered in Roblox Studio with UIScale, UIStroke, and UIAspectRatioConstraint so every menu and button stays sharp on PC, Mobile, and Console.',
       },
     ],
   },
@@ -620,7 +478,7 @@ export const SFX_AUDIO_CONFIG: Record<'click' | 'page-change', SfxTrimmedProfile
 
 export const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mqppkrdd';
 export const COMMISSION_RECIPIENT_EMAIL = 'xamch@gmail.com';
-export const COMMISSION_COOLDOWN_MS = 60 * 60 * 1000; // 1 Hour (3,600,000 ms)
+export const COMMISSION_COOLDOWN_MS = 60 * 60 * 1000;
 export const COMMISSION_COOLDOWN_STORAGE_KEY = 'balo_xio_last_commission_ts';
 
 export interface CooldownStatus {
@@ -677,11 +535,8 @@ export function getCommissionCooldownStatus(
 }
 
 export const DISCIPLINE_LABELS: Record<DisciplineId, string> = {
-  'all-rounder': 'All-Rounder (Full Pack — Scripting, UI, Modeling, Animation)',
   scripting: 'Scripting Work (3+ Years Experience)',
   'ui-design': 'UI Design Work (2+ Years Experience)',
-  modeling: '3D Modeling Work (2+ Years Experience)',
-  animating: 'Animation Work (1+ Year Experience)',
 };
 
 export interface CommissionEmailPayloadInput {
@@ -709,7 +564,7 @@ export function formatCommissionEmailPayload(
     currency: input.currency,
   });
 
-  const workLabel = DISCIPLINE_LABELS[input.disciplineId] ?? DISCIPLINE_LABELS['all-rounder'];
+  const workLabel = DISCIPLINE_LABELS[input.disciplineId] ?? DISCIPLINE_LABELS.scripting;
   const cleanRobloxUser = input.robloxUsername.trim().replace(/^@/, '');
   const displayName = (input.robloxDisplayName || cleanRobloxUser).trim();
   const userId = (input.robloxUserId || '156').trim();
@@ -808,10 +663,3 @@ export function evaluateGamepassOwnershipResponse(
   const cleanTarget = String(targetGamePassId || '').trim();
   return record.data.some((item) => String(item.id) === cleanTarget);
 }
-
-
-
-
-
-
-

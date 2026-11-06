@@ -2,20 +2,20 @@
 
 @layer base {
   :root {
-    --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-serif: 'Fraunces', Georgia, serif;
+    --font-display: 'Bricolage Grotesque', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
 
   body {
     font-family: var(--font-sans);
-    background-color: #09090B;
+    background-color: #0B0C10;
     background-image:
-      radial-gradient(ellipse 90% 45% at 50% -5%, rgba(216, 180, 120, 0.09), rgba(244, 239, 230, 0.025) 45%, transparent 75%),
-      linear-gradient(180deg, #09090B 0%, #0C0C0E 50%, #09090B 100%);
+      radial-gradient(ellipse 80% 50% at 18% -8%, rgba(249, 115, 22, 0.14), transparent 60%),
+      radial-gradient(ellipse 75% 45% at 85% 0%, rgba(225, 29, 72, 0.13), transparent 62%),
+      linear-gradient(180deg, #0B0C10 0%, #10121A 52%, #0B0C10 100%);
     background-attachment: fixed;
-    color: #F4F1EA;
+    color: #F5F5F7;
     overflow-x: hidden;
     margin: 0;
   }
@@ -24,71 +24,55 @@
     font-family: var(--font-display);
   }
 
-  .font-serif-editorial {
-    font-family: var(--font-serif);
-  }
-
   code, pre, .font-mono {
     font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Warm cinema monochrome/tungsten grade on the raw video so no green tint appears */
+/* Shifts raw green video tones into deep studio rose-indigo without muddy sepia */
 .hero-video-grade {
-  filter: grayscale(0.75) sepia(0.35) contrast(1.08) brightness(0.85);
+  filter: hue-rotate(235deg) saturate(0.82) contrast(1.08);
 }
 
-/* Selective partial blur on the left area while keeping the character on the right sharp */
-.selective-video-blur {
-  backdrop-filter: blur(7px) saturate(0.8) contrast(1.05);
-  -webkit-backdrop-filter: blur(7px) saturate(0.8) contrast(1.05);
-  mask-image: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.92) 48%,
-    rgba(0, 0, 0, 0.35) 75%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.92) 48%,
-    rgba(0, 0, 0, 0.35) 75%,
-    rgba(0, 0, 0, 0) 100%
-  );
-}
-
-/* Brushed Platinum to Warm Champagne Bronze editorial gradient */
+/* Signature Warm Coral-Amber to Crimson-Rose Studio Gradient Text */
 .pro-gradient-text {
-  background: linear-gradient(125deg, #FFFFFF 0%, #F4EFE6 36%, #DFC08A 72%, #C4934B 100%);
+  background: linear-gradient(120deg, #FFF7ED 0%, #FDBA74 38%, #FB7185 74%, #F43F5E 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Tactile Warm Champagne-Gold to Anodized Bronze interactive gradient */
+/* Primary Interactive Studio Gradient Button */
 .studio-btn-gradient {
-  background: linear-gradient(135deg, #EFE9DC 0%, #DFC28E 52%, #C99A52 100%);
-  color: #09090B;
+  background: linear-gradient(135deg, #F97316 0%, #E11D48 60%, #BE123C 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8px 24px -6px rgba(225, 29, 72, 0.4);
 }
 
 .studio-btn-gradient:hover {
-  background: linear-gradient(135deg, #FFFFFF 0%, #EAD3A7 55%, #D5A862 100%);
-  color: #09090B;
+  background: linear-gradient(135deg, #FB923C 0%, #F43F5E 60%, #E11D48 100%);
+  color: #FFFFFF;
 }
 
-/* Subtle top-lit anodized metal surface sheen */
-.studio-surface-gradient {
-  background: linear-gradient(180deg, rgba(244, 239, 230, 0.045) 0%, rgba(244, 239, 230, 0.008) 100%);
+/* Elevated dark studio card surface */
+.studio-card-surface {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.018) 100%);
 }
 
-/* Warm active row gradient for the architectural specification matrix */
+/* Active selection card with warm coral-rose gradient tint */
 .studio-active-row {
-  background: linear-gradient(90deg, rgba(216, 180, 120, 0.14) 0%, rgba(216, 180, 120, 0.03) 65%, transparent 100%);
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.15) 0%, rgba(225, 29, 72, 0.08) 65%, rgba(255, 255, 255, 0.02) 100%);
 }
 
 .studio-active-cell {
-  background: linear-gradient(180deg, rgba(216, 180, 120, 0.14) 0%, rgba(216, 180, 120, 0.02) 100%);
+  background: linear-gradient(160deg, rgba(249, 115, 22, 0.16) 0%, rgba(225, 29, 72, 0.08) 100%);
+}
+
+/* Warm Alabaster Paper Invoice Surface for the Right-Hand Quote Receipt */
+.studio-paper-invoice {
+  background: linear-gradient(165deg, #FAF8F5 0%, #F0ECE1 100%);
+  color: #111217;
 }
 
 .hidden-view {

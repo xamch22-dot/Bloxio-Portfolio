@@ -49,9 +49,6 @@ const WORK_OPTIONS: Array<{
 }> = [
   { id: 'scripting', label: 'Scripting Work', exp: '3+ Yrs Exp' },
   { id: 'ui-design', label: 'UI Design Work', exp: '2+ Yrs Exp' },
-  { id: 'modeling', label: '3D Modeling Work', exp: '2+ Yrs Exp' },
-  { id: 'animating', label: 'Animation Work', exp: '1+ Yr Exp' },
-  { id: 'all-rounder', label: 'All-Rounder (Full Pack)', exp: 'All 4 Skills' },
 ];
 
 async function compressImageFile(file: File): Promise<string> {

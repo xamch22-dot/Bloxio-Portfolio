@@ -15,7 +15,7 @@ export default function App() {
   const [activeView, setActiveView] = useState<AppView>('portfolio');
   const [demoSubPage, setDemoSubPage] = useState<PreviousWorkSubPage>('all');
   const [selectedDiscipline, setSelectedDiscipline] =
-    useState<CommissionInput['disciplineId']>('all-rounder');
+    useState<CommissionInput['disciplineId']>('scripting');
 
   const handleOpenDemoView = (subPage: PreviousWorkSubPage = 'all') => {
     setDemoSubPage(subPage);
@@ -64,7 +64,7 @@ export default function App() {
           <div>
             <span className="text-white font-semibold">balo_xio</span>
             <span aria-hidden="true" className="mx-2 text-zinc-600">/</span>
-            <span>Scripter (3+ Yrs) · UI Designer (2+ Yrs) · Modeler (2+ Yrs) · Animator (1+ Yr)</span>
+            <span>Scripter (3+ Yrs) · UI Designer (2+ Yrs)</span>
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <a

@@ -1,6 +1,7 @@
 import {
   VIDEO_LOOP_START_SECONDS,
   DISCIPLINE_EXPERIENCES,
+  DISCIPLINE_PRICING_TABLE,
   PREVIOUS_WORK_DEMOS,
   UNLOCKED_CREATIONS_STORAGE_KEY,
   getRobloxGamepassCheckoutUrl,
@@ -26,11 +27,11 @@ function saveUnlockedCreationsMap(map) {
   } catch {}
 }
 
-// Application State (Vanilla JS)
+// Application State (Vanilla JS) — Strictly Scripting & UI Design
 const state = {
   activeView: 'portfolio', // 'portfolio' | 'previous-work'
-  demoSubPage: 'all', // 'all' | 'scripting' | 'animating' | 'ui-design' | 'modeling'
-  selectedDiscipline: 'all-rounder', // 'all-rounder' | 'scripting' | 'ui-design' | 'modeling' | 'animating'
+  demoSubPage: 'all', // 'all' | 'scripting' | 'ui-design'
+  selectedDiscipline: 'scripting', // 'scripting' | 'ui-design'
   selectedContract: 'commission', // 'commission' | 'short-term' | 'long-term'
   selectedCurrency: 'USD', // 'USD' | 'ROBUX'
   heroMuted: true,
@@ -63,16 +64,16 @@ function setView(viewName, optionalDemoSubPage) {
   const navPrevWork = document.getElementById('nav-previous-work');
 
   if (navOverview) {
-    navOverview.className = `hover:text-[#DFC08A] transition-colors whitespace-nowrap shrink-0 ${
+    navOverview.className = `hover:text-orange-300 transition-colors whitespace-nowrap shrink-0 ${
       state.activeView === 'portfolio'
-        ? 'text-white font-semibold underline underline-offset-8 decoration-[#DFC08A]'
+        ? 'text-white font-semibold underline underline-offset-8 decoration-orange-400'
         : 'text-zinc-400'
     }`;
   }
   if (navPrevWork) {
-    navPrevWork.className = `hover:text-[#DFC08A] transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+    navPrevWork.className = `hover:text-orange-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
       state.activeView === 'previous-work'
-        ? 'text-[#DFC08A] font-semibold underline underline-offset-8 decoration-[#DFC08A]'
+        ? 'text-orange-300 font-semibold underline underline-offset-8 decoration-orange-400'
         : 'text-zinc-400'
     }`;
   }
@@ -124,8 +125,8 @@ function initHeroVideoControls() {
         state.heroMuted ? 'Unmute background video sound' : 'Mute background video sound'
       );
       audioBtn.innerHTML = state.heroMuted
-        ? `<span>Reel Audio // Muted</span>`
-        : `<span class="text-[#DFC08A]">Reel Audio // Active</span>`;
+        ? `<span>Sound Off</span>`
+        : `<span class="text-orange-300">Sound On</span>`;
       if (!state.heroMuted) {
         if (video.currentTime < VIDEO_LOOP_START_SECONDS) {
           video.currentTime = VIDEO_LOOP_START_SECONDS;
@@ -139,62 +140,62 @@ function initHeroVideoControls() {
 const ARROW_UP_RIGHT_SVG = `<svg class="w-3.5 h-3.5 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>`;
 
 // ============================================================================
-// 3. EXPERIENCE GRID RENDERER
+// 3. EXPERIENCE BENTO GRID RENDERER (SCRIPTING & UI DESIGN ONLY)
 // ============================================================================
 function renderExperienceGrid() {
   const container = document.getElementById('experience-grid');
   if (!container) return;
 
-  container.innerHTML = DISCIPLINE_EXPERIENCES.map((disc, idx) => {
-    const demoLabel =
-      disc.id === 'scripting'
-        ? 'Scripting Work Demo'
-        : disc.id === 'animating'
-        ? 'Animation Work Demo'
-        : disc.id === 'ui-design'
-        ? 'UI Design Demo'
-        : '3D Modeling Demo';
+  container.innerHTML = DISCIPLINE_EXPERIENCES.map((disc) => {
+    const demoLabel = disc.id === 'scripting' ? 'Scripting Work Demo' : 'UI Design Demo';
+
+    const perTaskPrice = DISCIPLINE_PRICING_TABLE[disc.id]?.commission || {
+      usdTotal: 15,
+      robuxTotal: 5000,
+    };
 
     const deliverablesHtml = disc.deliverables
       .map(
         (item, i) =>
           `<span>${item}</span>${
             i < disc.deliverables.length - 1
-              ? '<span aria-hidden="true" class="text-[#DFC08A]">/</span>'
+              ? '<span aria-hidden="true" class="text-orange-400">·</span>'
               : ''
           }`
       )
       .join('');
 
     return `
-      <article class="py-10 border-b border-white/10 flex flex-col justify-between ${
-        idx % 2 === 0 ? 'md:pr-10 md:border-r md:border-white/10' : 'md:pl-10'
-      }">
+      <article class="p-7 sm:p-8 rounded-2xl border border-white/15 studio-card-surface flex flex-col justify-between">
         <div>
           <div class="flex items-baseline justify-between gap-4">
-            <div class="flex items-baseline gap-3">
-              <span class="font-mono text-xs text-[#DFC08A] tabular-nums">${disc.index} /</span>
-              <h3 class="font-display text-2xl sm:text-3xl font-bold text-white">${disc.title}</h3>
-            </div>
+            <h3 class="font-display text-2xl sm:text-3xl font-bold text-white">
+              <span class="text-orange-300 font-mono text-base mr-2">${disc.index}.</span>${disc.title}
+            </h3>
             <span class="font-display text-xl sm:text-2xl font-bold pro-gradient-text tabular-nums">${
               disc.yearsDisplay
             }</span>
           </div>
-          <p class="mt-3 text-base font-medium text-zinc-200">${disc.headline}</p>
+          <p class="mt-3 text-base font-semibold text-zinc-100">${disc.headline}</p>
           <p class="mt-2 text-sm text-zinc-400 leading-relaxed">${disc.description}</p>
-          <div class="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs font-mono text-zinc-300">
+          <div class="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs font-medium text-zinc-300">
             ${deliverablesHtml}
           </div>
         </div>
-        <div class="mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs">
-          <span class="font-mono text-zinc-500 uppercase tracking-wider">${disc.tools}</span>
-          <div class="flex items-center gap-5">
-            <button type="button" data-open-demo="${disc.id}" class="inline-flex items-center gap-1 font-mono uppercase tracking-wider font-medium text-zinc-200 hover:text-[#DFC08A] underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer">
+        <div class="mt-7 pt-5 border-t border-white/10 space-y-4">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-zinc-400">${disc.tools}</span>
+            <span class="font-mono font-semibold text-orange-300 tabular-nums">
+              Per Task: $${perTaskPrice.usdTotal} / ${formatNumber(perTaskPrice.robuxTotal)} R$
+            </span>
+          </div>
+          <div class="flex items-center justify-between gap-4 pt-1 text-xs font-semibold">
+            <button type="button" data-open-demo="${disc.id}" class="inline-flex items-center gap-1 text-zinc-200 hover:text-orange-300 underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer">
               <span>${demoLabel}</span>
               ${ARROW_UP_RIGHT_SVG}
             </button>
-            <a href="#estimator" data-select-discipline="${disc.id}" class="inline-flex items-center gap-1 font-mono uppercase tracking-wider font-medium text-[#DFC08A] hover:text-white transition-colors whitespace-nowrap shrink-0">
-              <span>Select Track</span>
+            <a href="#estimator" data-select-discipline="${disc.id}" class="inline-flex items-center gap-1 text-orange-300 hover:text-white transition-colors whitespace-nowrap shrink-0">
+              <span>Calculate Per-Task Quote</span>
               ${ARROW_UP_RIGHT_SVG}
             </a>
           </div>
@@ -220,7 +221,7 @@ function renderExperienceGrid() {
 }
 
 // ============================================================================
-// 4. ARCHITECTURAL SPECIFICATION MATRIX & 40% UPFRONT LEDGER ESTIMATOR
+// 4. INTERACTIVE PER-TASK & PROJECT RATE CALCULATOR (SCRIPTING & UI ONLY)
 // ============================================================================
 function renderRateEstimator() {
   const roleContainer = document.getElementById('estimator-roles');
@@ -228,40 +229,43 @@ function renderRateEstimator() {
   const currencyContainer = document.getElementById('estimator-currencies');
 
   const roles = [
-    { id: 'all-rounder', index: '01', label: 'Full Pack (All-Rounder)', sub: 'Scripting + UI + 3D + Animation', tenure: 'Complete Studio Pipeline' },
-    { id: 'scripting', index: '02', label: 'Scripting Systems', sub: 'Luau Frameworks, Combat & DataStores', tenure: '3+ Years Experience' },
-    { id: 'ui-design', index: '03', label: 'UI Design & HUDs', sub: 'Responsive Scale Layouts & Motion', tenure: '2+ Years Experience' },
-    { id: 'modeling', index: '04', label: '3D Modeling', sub: 'Hard-Surface Weapons & Environment Assets', tenure: '2+ Years Experience' },
-    { id: 'animating', index: '05', label: 'Keyframe Animation', sub: 'Moon Animator 2 R6 & R15 Combat Rigs', tenure: '1+ Year Experience' },
+    { id: 'scripting', index: '01', label: 'Scripting Systems', sub: 'Luau Frameworks, Combat & DataStores', tenure: '3+ Years Exp' },
+    { id: 'ui-design', index: '02', label: 'UI Design & HUDs', sub: 'Studded Frames, Store Menus & Scale Layouts', tenure: '2+ Years Exp' },
   ];
 
   if (roleContainer) {
     roleContainer.innerHTML = roles
       .map((r) => {
         const isActive = state.selectedDiscipline === r.id;
+        const perTaskRate = DISCIPLINE_PRICING_TABLE[r.id]?.commission || { usdTotal: 15, robuxTotal: 5000 };
         return `
         <button
           type="button"
           data-role-btn="${r.id}"
-          class="w-full px-6 py-4 text-left transition-all cursor-pointer flex items-center justify-between gap-4 border-l-2 ${
+          class="w-full px-6 py-5 text-left transition-all cursor-pointer flex items-center justify-between gap-4 ${
             isActive
-              ? 'border-[#DFC08A] studio-active-row text-white'
-              : 'border-transparent bg-transparent text-zinc-400 hover:bg-white/[0.02] hover:text-zinc-200'
+              ? 'studio-active-row text-white'
+              : 'bg-transparent text-zinc-400 hover:bg-white/[0.03] hover:text-zinc-200'
           }"
         >
-          <div class="flex items-baseline gap-4 min-w-0">
-            <span class="font-mono text-xs tabular-nums ${isActive ? 'text-[#DFC08A] font-semibold' : 'text-zinc-500'}">${r.index}</span>
+          <div class="flex items-baseline gap-3.5 min-w-0">
+            <span class="font-mono text-xs tabular-nums ${isActive ? 'text-orange-300 font-bold' : 'text-zinc-500'}">${r.index}.</span>
             <div class="min-w-0">
-              <div class="font-display text-base font-bold ${isActive ? 'text-white' : 'text-zinc-200'}">${r.label}</div>
-              <div class="text-xs font-mono ${isActive ? 'text-zinc-300' : 'text-zinc-500'} mt-0.5 truncate">${r.sub}</div>
+              <div class="font-display text-lg font-bold ${isActive ? 'text-white' : 'text-zinc-200'}">${r.label}</div>
+              <div class="text-xs ${isActive ? 'text-zinc-300' : 'text-zinc-500'} mt-0.5 truncate">${r.sub}</div>
             </div>
           </div>
           <div class="text-right shrink-0 flex items-center gap-4">
-            <span class="hidden sm:inline-block text-[11px] font-mono text-zinc-500">${r.tenure}</span>
-            <span class="font-mono text-[11px] uppercase tracking-widest px-2.5 py-1 border ${
+            <div class="hidden sm:block text-right">
+              <div class="text-[11px] text-zinc-400">${r.tenure}</div>
+              <div class="text-xs font-mono ${isActive ? 'text-orange-300 font-semibold' : 'text-zinc-400'} tabular-nums">
+                Per Task: $${perTaskRate.usdTotal} / ${formatNumber(perTaskRate.robuxTotal)} R$
+              </div>
+            </div>
+            <span class="text-xs font-semibold px-3 py-1.5 rounded-lg border ${
               isActive
-                ? 'border-[#DFC08A] text-[#DFC08A] bg-[#DFC08A]/10 font-semibold'
-                : 'border-white/10 text-zinc-500'
+                ? 'border-orange-400/60 text-orange-300 bg-orange-500/15'
+                : 'border-white/10 text-zinc-400'
             }">
               ${isActive ? 'Selected' : 'Select'}
             </span>
@@ -284,6 +288,12 @@ function renderRateEstimator() {
     contractContainer.innerHTML = Object.values(tiers)
       .map((tier, idx) => {
         const isActive = state.selectedContract === tier.id;
+        const badgeText =
+          tier.id === 'commission'
+            ? '1 Task Only'
+            : tier.id === 'short-term'
+            ? 'Multi-Task Sprint'
+            : 'Full Production';
         return `
         <button
           type="button"
@@ -291,24 +301,19 @@ function renderRateEstimator() {
           class="relative p-5 text-left transition-all cursor-pointer flex flex-col justify-between ${
             isActive
               ? 'studio-active-cell text-white'
-              : 'bg-transparent text-zinc-400 hover:bg-white/[0.02] hover:text-zinc-200'
+              : 'bg-transparent text-zinc-400 hover:bg-white/[0.03] hover:text-zinc-200'
           }"
         >
-          ${
-            isActive
-              ? '<div class="absolute top-0 inset-x-0 h-[2px] studio-btn-gradient"></div>'
-              : ''
-          }
           <div>
             <div class="flex items-center justify-between gap-2">
-              <span class="font-mono text-[11px] uppercase tracking-widest ${isActive ? 'text-[#DFC08A]' : 'text-zinc-500'}">Scope 0${idx + 1}</span>
-              ${isActive ? '<span class="font-mono text-[10px] uppercase tracking-widest text-[#DFC08A]">Active</span>' : ''}
+              <span class="text-xs font-semibold ${isActive ? 'text-orange-300' : 'text-zinc-500'}">0${idx + 1}. ${badgeText}</span>
+              ${isActive ? '<span class="text-[11px] font-semibold text-orange-300">Active</span>' : ''}
             </div>
-            <div class="font-display text-base font-bold text-white mt-1.5">${tier.label}</div>
-            <div class="text-xs text-zinc-400 mt-1 leading-relaxed">${tier.subtitle}</div>
+            <div class="font-display text-lg font-bold text-white mt-1.5">${tier.label}</div>
+            <div class="text-xs text-zinc-300 mt-1 leading-relaxed">${tier.subtitle}</div>
           </div>
           <div class="font-mono text-xs font-semibold ${
-            isActive ? 'text-[#DFC08A]' : 'text-zinc-300'
+            isActive ? 'text-orange-300' : 'text-zinc-300'
           } mt-5 pt-3 border-t border-white/10 tabular-nums">
             $${tier.usdTotal} USD / ${formatNumber(tier.robuxTotal)} R$
           </div>
@@ -333,7 +338,7 @@ function renderRateEstimator() {
         <button
           type="button"
           data-currency-btn="${curr}"
-          class="px-5 py-2.5 text-xs font-mono uppercase tracking-wider font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+          class="px-4 py-2 text-xs font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
             isActive
               ? 'studio-btn-gradient'
               : 'text-zinc-400 hover:text-white'
@@ -365,8 +370,14 @@ function renderRateEstimator() {
   const deliveryEl = document.getElementById('receipt-delivery');
   const upfrontEl = document.getElementById('receipt-upfront-amount');
   const completionEl = document.getElementById('receipt-completion-amount');
+  const scopePolicyEl = document.getElementById('receipt-scope-policy');
 
-  if (labelEl) labelEl.textContent = estimate.contractLabel.toUpperCase();
+  if (labelEl) {
+    labelEl.textContent =
+      state.selectedContract === 'commission'
+        ? 'PER TASK (1 SINGLE TASK ONLY)'
+        : estimate.contractLabel.toUpperCase();
+  }
   if (totalEl) totalEl.textContent = `${estimate.currencySymbol}${formatNumber(estimate.totalAmount)}`;
   if (equivEl) {
     equivEl.textContent = `($${estimate.usdEquivalent} USD / ${formatNumber(estimate.robuxEquivalent)} Robux)`;
@@ -376,10 +387,19 @@ function renderRateEstimator() {
   if (completionEl) {
     completionEl.textContent = `${estimate.currencySymbol}${formatNumber(estimate.completionAmount)}`;
   }
+  if (scopePolicyEl) {
+    if (state.selectedContract === 'commission') {
+      scopePolicyEl.innerHTML = `<strong class="text-zinc-950">Per Task Scope:</strong> Payment covers strictly <strong class="text-rose-700">1 single task only</strong>. Additional tasks or extra features are billed separately.`;
+    } else if (state.selectedContract === 'short-term') {
+      scopePolicyEl.innerHTML = `<strong class="text-zinc-950">Short-Term Scope:</strong> Covers a focused multi-task sprint or complete feature pack delivered in 1–2 weeks.`;
+    } else {
+      scopePolicyEl.innerHTML = `<strong class="text-zinc-950">Long-Term Scope:</strong> Covers full ongoing production and milestone-based studio commitment.`;
+    }
+  }
 }
 
 // ============================================================================
-// 5. PREVIOUS WORK (DEMO) PAGE RENDERER (SCRIPTING, ANIMATION, UI DESIGN, MODELING)
+// 5. PREVIOUS WORK (DEMO) PAGE RENDERER (SCRIPTING & UI DESIGN ONLY)
 // ============================================================================
 function renderPreviousWorkDemos() {
   const tabsContainer = document.getElementById('previous-work-tabs');
@@ -390,24 +410,17 @@ function renderPreviousWorkDemos() {
   const subPageTitle =
     state.demoSubPage === 'scripting'
       ? 'Scripting Work'
-      : state.demoSubPage === 'animating'
-      ? 'Animation Work'
       : state.demoSubPage === 'ui-design'
       ? 'UI Design'
-      : state.demoSubPage === 'modeling'
-      ? '3D Modeling'
       : 'Previous Work (Demo)';
 
   if (breadcrumbSub) breadcrumbSub.textContent = subPageTitle;
   if (headingEl) headingEl.textContent = subPageTitle;
 
-  const hasModeling = PREVIOUS_WORK_DEMOS.some((d) => d.category === 'modeling');
   const tabs = [
     { id: 'all', label: `All Demos (${PREVIOUS_WORK_DEMOS.length})` },
     { id: 'scripting', label: 'Scripting Work' },
-    { id: 'animating', label: 'Animation Work' },
     { id: 'ui-design', label: 'UI Design' },
-    ...(hasModeling ? [{ id: 'modeling', label: '3D Modeling' }] : []),
   ];
 
   if (tabsContainer) {
@@ -419,9 +432,9 @@ function renderPreviousWorkDemos() {
           role="tab"
           aria-selected="${state.demoSubPage === t.id}"
           data-demo-tab="${t.id}"
-          class="px-4 py-2 text-xs font-mono uppercase tracking-wider transition-all whitespace-nowrap shrink-0 cursor-pointer border-r border-white/10 last:border-r-0 ${
+          class="px-4 py-2 text-xs font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
             state.demoSubPage === t.id
-              ? 'studio-btn-gradient font-semibold'
+              ? 'studio-btn-gradient'
               : 'text-zinc-400 hover:text-white'
           }"
         >
@@ -449,20 +462,14 @@ function renderPreviousWorkDemos() {
   listContainer.innerHTML = visibleDemos
     .map((demo) => {
       const highlightsHeading =
-        demo.category === 'scripting'
-          ? 'Included Core Systems:'
-          : demo.category === 'animating'
-          ? 'Animation Highlights:'
-          : demo.category === 'modeling'
-          ? '3D Modeling Highlights:'
-          : 'UI Design Highlights:';
+        demo.category === 'scripting' ? 'Included Core Systems:' : 'UI Design Highlights:';
 
       const systemsHtml = demo.systemsIncluded
         .map(
           (sys, idx) =>
-            `<span class="text-[#DFC08A]">${sys}</span>${
+            `<span class="text-orange-300 font-medium">${sys}</span>${
               idx < demo.systemsIncluded.length - 1
-                ? '<span aria-hidden="true" class="text-zinc-600">/</span>'
+                ? '<span aria-hidden="true" class="text-zinc-600">·</span>'
                 : ''
             }`
         )
@@ -472,7 +479,7 @@ function renderPreviousWorkDemos() {
         .map(
           (item) => `
           <div class="py-3.5">
-            <div class="text-xs font-mono font-semibold text-white uppercase tracking-wider">${item.label}</div>
+            <div class="text-xs font-bold text-white">${item.label}</div>
             <div class="text-xs text-zinc-400 mt-1 leading-relaxed">${item.detail}</div>
           </div>
         `
@@ -482,7 +489,7 @@ function renderPreviousWorkDemos() {
       const mediaColumnHtml =
         demo.mediaType === 'video' && demo.videoUrl
           ? `
-            <div class="relative overflow-hidden border border-white/15 bg-black">
+            <div class="relative rounded-2xl overflow-hidden border border-white/15 bg-black shadow-xl">
               <video
                 id="video-${demo.id}"
                 src="${demo.videoUrl}"
@@ -491,21 +498,21 @@ function renderPreviousWorkDemos() {
                 muted
                 playsinline
                 controls
-                class="w-full aspect-video object-cover bg-[#09090B]"
+                class="w-full aspect-video object-cover bg-[#0B0C10]"
               ></video>
             </div>
-            <div class="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs text-zinc-400">
               <div class="flex items-center gap-2">
                 <span>Roblox Studio Live Capture</span>
-                <span aria-hidden="true">/</span>
-                <span class="text-[#DFC08A]">${
+                <span aria-hidden="true">·</span>
+                <span class="text-orange-300 font-mono">${
                   demo.assetId ? `Asset ID: ${demo.assetId}` : demo.craftTag
                 }</span>
               </div>
               <div class="flex items-center gap-2">
-                <button type="button" data-video-toggle="${demo.id}" class="px-3 py-1.5 text-xs text-zinc-200 bg-[#121216] hover:bg-[#1A1A20] border border-white/15 cursor-pointer">Pause</button>
-                <button type="button" data-video-mute="${demo.id}" class="px-3 py-1.5 text-xs text-zinc-200 bg-[#121216] hover:bg-[#1A1A20] border border-white/15 cursor-pointer">Unmute Audio</button>
-                <button type="button" data-video-replay="${demo.id}" class="px-3 py-1.5 text-xs text-zinc-200 bg-[#121216] hover:bg-[#1A1A20] border border-white/15 cursor-pointer">Replay</button>
+                <button type="button" data-video-toggle="${demo.id}" class="px-3 py-1.5 text-xs font-medium text-zinc-200 bg-[#141722] hover:bg-[#1C2030] rounded-lg border border-white/15 cursor-pointer">Pause</button>
+                <button type="button" data-video-mute="${demo.id}" class="px-3 py-1.5 text-xs font-medium text-zinc-200 bg-[#141722] hover:bg-[#1C2030] rounded-lg border border-white/15 cursor-pointer">Unmute Audio</button>
+                <button type="button" data-video-replay="${demo.id}" class="px-3 py-1.5 text-xs font-medium text-zinc-200 bg-[#141722] hover:bg-[#1C2030] rounded-lg border border-white/15 cursor-pointer">Replay</button>
               </div>
             </div>
           `
@@ -515,26 +522,26 @@ function renderPreviousWorkDemos() {
               ${demo.galleryImages
                 .map(
                   (imgItem, gIdx) => `
-                  <div class="overflow-hidden border border-white/15 bg-[#0C0C0E] flex flex-col justify-between">
-                    <div class="aspect-square overflow-hidden bg-[#121216]">
+                  <div class="rounded-2xl overflow-hidden border border-white/15 bg-[#11131C] flex flex-col justify-between">
+                    <div class="aspect-[16/10] p-3 flex items-center justify-center overflow-hidden bg-[#0D0F17]">
                       <img
                         src="${imgItem.url}"
-                        alt="${imgItem.label} — 3D Model by ${demo.author}"
+                        alt="${imgItem.label} — UI Design by ${demo.author}"
                         referrerpolicy="no-referrer"
-                        class="w-full h-full object-cover"
+                        class="max-w-full max-h-full object-contain rounded-lg"
                       />
                     </div>
-                    <div class="p-3.5 border-t border-white/10 flex items-center justify-between gap-2 bg-[#0C0C0E]">
+                    <div class="p-3.5 border-t border-white/10 flex items-center justify-between gap-2 bg-[#11131C]">
                       <div class="min-w-0">
                         <div class="font-display text-sm font-bold text-white truncate">${imgItem.label}</div>
-                        <div class="text-xs font-mono text-zinc-400 truncate mt-0.5">${imgItem.subtitle}</div>
+                        <div class="text-xs text-zinc-400 truncate mt-0.5">${imgItem.subtitle}</div>
                       </div>
                       <button
                         type="button"
                         data-open-gallery="${demo.id}:${gIdx}"
-                        class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-mono text-zinc-200 bg-[#141418] hover:bg-[#1C1C22] border border-white/15 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                        class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-zinc-200 bg-[#181B28] hover:bg-[#222638] rounded-lg border border-white/15 transition-colors cursor-pointer whitespace-nowrap shrink-0"
                       >
-                        <span class="text-[#DFC08A]">Inspect</span>
+                        <span class="text-orange-300">Inspect</span>
                       </button>
                     </div>
                   </div>
@@ -542,37 +549,22 @@ function renderPreviousWorkDemos() {
                 )
                 .join('')}
             </div>
-            <div class="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs text-zinc-400">
               <div class="flex items-center gap-2">
-                <span>Roblox Studio Viewport Renders (2 Models)</span>
-                <span aria-hidden="true">/</span>
-                <span class="text-[#DFC08A]">${demo.craftTag}</span>
+                <span>Custom Roblox UI Showcase (${demo.galleryImages.length} Assets)</span>
+                <span aria-hidden="true">·</span>
+                <span class="text-orange-300">${demo.craftTag}</span>
               </div>
             </div>
           `
           : `
-            <div class="relative overflow-hidden border border-white/15 bg-[#0C0C0E]">
+            <div class="relative rounded-2xl overflow-hidden border border-white/15 bg-[#11131C]">
               <img
                 src="${demo.imageUrl}"
                 alt="${demo.title} — ${demo.craftTag} by ${demo.author}"
                 referrerpolicy="no-referrer"
-                class="w-full h-auto object-contain bg-[#0C0C0E]"
+                class="w-full h-auto object-contain bg-[#11131C]"
               />
-            </div>
-            <div class="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono text-zinc-400">
-              <div class="flex items-center gap-2">
-                <span>High-Resolution Studio Capture</span>
-                <span aria-hidden="true">/</span>
-                <span class="text-[#DFC08A]">${demo.craftTag}</span>
-              </div>
-              <button
-                type="button"
-                data-open-lightbox="${demo.id}"
-                aria-label="Inspect ${demo.title} in fullscreen"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-zinc-200 bg-[#121216] hover:bg-[#1A1A20] border border-white/15 transition-colors cursor-pointer"
-              >
-                <span>Inspect Fullscreen</span>
-              </button>
             </div>
           `;
 
@@ -587,7 +579,7 @@ function renderPreviousWorkDemos() {
         <section id="demo-${demo.category}" aria-labelledby="heading-${demo.id}" class="py-12 border-b border-white/10">
           <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <p class="text-xs font-mono uppercase tracking-widest text-[#DFC08A] mb-1.5">${demo.index} // ${demo.categoryLabel}</p>
+              <p class="text-xs font-semibold text-orange-300 mb-1.5">${demo.index}. ${demo.categoryLabel}</p>
               <h2 id="heading-${demo.id}" class="font-display text-2xl sm:text-4xl font-bold tracking-tight text-white text-balance">${demo.title}</h2>
             </div>
             <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
@@ -597,7 +589,7 @@ function renderPreviousWorkDemos() {
                       href="${targetUnlockUrl}"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient transition-all whitespace-nowrap shrink-0"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold studio-btn-gradient rounded-xl transition-all whitespace-nowrap shrink-0"
                     >
                       <span>Unlocked · Open Roblox Asset Link</span>
                       ${ARROW_UP_RIGHT_SVG}
@@ -605,7 +597,7 @@ function renderPreviousWorkDemos() {
                   : `<button
                       type="button"
                       data-open-gamepass="${demo.id}"
-                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient transition-all whitespace-nowrap shrink-0 cursor-pointer"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold studio-btn-gradient rounded-xl transition-all whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       <span>Locked Link · Buy Gamepass (${formatNumber(demo.gamePassPriceRobux || 3500)} R$)</span>
                       ${ARROW_UP_RIGHT_SVG}
@@ -621,17 +613,17 @@ function renderPreviousWorkDemos() {
 
             <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
               <div class="space-y-4">
-                <div class="flex items-center gap-2 text-xs font-mono text-zinc-400">
-                  <span class="text-[#DFC08A] font-semibold uppercase">${demo.categoryLabel}</span>
-                  <span aria-hidden="true">/</span>
+                <div class="flex items-center gap-2 text-xs text-zinc-400">
+                  <span class="text-orange-300 font-semibold">${demo.categoryLabel}</span>
+                  <span aria-hidden="true">·</span>
                   <span>By ${demo.author}</span>
-                  <span aria-hidden="true">/</span>
+                  <span aria-hidden="true">·</span>
                   <span>${demo.craftTag}</span>
                 </div>
                 <p class="text-sm sm:text-base text-zinc-200 leading-relaxed">${demo.description}</p>
                 <div class="pt-1">
-                  <div class="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2">${highlightsHeading}</div>
-                  <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs font-mono text-zinc-200">
+                  <div class="text-xs font-semibold text-zinc-400 mb-2">${highlightsHeading}</div>
+                  <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs text-zinc-200">
                     ${systemsHtml}
                   </div>
                 </div>
@@ -644,14 +636,14 @@ function renderPreviousWorkDemos() {
               <div class="pt-2 space-y-3">
                 <div
                   id="unlocked-link-box-${demo.id}"
-                  class="p-5 border ${
+                  class="p-5 rounded-2xl border ${
                     isUnlocked
-                      ? 'studio-active-cell border-[#DFC08A]/60'
-                      : 'bg-[#0C0C0E] border-white/15'
+                      ? 'studio-active-cell border-orange-400/50'
+                      : 'bg-[#11131C] border-white/15'
                   } space-y-3"
                 >
                   <div class="flex items-center justify-between gap-2 text-xs font-mono">
-                    <span class="text-[#DFC08A] font-semibold uppercase tracking-wider">
+                    <span class="text-orange-300 font-semibold">
                       ${
                         isUnlocked
                           ? `[UNLOCKED] ASSET LINK READY · @${unlockRecord.robloxUsername || 'VERIFIED'}`
@@ -667,13 +659,13 @@ function renderPreviousWorkDemos() {
                         <p class="text-xs text-zinc-200 leading-relaxed">
                           Gamepass verified. Your official Roblox Creator Store link is unlocked below:
                         </p>
-                        <div class="p-3 bg-[#09090B] border border-[#DFC08A]/40">
-                          <div class="text-[11px] font-mono text-[#DFC08A] mb-1">Unlocked Roblox Creator Store Asset URL:</div>
+                        <div class="p-3 rounded-xl bg-[#0B0C10] border border-orange-400/40">
+                          <div class="text-[11px] font-mono text-orange-300 mb-1">Unlocked Roblox Creator Store Asset URL:</div>
                           <a
                             href="${targetUnlockUrl}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="block text-xs font-mono text-white hover:text-[#DFC08A] break-all underline underline-offset-4"
+                            class="block text-xs font-mono text-white hover:text-orange-300 break-all underline underline-offset-4"
                           >${targetUnlockUrl}</a>
                         </div>
                         <div class="flex flex-wrap items-center gap-2.5">
@@ -681,7 +673,7 @@ function renderPreviousWorkDemos() {
                             href="${targetUnlockUrl}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient transition-all whitespace-nowrap"
+                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold studio-btn-gradient rounded-xl transition-all whitespace-nowrap"
                           >
                             <span>Open Unlocked Asset Link</span>
                             ${ARROW_UP_RIGHT_SVG}
@@ -689,7 +681,7 @@ function renderPreviousWorkDemos() {
                           <button
                             type="button"
                             data-copy-asset="${targetUnlockUrl}"
-                            class="inline-flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-mono uppercase tracking-wider font-medium text-zinc-200 hover:text-white bg-[#141418] hover:bg-[#1C1C22] border border-white/15 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                            class="inline-flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-semibold text-zinc-200 hover:text-white bg-[#161925] hover:bg-[#1E2232] rounded-xl border border-white/15 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                           >
                             <span>Copy Link</span>
                           </button>
@@ -699,14 +691,14 @@ function renderPreviousWorkDemos() {
                         <p class="text-xs text-zinc-300 leading-relaxed">
                           This Roblox Creator Store asset link is <strong class="text-white">locked</strong>. Purchase the Gamepass on Roblox and verify ownership—the buying menu will automatically close and unlock the link right here.
                         </p>
-                        <div class="p-3 bg-[#09090B] border border-white/10 flex items-center justify-between gap-2 text-xs font-mono text-zinc-500 select-none">
+                        <div class="p-3 rounded-xl bg-[#0B0C10] border border-white/10 flex items-center justify-between gap-2 text-xs font-mono text-zinc-500 select-none">
                           <span class="truncate">https://create.roblox.com/store/asset/••••••••••••••• (Locked)</span>
-                          <span class="text-[#DFC08A] shrink-0">LOCKED</span>
+                          <span class="text-orange-300 shrink-0">LOCKED</span>
                         </div>
                         <button
                           type="button"
                           data-open-gamepass="${demo.id}"
-                          class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient transition-all cursor-pointer"
+                          class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 text-xs font-semibold studio-btn-gradient rounded-xl transition-all cursor-pointer"
                         >
                           <span>Buy Gamepass (${formatNumber(demo.gamePassPriceRobux || 3500)} R$) to Unlock Link</span>
                           ${ARROW_UP_RIGHT_SVG}
@@ -715,8 +707,8 @@ function renderPreviousWorkDemos() {
                   }
                 </div>
 
-                <div class="p-3.5 bg-[#0C0C0E] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div class="text-xs text-zinc-400 font-mono">${demo.rateLabel}</div>
+                <div class="p-3.5 rounded-xl bg-[#11131C] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="text-xs text-zinc-300 font-mono">${demo.rateLabel}</div>
                 </div>
               </div>
             </div>
@@ -725,22 +717,22 @@ function renderPreviousWorkDemos() {
           ${
             demo.tryAssetUrl
               ? isUnlocked
-                ? `<div class="mt-8 p-4 studio-active-cell border border-[#DFC08A]/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                ? `<div class="mt-8 p-4 rounded-xl studio-active-cell border border-orange-400/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="space-y-1 min-w-0">
-                      <div class="text-xs font-mono text-[#DFC08A]">[UNLOCKED] Official Roblox Creator Store Link</div>
+                      <div class="text-xs font-mono text-orange-300">[UNLOCKED] Official Roblox Creator Store Link</div>
                       <a href="${targetUnlockUrl}" target="_blank" rel="noopener noreferrer" class="block text-xs font-mono text-zinc-200 hover:text-white truncate underline underline-offset-4">${targetUnlockUrl}</a>
                     </div>
-                    <a href="${targetUnlockUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider font-semibold text-[#DFC08A] hover:text-white whitespace-nowrap shrink-0">
+                    <a href="${targetUnlockUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-300 hover:text-white whitespace-nowrap shrink-0">
                       <span>Open in Roblox Creator Store</span>
                       ${ARROW_UP_RIGHT_SVG}
                     </a>
                   </div>`
-                : `<div class="mt-8 p-4 bg-[#0C0C0E] border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                : `<div class="mt-8 p-4 rounded-xl bg-[#11131C] border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="space-y-1 min-w-0">
-                      <div class="text-xs font-mono text-[#DFC08A]">[LOCKED] Official Roblox Creator Store Link</div>
+                      <div class="text-xs font-mono text-orange-300">[LOCKED] Official Roblox Creator Store Link</div>
                       <div class="text-xs font-mono text-zinc-400 truncate">Link is locked — Buy &amp; verify Gamepass #${demo.gamePassId || '2053169441'} (${formatNumber(demo.gamePassPriceRobux || 3500)} R$) to unlock link</div>
                     </div>
-                    <button type="button" data-open-gamepass="${demo.id}" class="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider font-semibold text-[#DFC08A] hover:text-white whitespace-nowrap shrink-0 cursor-pointer">
+                    <button type="button" data-open-gamepass="${demo.id}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-300 hover:text-white whitespace-nowrap shrink-0 cursor-pointer">
                       <span>Unlock Link (${formatNumber(demo.gamePassPriceRobux || 3500)} R$ Gamepass)</span>
                       ${ARROW_UP_RIGHT_SVG}
                     </button>
@@ -795,23 +787,14 @@ function renderPreviousWorkDemos() {
       try {
         await navigator.clipboard.writeText(url);
       } catch {}
-      btn.innerHTML = `<span class="text-[#DFC08A]">Link Copied!</span>`;
+      btn.innerHTML = `<span class="text-orange-300">Link Copied!</span>`;
       setTimeout(() => {
         btn.innerHTML = `<span>Copy Link</span>`;
       }, 2000);
     });
   });
 
-  // Lightbox for UI Design
-  listContainer.querySelectorAll('[data-open-lightbox]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const demoId = btn.getAttribute('data-open-lightbox');
-      const found = PREVIOUS_WORK_DEMOS.find((d) => d.id === demoId);
-      if (found) openImageLightbox(found);
-    });
-  });
-
-  // Lightbox for 3D Modeling gallery images
+  // Lightbox for UI Design gallery images
   listContainer.querySelectorAll('[data-open-gallery]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const raw = btn.getAttribute('data-open-gallery') || '';
@@ -868,11 +851,11 @@ function setBotStatusBanner(type, message) {
   banner.classList.remove('hidden-view');
   const colorClasses =
     type === 'success'
-      ? 'studio-active-cell border-[#DFC08A] text-[#DFC08A]'
+      ? 'studio-active-cell border-orange-400 text-orange-300'
       : type === 'error'
       ? 'bg-rose-950/60 border-rose-500/50 text-rose-300'
-      : 'bg-[#121216] border-white/15 text-zinc-200';
-  banner.className = `p-3.5 border text-xs font-mono leading-relaxed ${colorClasses}`;
+      : 'bg-[#161925] border-white/15 text-zinc-200';
+  banner.className = `p-3.5 rounded-xl border text-xs font-mono leading-relaxed ${colorClasses}`;
   banner.textContent = message;
 }
 
@@ -893,7 +876,7 @@ function openGamepassModal(demo) {
   const priceRobux = demo.gamePassPriceRobux || 3500;
   const checkoutUrl = demo.gamePassUrl || getRobloxGamepassCheckoutUrl(gamePassId);
 
-  if (catEl) catEl.textContent = `${demo.categoryLabel.toUpperCase()} // ROBLOX GAMEPASS LINK UNLOCK`;
+  if (catEl) catEl.textContent = `${demo.categoryLabel} · Roblox Gamepass Link Unlock`;
   if (titleEl) titleEl.textContent = demo.title;
   if (passIdEl) {
     passIdEl.textContent = `Roblox Gamepass ID: #${gamePassId} · Unlocks Official Roblox Creator Store Link`;
@@ -951,16 +934,16 @@ async function lookupGamepassRobloxUser() {
     };
     state.lookedUpRobloxUser = normalizedUser;
     previewEl.innerHTML = `
-      <div class="mt-2 p-2.5 bg-[#121216] border border-[#DFC08A]/40 flex items-center justify-between gap-3">
+      <div class="mt-2 p-2.5 rounded-xl bg-[#161925] border border-orange-400/40 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           ${
             normalizedUser.avatarUrl
-              ? `<img src="${normalizedUser.avatarUrl}" alt="${normalizedUser.name}" class="w-9 h-9 bg-zinc-800 border border-[#DFC08A]/40 object-cover" />`
-              : `<div class="w-9 h-9 bg-zinc-900 border border-[#DFC08A]/40 flex items-center justify-center text-xs font-mono text-[#DFC08A]">R$</div>`
+              ? `<img src="${normalizedUser.avatarUrl}" alt="${normalizedUser.name}" class="w-9 h-9 rounded-lg bg-zinc-800 border border-orange-400/40 object-cover" />`
+              : `<div class="w-9 h-9 rounded-lg bg-zinc-900 border border-orange-400/40 flex items-center justify-center text-xs font-mono text-orange-300">R$</div>`
           }
           <div>
             <div class="text-xs font-semibold text-white">${normalizedUser.displayName} (@${normalizedUser.name})</div>
-            <div class="text-[11px] font-mono text-[#DFC08A]">Roblox User ID: ${normalizedUser.id} · Connected to Bot</div>
+            <div class="text-[11px] font-mono text-orange-300">Roblox User ID: ${normalizedUser.id} · Connected to Bot</div>
           </div>
         </div>
         <a href="${normalizedUser.profileUrl}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-mono text-zinc-400 hover:text-white underline">Profile -></a>
@@ -994,7 +977,7 @@ async function verifyGamepassOwnership(isAutoFocusCheck = false) {
     if (!isAutoFocusCheck) {
       setBotStatusBanner(
         'error',
-        'Please enter your Roblox username in Step 01 before verifying Gamepass ownership.'
+        'Please enter your Roblox username in Step 1 before verifying Gamepass ownership.'
       );
       if (inputEl) inputEl.focus();
     }
@@ -1086,17 +1069,6 @@ function initApp() {
     el.addEventListener('click', () => {
       const target = el.getAttribute('data-nav-view');
       setView(target, target === 'previous-work' ? 'all' : undefined);
-    });
-  });
-
-  // Quick discipline links in Experience section header
-  document.querySelectorAll('[data-select-discipline]').forEach((el) => {
-    el.addEventListener('click', () => {
-      const disc = el.getAttribute('data-select-discipline');
-      if (disc) {
-        state.selectedDiscipline = disc;
-        renderRateEstimator();
-      }
     });
   });
 

@@ -3,50 +3,49 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>balo_xio | Roblox Developer Portfolio — Scripter, UI Designer, Modeler &amp; Animator</title>
+    <title>balo_xio | Roblox Developer Portfolio — Scripter &amp; UI Designer</title>
     <meta
       name="description"
-      content="Official Roblox developer portfolio of balo_xio (16+). 3+ years Scripting, 2+ years UI Design, 2+ years 3D Modeling, and 1+ year Animating. Available for short-term, long-term, and single commissions with a mandatory 40% upfront payment."
+      content="Official Roblox developer portfolio of balo_xio (16+). 3+ years Scripting and 2+ years UI Design. Available for Per Task, Short-Term, and Long-Term engagements with a mandatory 40% upfront payment."
     />
     <meta
       property="og:title"
-      content="balo_xio | Roblox Developer Portfolio — Scripter, UI Designer, Modeler &amp; Animator"
+      content="balo_xio | Roblox Developer Portfolio — Scripter &amp; UI Designer"
     />
     <meta
       property="og:description"
-      content="Official Roblox developer portfolio of balo_xio (16+). 3+ years Scripting, 2+ years UI Design, 2+ years 3D Modeling, and 1+ year Animating. Available for short-term, long-term, and single commissions with a mandatory 40% upfront payment."
+      content="Official Roblox developer portfolio of balo_xio (16+). 3+ years Scripting and 2+ years UI Design. Available for Per Task, Short-Term, and Long-Term engagements with a mandatory 40% upfront payment."
     />
     <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400;1,9..144,600&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/style.css" />
   </head>
-  <body class="bg-[#09090B] text-[#F4F1EA] antialiased selection:bg-[#DFC08A] selection:text-[#09090B] min-h-screen flex flex-col">
+  <body class="bg-[#0B0C10] text-[#F5F5F7] antialiased selection:bg-orange-500 selection:text-white min-h-screen flex flex-col">
     <!-- =====================================================================
-         TOP NAVIGATION BAR (3-ZONE ARCHITECTURAL CONTRACT)
+         TOP NAVIGATION BAR (3-ZONE CONTRACT)
          ===================================================================== -->
-    <header class="sticky top-0 z-40 flex items-center justify-between gap-8 px-6 lg:px-12 h-16 bg-[#09090B]/90 backdrop-blur-md border-b border-white/10">
-      <!-- Zone 1: Studio Wordmark (Zero decorative dots) -->
+    <header class="sticky top-0 z-40 flex items-center justify-between gap-8 px-6 lg:px-12 h-16 bg-[#0B0C10]/85 backdrop-blur-xl border-b border-white/10">
+      <!-- Zone 1: Single Brand Wordmark -->
       <a
         href="#overview"
         data-nav-view="portfolio"
-        class="font-display text-lg font-bold tracking-tight text-white hover:text-[#DFC08A] transition-colors whitespace-nowrap shrink-0 flex items-baseline gap-2.5"
+        class="font-display text-xl font-bold tracking-tight text-white hover:text-orange-300 transition-colors whitespace-nowrap shrink-0"
       >
-        <span>balo_xio</span>
-        <span class="hidden sm:inline-block font-mono text-[11px] font-normal uppercase tracking-widest text-zinc-500">/ Studio</span>
+        balo_xio
       </a>
 
-      <!-- Zone 2: Primary Navigation -->
+      <!-- Zone 2: 4 Clean Single-Line Text Navigation Links -->
       <nav aria-label="Primary Navigation" class="flex items-center gap-5 sm:gap-8 text-xs sm:text-sm font-medium text-zinc-400">
         <a
           href="#overview"
           id="nav-overview"
           data-nav-view="portfolio"
-          class="text-white hover:text-[#DFC08A] underline underline-offset-8 decoration-[#DFC08A] transition-colors whitespace-nowrap shrink-0"
+          class="text-white hover:text-orange-300 underline underline-offset-8 decoration-orange-400 transition-colors whitespace-nowrap shrink-0"
         >
           Overview
         </a>
@@ -54,7 +53,7 @@
           type="button"
           id="nav-previous-work"
           data-nav-view="previous-work"
-          class="hover:text-[#DFC08A] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+          class="hover:text-orange-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
         >
           Previous Work (Demo)
         </button>
@@ -70,18 +69,18 @@
           data-nav-view="portfolio"
           class="hover:text-white transition-colors whitespace-nowrap shrink-0"
         >
-          Estimator
+          Rate Calculator
         </a>
       </nav>
 
-      <!-- Zone 3: Single Primary Action -->
+      <!-- Zone 3: 1 Primary Action -->
       <div class="hidden md:flex items-center shrink-0">
         <a
           href="#estimator"
           data-nav-view="portfolio"
-          class="px-4 py-2 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient rounded-sm transition-all whitespace-nowrap"
+          class="px-4 py-2 text-xs font-semibold studio-btn-gradient rounded-lg transition-all whitespace-nowrap shrink-0"
         >
-          Configure Quote
+          Calculate Quote
         </a>
       </div>
     </header>
@@ -92,124 +91,139 @@
     <main class="flex-1">
       <!-- 1. MAIN PORTFOLIO VIEW -->
       <div id="view-portfolio">
-        <!-- HERO SECTION -->
+        <!-- SPLIT-SCREEN SHOWREEL HERO SECTION -->
         <section
           id="overview"
           aria-label="balo_xio Portfolio Hero"
-          class="relative min-h-[calc(100vh-64px)] flex flex-col justify-between overflow-hidden border-b border-white/10"
+          class="relative pt-8 pb-12 lg:pt-12 lg:pb-16 border-b border-white/10"
         >
-          <!-- Full-Bleed Background Video (Skips 0s-2s, loops 2.0s to end) -->
-          <div class="absolute inset-0 z-0 bg-[#09090B]">
-            <video
-              id="hero-bg-video"
-              src="/assets/aistudio/1022_bd4c00dc.mp4#t=2"
-              autoplay
-              muted
-              playsinline
-              class="w-full h-full object-cover object-center hero-video-grade scale-[1.01] opacity-75"
-            ></video>
-            <div aria-hidden="true" class="absolute inset-0 selective-video-blur bg-[#09090B]/55 pointer-events-none"></div>
-            <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-r from-[#09090B]/95 via-[#09090B]/80 to-transparent pointer-events-none"></div>
-            <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-[#09090B] via-transparent to-[#09090B]/70 pointer-events-none"></div>
-          </div>
+          <div class="w-full max-w-[1280px] mx-auto px-6 lg:px-12">
+            <!-- 2-Column Split: Editorial Copy (Left) + Crisp Showreel Stage (Right) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+              <!-- Left 7 Columns: Typographic Hierarchy -->
+              <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+                <div class="space-y-4">
+                  <!-- Unboxed Metadata Line -->
+                  <div class="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm font-medium text-zinc-400">
+                    <span class="text-orange-300 font-semibold">Roblox Scripting &amp; UI Design</span>
+                    <span aria-hidden="true">·</span>
+                    <span class="text-zinc-200">16+ Years Old</span>
+                    <span aria-hidden="true">·</span>
+                    <span>Paid Per Task or Project</span>
+                    <span aria-hidden="true">·</span>
+                    <span class="text-rose-300">40% Upfront Policy</span>
+                  </div>
 
-          <div class="relative z-10 w-full max-w-[1280px] mx-auto px-6 lg:px-12 pt-16 pb-12 lg:pt-24 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end flex-1">
-            <div class="lg:col-span-8 space-y-7 self-center">
-              <!-- Architectural Index Kicker (Unboxed typography, zero pills) -->
-              <div class="flex flex-wrap items-center gap-3 text-xs font-mono uppercase tracking-widest text-zinc-400 border-l-2 border-[#DFC08A] pl-3.5">
-                <span class="text-[#DFC08A] font-semibold">Index 00 / Dossier</span>
-                <span aria-hidden="true" class="text-zinc-600">—</span>
-                <span>Roblox Systems &amp; Technical Art</span>
-                <span aria-hidden="true" class="text-zinc-600">—</span>
-                <span class="text-zinc-200">16+ Years Old</span>
-                <span aria-hidden="true" class="text-zinc-600">—</span>
-                <span class="text-[#DFC08A]">40% Upfront Terms</span>
+                  <!-- Main Display Headline -->
+                  <div class="space-y-3">
+                    <h1 class="font-display text-4xl sm:text-5xl lg:text-[56px] font-extrabold tracking-tight text-white leading-[1.05] text-balance">
+                      balo_xio —
+                      <span class="block mt-1 pro-gradient-text">
+                        Roblox Luau Scripting &amp; Custom UI Design.
+                      </span>
+                    </h1>
+                    <p class="text-sm sm:text-base text-zinc-400 font-medium">
+                      Server-Authoritative Luau Systems · Custom Studded &amp; Glossy Shop UI · Scale HUD Layouts
+                    </p>
+                  </div>
+
+                  <p class="text-sm sm:text-base text-zinc-300 leading-relaxed max-w-2xl">
+                    I am a <strong class="text-white font-semibold">16+ year old</strong> Roblox developer specializing in
+                    <strong class="text-white font-semibold">3+ years of Luau Scripting</strong> and
+                    <strong class="text-white font-semibold">2+ years of UI Design</strong>.
+                    Choose <strong class="text-orange-300 font-semibold">Per Task</strong> billing for a single isolated task (paid strictly per individual task), or book a Short-Term or Long-Term package—always with a <strong class="text-white font-semibold">40% upfront deposit</strong> and 0% revenue share.
+                  </p>
+                </div>
+
+                <!-- Primary & Secondary Actions -->
+                <div class="flex flex-wrap items-center gap-4 pt-1">
+                  <button
+                    type="button"
+                    data-nav-view="previous-work"
+                    class="inline-flex items-center gap-2.5 px-6 py-3 text-sm font-semibold studio-btn-gradient rounded-xl transition-all whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <span>Explore Previous Work (Demo)</span>
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                  </button>
+                  <a
+                    href="#estimator"
+                    class="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-zinc-100 hover:text-white border border-white/15 hover:border-orange-400/60 bg-white/[0.03] hover:bg-white/[0.07] rounded-xl transition-all whitespace-nowrap shrink-0"
+                  >
+                    Calculate Per-Task Quote
+                  </a>
+                </div>
               </div>
 
-              <!-- Editorial Studio Headline -->
-              <div class="space-y-4">
-                <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.02]">
-                  balo_xio
-                  <span class="block mt-2 text-2xl sm:text-4xl lg:text-5xl font-semibold pro-gradient-text tracking-tight">
-                    Full-Stack Roblox Systems &amp; <em class="font-serif-editorial italic font-normal text-[#EAD3A7]">Technical Craft.</em>
-                  </span>
-                </h1>
-                <p class="text-xs sm:text-sm font-mono text-zinc-400 tracking-wider uppercase">
-                  Luau Architecture <span class="text-[#DFC08A] mx-2">/</span> Scale UI Engineering <span class="text-[#DFC08A] mx-2">/</span> Hard-Surface 3D <span class="text-[#DFC08A] mx-2">/</span> R6 &amp; R15 Combat Motion
-                </p>
-              </div>
+              <!-- Right 5 Columns: Dedicated Studio Showreel Viewport -->
+              <div class="lg:col-span-5 flex flex-col justify-between rounded-2xl overflow-hidden border border-white/15 bg-[#12141D] shadow-2xl">
+                <!-- Showreel Top Bar -->
+                <div class="px-5 py-3 border-b border-white/10 flex items-center justify-between gap-4 bg-[#161924]">
+                  <div class="text-xs font-medium text-zinc-300">
+                    <span class="text-white font-semibold">Studio Showreel</span>
+                    <span aria-hidden="true" class="mx-1.5 text-zinc-500">·</span>
+                    <span class="text-zinc-400">Live Capture</span>
+                  </div>
+                  <button
+                    id="hero-audio-btn"
+                    type="button"
+                    aria-label="Unmute background video sound"
+                    class="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold text-zinc-200 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <span>Sound Off</span>
+                  </button>
+                </div>
 
-              <p class="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-2xl font-normal">
-                Independent technical developer combining <strong class="text-white font-semibold">3+ years of Luau scripting</strong>,
-                <strong class="text-white font-semibold">2+ years of UI design</strong>,
-                <strong class="text-white font-semibold">2+ years of 3D modeling</strong>, and
-                <strong class="text-white font-semibold">1+ year of animation</strong> into a cohesive production pipeline.
-                I am <strong class="text-white font-semibold">16+ years old</strong> and available for single commissions, short-term sprints,
-                and long-term studio contracts—strictly with a <strong class="text-[#DFC08A] font-semibold">40% upfront deposit</strong> and zero revenue share.
-              </p>
-
-              <div class="flex flex-wrap items-center gap-4 pt-2">
-                <button
-                  type="button"
-                  data-nav-view="previous-work"
-                  class="inline-flex items-center gap-3 px-6 py-3.5 text-xs sm:text-sm font-mono uppercase tracking-wider font-semibold studio-btn-gradient rounded-sm transition-all whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  <span>Explore Previous Work (Demo)</span>
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-                </button>
-                <a
-                  href="#estimator"
-                  class="inline-flex items-center gap-2 px-6 py-3.5 text-xs sm:text-sm font-mono uppercase tracking-wider font-medium text-zinc-200 hover:text-white border border-white/20 hover:border-[#DFC08A] bg-[#0C0C0E]/80 hover:bg-white/[0.04] rounded-sm transition-all whitespace-nowrap shrink-0"
-                >
-                  Open Specification Ledger
-                </a>
+                <!-- Crisp Video Container (Starts at 2.0s, zero green tint) -->
+                <div class="relative flex-1 min-h-[240px] sm:min-h-[280px] bg-black overflow-hidden">
+                  <video
+                    id="hero-bg-video"
+                    src="/assets/aistudio/1022_bd4c00dc.mp4#t=2"
+                    autoplay
+                    muted
+                    playsinline
+                    class="w-full h-full object-cover object-[74%_center] hero-video-grade"
+                  ></video>
+                  <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex items-end justify-between gap-3">
+                    <div>
+                      <div class="text-xs font-semibold text-white">Roblox Production Reel</div>
+                      <div class="text-[11px] text-zinc-300">Combat Scripting · Studded &amp; Glossy Game UI</div>
+                    </div>
+                    <span class="text-[11px] font-mono text-orange-300 tabular-nums">Per Task from $10</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="lg:col-span-4 flex justify-start lg:justify-end items-end">
-              <button
-                id="hero-audio-btn"
-                type="button"
-                aria-label="Unmute background video sound"
-                class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-zinc-300 hover:text-white bg-[#0C0C0E]/90 backdrop-blur-md border border-white/15 hover:border-[#DFC08A] rounded-sm transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <span>Reel Audio // Muted</span>
-              </button>
-            </div>
-          </div>
+            <!-- Full-Width 2-Column Experience & Starting Per-Task Rate Strip -->
+            <div class="mt-8 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div class="p-6 rounded-2xl border border-white/10 studio-card-surface flex flex-col justify-between">
+                <div>
+                  <div class="text-xs font-medium text-zinc-400">01. Luau Engineering</div>
+                  <div class="font-display text-3xl sm:text-4xl font-bold text-white tabular-nums mt-1.5">3+ Years</div>
+                  <div class="text-sm font-semibold text-orange-300 mt-1">Scripting Experience</div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-zinc-400">
+                  <span>Per Task (1 Single Task)</span>
+                  <span class="font-mono font-semibold text-white tabular-nums">$15 USD / 5,000 R$</span>
+                </div>
+              </div>
 
-          <!-- 4-Column Architectural Experience Ledger Strip (Hairline Grid Dividers) -->
-          <div class="relative z-10 bg-[#0B0B0E]/95 backdrop-blur-md border-t border-white/10">
-            <div class="max-w-[1280px] mx-auto grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 divide-x divide-white/10">
-              <div class="px-6 lg:px-10 py-6">
-                <div class="text-[11px] font-mono uppercase tracking-widest text-zinc-500">01 / Luau Engineering</div>
-                <div class="font-display text-3xl sm:text-4xl font-bold text-white tabular-nums mt-1">3+ Years</div>
-                <div class="text-xs font-mono text-[#DFC08A] mt-1">Scripting Experience</div>
-                <div class="text-xs text-zinc-400 mt-0.5">Combat · Replication · DataStores</div>
-              </div>
-              <div class="px-6 lg:px-10 py-6">
-                <div class="text-[11px] font-mono uppercase tracking-widest text-zinc-500">02 / Interface Systems</div>
-                <div class="font-display text-3xl sm:text-4xl font-bold text-white tabular-nums mt-1">2+ Years</div>
-                <div class="text-xs font-mono text-[#DFC08A] mt-1">UI Design Experience</div>
-                <div class="text-xs text-zinc-400 mt-0.5">Scale Layouts · Springs · HUDs</div>
-              </div>
-              <div class="px-6 lg:px-10 py-6">
-                <div class="text-[11px] font-mono uppercase tracking-widest text-zinc-500">03 / Mesh Topology</div>
-                <div class="font-display text-3xl sm:text-4xl font-bold text-white tabular-nums mt-1">2+ Years</div>
-                <div class="text-xs font-mono text-[#DFC08A] mt-1">3D Modeling Experience</div>
-                <div class="text-xs text-zinc-400 mt-0.5">Blender · Weapons · Environmental</div>
-              </div>
-              <div class="px-6 lg:px-10 py-6">
-                <div class="text-[11px] font-mono uppercase tracking-widest text-zinc-500">04 / Keyframe Motion</div>
-                <div class="font-display text-3xl sm:text-4xl font-bold text-white tabular-nums mt-1">1+ Year</div>
-                <div class="text-xs font-mono text-[#DFC08A] mt-1">Animating Experience</div>
-                <div class="text-xs text-zinc-400 mt-0.5">Moon Animator 2 · R6 &amp; R15 Rigs</div>
+              <div class="p-6 rounded-2xl border border-white/10 studio-card-surface flex flex-col justify-between">
+                <div>
+                  <div class="text-xs font-medium text-zinc-400">02. Interface Systems</div>
+                  <div class="font-display text-3xl sm:text-4xl font-bold text-white tabular-nums mt-1.5">2+ Years</div>
+                  <div class="text-sm font-semibold text-orange-300 mt-1">UI Design Experience</div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-zinc-400">
+                  <span>Per Task (1 Single Task)</span>
+                  <span class="font-mono font-semibold text-white tabular-nums">$10 USD / 1,500 R$</span>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- SECTION 01: EXPERIENCE & SPECIALIZATIONS -->
+        <!-- SECTION 01: EXPERIENCE & SPECIALIZATIONS (SCRIPTING & UI DESIGN) -->
         <section
           id="experience"
           aria-labelledby="experience-heading"
@@ -217,236 +231,223 @@
         >
           <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14">
             <div class="max-w-2xl">
-              <p class="text-xs font-mono uppercase tracking-widest text-[#DFC08A] mb-3">01 / Technical Capabilities &amp; Tenure</p>
+              <p class="text-sm font-semibold text-orange-300 mb-2">01. Core Disciplines &amp; Verified Tenure</p>
               <h2
                 id="experience-heading"
                 class="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white text-balance"
               >
-                Four Core Disciplines. <span class="pro-gradient-text">One Cohesive Pipeline.</span>
+                Two Core Specializations. <span class="pro-gradient-text">Built for Production.</span>
               </h2>
               <p class="mt-4 text-base text-zinc-400 leading-relaxed">
-                With 3+ years in scripting, 2+ years in UI design, 2+ years in 3D modeling, and 1+ year in
-                animation, I deliver standalone technical systems or complete full-stack Roblox production builds.
+                With <strong class="text-white">3+ years in Scripting</strong> and <strong class="text-white">2+ years in UI Design</strong>, you can book a single isolated task on a <strong class="text-orange-300">Per Task</strong> basis or choose a Short-Term or Long-Term package.
               </p>
             </div>
 
-            <a
-              href="#estimator"
-              data-select-discipline="all-rounder"
-              class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#DFC08A] hover:text-white underline underline-offset-8 whitespace-nowrap shrink-0"
+            <button
+              type="button"
+              data-nav-view="previous-work"
+              class="inline-flex items-center gap-2 text-sm font-semibold text-orange-300 hover:text-white underline underline-offset-8 whitespace-nowrap shrink-0 cursor-pointer"
             >
-              <span>Configure Full-Pack Specification</span>
+              <span>Inspect Scripting &amp; UI Demos</span>
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
-            </a>
+            </button>
           </div>
 
-          <div id="experience-grid" class="grid grid-cols-1 md:grid-cols-2 border-t border-white/10"></div>
+          <div id="experience-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </section>
 
-        <!-- SECTION 02 & 03: COMMISSION POLICY & ARCHITECTURAL SPECIFICATION ESTIMATOR -->
+        <!-- SECTION 02 & 03: PER-TASK RATE SCHEDULE & INTERACTIVE QUOTE CALCULATOR -->
         <div class="max-w-[1280px] mx-auto px-6 lg:px-12">
           <section id="commission-terms" class="py-20 lg:py-24 border-b border-white/10">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-              <div class="lg:col-span-5 space-y-4">
-                <p class="text-xs font-mono uppercase tracking-widest text-[#DFC08A]">02 / Commission Policy &amp; Rate Schedule</p>
+              <div class="lg:col-span-5 space-y-5">
+                <p class="text-sm font-semibold text-orange-300">02. Transparent Rate Schedule &amp; Per-Task Policy</p>
                 <h2 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-white text-balance">
-                  Fixed Studio Rates. <span class="pro-gradient-text">40% Upfront.</span> Zero Revenue Share.
+                  Paid <span class="pro-gradient-text">Per Task</span> or Project. 40% Upfront.
                 </h2>
                 <p class="text-base text-zinc-400 leading-relaxed">
-                  Every engagement with <strong class="text-white">balo_xio</strong> operates on fixed, transparent rates
-                  in USD or Robux—with a mandatory 40% upfront commencement deposit and strictly 0% revenue share.
+                  Every engagement with <strong class="text-white">balo_xio</strong> operates on fixed rates in USD or Robux with a mandatory <strong class="text-white">40% upfront deposit</strong> and strictly <strong class="text-white">0% revenue share</strong>.
                 </p>
+
+                <!-- Explicit Per-Task Scope Rule Notice -->
+                <div class="p-5 rounded-2xl border border-orange-400/25 studio-active-cell space-y-2">
+                  <div class="text-sm font-bold text-white">
+                    Per Task Payment Rule (Strictly 1 Task Only)
+                  </div>
+                  <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                    Selecting <strong class="text-orange-300">Per Task</strong> means payment covers <strong class="text-white">strictly one single task</strong> (1 script or 1 UI frame/component). Clients cannot bundle multiple tasks or extra ongoing benefits into a single Per Task payment. For multiple tasks, select a Short-Term or Long-Term package.
+                  </p>
+                </div>
               </div>
 
-              <div class="lg:col-span-7 divide-y divide-white/10 border-t border-b border-white/10">
-                <div class="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h3 class="font-display text-lg font-bold text-white">01 / Full Pack (All-Rounder)</h3>
-                    <p class="text-xs sm:text-sm text-zinc-400 mt-1 font-mono tabular-nums">
-                      Single: <span class="text-white">$20 / 5,000 R$</span> · Short-Term:
-                      <span class="text-white">$70 / 20,000 R$</span> · Long-Term:
-                      <span class="text-[#DFC08A] font-semibold">$250 / 100,000 R$</span>
-                    </p>
-                  </div>
-                  <span class="text-xs font-mono uppercase tracking-wider text-[#DFC08A] shrink-0">40% Upfront</span>
+              <!-- 2-Discipline Rate Schedule Table (Scripting & UI Design Only) -->
+              <div class="lg:col-span-7 rounded-2xl border border-white/15 bg-[#11131C] overflow-hidden divide-y divide-white/10">
+                <div class="px-6 py-4 bg-[#161925] flex items-center justify-between text-xs font-semibold text-zinc-300">
+                  <span>Specialization Track</span>
+                  <span>Per Task (1 Task) · Short-Term · Long-Term</span>
                 </div>
 
-                <div class="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h3 class="font-display text-lg font-bold text-white">02 / Scripting</h3>
+                    <h3 class="font-display text-lg font-bold text-white">01. Scripting (3+ Years Experience)</h3>
                     <p class="text-xs sm:text-sm text-zinc-400 mt-1 font-mono tabular-nums">
-                      Single: <span class="text-white">$15 / 5,000 R$</span> · Short-Term:
+                      Per Task: <span class="text-orange-300 font-semibold">$15 / 5,000 R$</span> · Short-Term:
                       <span class="text-white">$75 / 15,000 R$</span> · Long-Term:
-                      <span class="text-[#DFC08A] font-semibold">$140 / 65,000 R$</span>
+                      <span class="text-white font-semibold">$140 / 65,000 R$</span>
                     </p>
                   </div>
-                  <span class="text-xs font-mono uppercase tracking-wider text-[#DFC08A] shrink-0">40% Upfront</span>
+                  <span class="text-xs font-mono text-zinc-300 shrink-0">1 Task Only · 40% Upfront</span>
                 </div>
 
-                <div class="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h3 class="font-display text-lg font-bold text-white">03 / 3D Modeling</h3>
+                    <h3 class="font-display text-lg font-bold text-white">02. UI Design (2+ Years Experience)</h3>
                     <p class="text-xs sm:text-sm text-zinc-400 mt-1 font-mono tabular-nums">
-                      Single: <span class="text-white">$35 / 15,000 R$</span> · Short-Term:
-                      <span class="text-white">$75 / 20,000 R$</span> · Long-Term:
-                      <span class="text-[#DFC08A] font-semibold">$130 / 80,000 R$</span>
-                    </p>
-                  </div>
-                  <span class="text-xs font-mono uppercase tracking-wider text-[#DFC08A] shrink-0">40% Upfront</span>
-                </div>
-
-                <div class="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h3 class="font-display text-lg font-bold text-white">04 / Animation</h3>
-                    <p class="text-xs sm:text-sm text-zinc-400 mt-1 font-mono tabular-nums">
-                      Single: <span class="text-white">$10 / 2,000 R$</span> · Short-Term:
-                      <span class="text-white">$37 / 8,000 R$</span> · Long-Term:
-                      <span class="text-[#DFC08A] font-semibold">$120 / 13,000 R$</span>
-                    </p>
-                  </div>
-                  <span class="text-xs font-mono uppercase tracking-wider text-[#DFC08A] shrink-0">40% Upfront</span>
-                </div>
-
-                <div class="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <h3 class="font-display text-lg font-bold text-white">05 / UI Design</h3>
-                    <p class="text-xs sm:text-sm text-zinc-400 mt-1 font-mono tabular-nums">
-                      Single: <span class="text-white">$10 / 1,500 R$</span> · Short-Term:
+                      Per Task: <span class="text-orange-300 font-semibold">$10 / 1,500 R$</span> · Short-Term:
                       <span class="text-white">$34 / 7,000 R$</span> · Long-Term:
-                      <span class="text-[#DFC08A] font-semibold">$95 / 12,000 R$</span>
+                      <span class="text-white font-semibold">$95 / 12,000 R$</span>
                     </p>
                   </div>
-                  <span class="text-xs font-mono uppercase tracking-wider text-[#DFC08A] shrink-0">40% Upfront</span>
+                  <span class="text-xs font-mono text-zinc-300 shrink-0">1 Task Only · 40% Upfront</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <!-- SECTION 03: ARCHITECTURAL SPECIFICATION & 40% UPFRONT LEDGER -->
+          <!-- SECTION 03: INTERACTIVE PER-TASK & PROJECT RATE CALCULATOR -->
           <section id="estimator" class="py-20 lg:py-28">
-            <!-- Section Header Outside the Ledger Frame -->
-            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
               <div>
-                <p class="text-xs font-mono uppercase tracking-widest text-[#DFC08A] mb-3">
-                  03 / Interactive Specification &amp; Split-Payment Ledger
+                <p class="text-sm font-semibold text-orange-300 mb-2">
+                  03. Interactive Rate Calculator &amp; Split-Payment Breakdown
                 </p>
                 <h2 class="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white">
-                  Commission <span class="pro-gradient-text">Specification Studio.</span>
+                  Configure Your <span class="pro-gradient-text">Scripting or UI Quote.</span>
                 </h2>
                 <p class="mt-3 text-sm sm:text-base text-zinc-400 max-w-2xl">
-                  Select a technical track, contract scope, and settlement currency to calculate your exact 40% commencement deposit and 60% delivery balance.
+                  Select <strong class="text-white">Scripting</strong> or <strong class="text-white">UI Design</strong>, choose between <strong class="text-orange-300">Per Task (1 single task)</strong>, Short-Term, or Long-Term scope, and view your exact 40% upfront deposit.
                 </p>
               </div>
 
-              <!-- Settlement Currency Switcher -->
+              <!-- Currency Switcher -->
               <div class="flex flex-col sm:items-end gap-2 shrink-0">
-                <span class="text-[11px] font-mono uppercase tracking-widest text-zinc-500">Settlement Currency</span>
-                <div id="estimator-currencies" class="inline-flex items-center border border-white/15 bg-[#0C0C0E]"></div>
+                <span class="text-xs font-medium text-zinc-400">Payment Currency</span>
+                <div id="estimator-currencies" class="inline-flex items-center p-1 rounded-xl border border-white/15 bg-[#12141D]"></div>
               </div>
             </div>
 
-            <!-- Precision Exposed-Hairline Architectural Frame (Zero nested rounded bubble cards) -->
-            <div class="border border-white/15 bg-[#0B0B0E] grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-white/15">
-              <!-- Left 7 Columns: Specification Matrix (Discipline Rows + Contract Columns) -->
-              <div class="lg:col-span-7 flex flex-col justify-between divide-y divide-white/15">
-                <!-- Part A: 5-Row Interactive Discipline Specification Table -->
-                <div>
-                  <div class="px-6 py-3.5 bg-[#101014] border-b border-white/10 flex items-center justify-between text-[11px] font-mono uppercase tracking-widest text-zinc-400">
-                    <span>Step 01 // Select Technical Discipline</span>
-                    <span class="text-[#DFC08A]">5 Studio Tracks</span>
+            <!-- Asymmetric Studio Configurator (Left Dark Controls + Right Warm Alabaster Paper Invoice) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+              <!-- Left 7 Columns: Specialization & Tier Selectors -->
+              <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+                <!-- Step 1: Select Specialization (Scripting or UI Design Only) -->
+                <div class="rounded-2xl border border-white/15 bg-[#11131C] overflow-hidden">
+                  <div class="px-6 py-4 bg-[#161925] border-b border-white/10 flex items-center justify-between text-xs font-semibold text-zinc-300">
+                    <span>1. Select Specialization Track</span>
+                    <span class="text-orange-300">Scripting &amp; UI Design</span>
                   </div>
                   <div id="estimator-roles" class="divide-y divide-white/10"></div>
                 </div>
 
-                <!-- Part B: 3-Column Flush Engagement Scope Grid -->
-                <div>
-                  <div class="px-6 py-3.5 bg-[#101014] border-b border-white/10 flex items-center justify-between text-[11px] font-mono uppercase tracking-widest text-zinc-400">
-                    <span>Step 02 // Select Engagement Scope</span>
-                    <span>Fixed Rate · 0% Rev-Share</span>
+                <!-- Step 2: Select Payment Scope (Per Task / Short-Term / Long-Term) -->
+                <div class="rounded-2xl border border-white/15 bg-[#11131C] overflow-hidden">
+                  <div class="px-6 py-4 bg-[#161925] border-b border-white/10 flex items-center justify-between text-xs font-semibold text-zinc-300">
+                    <span>2. Select Payment Tier (Per Task vs. Project)</span>
+                    <span class="text-zinc-400">Per Task = Strictly 1 Task</span>
                   </div>
                   <div id="estimator-contracts" class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10"></div>
                 </div>
               </div>
 
-              <!-- Right 5 Columns: Official Statement of Work & 40% Upfront Ledger -->
-              <div class="lg:col-span-5 flex flex-col justify-between studio-surface-gradient">
+              <!-- Right 5 Columns: Tactile Warm Alabaster Paper Quote Invoice -->
+              <div class="lg:col-span-5 rounded-2xl studio-paper-invoice shadow-2xl border border-white/20 flex flex-col justify-between overflow-hidden">
                 <div>
-                  <!-- Ledger Top Header Bar -->
-                  <div class="px-6 sm:px-8 py-3.5 bg-[#101014] border-b border-white/10 flex items-center justify-between text-[11px] font-mono uppercase tracking-widest text-zinc-400">
-                    <span>Statement of Work</span>
-                    <span class="text-[#DFC08A]">Ref // BALO-40-60</span>
+                  <!-- Invoice Header -->
+                  <div class="px-7 py-5 border-b border-zinc-300/80 flex items-center justify-between">
+                    <div>
+                      <div class="text-xs font-bold tracking-tight text-zinc-900">balo_xio Studio Quote</div>
+                      <div class="text-[11px] text-zinc-600 mt-0.5">Fixed-Rate Split Payment Summary</div>
+                    </div>
+                    <span class="text-xs font-mono font-semibold text-rose-700">40% / 60% Split</span>
                   </div>
 
-                  <!-- Total Project Valuation Readout -->
-                  <div class="p-6 sm:p-8 border-b border-white/10 flex items-baseline justify-between gap-4">
+                  <!-- Total Valuation Readout -->
+                  <div class="p-7 border-b border-zinc-300/80 flex items-baseline justify-between gap-4">
                     <div>
-                      <div id="receipt-contract-label" class="text-xs font-mono uppercase tracking-widest text-[#DFC08A] font-semibold">
-                        SINGLE COMMISSION
+                      <div id="receipt-contract-label" class="text-xs font-bold uppercase tracking-wider text-rose-700">
+                        PER TASK (1 SINGLE TASK ONLY)
                       </div>
-                      <div id="receipt-total-amount" class="font-display text-5xl sm:text-6xl font-bold text-white mt-2 tabular-nums tracking-tight">
-                        $20
+                      <div id="receipt-total-amount" class="font-display text-5xl sm:text-6xl font-extrabold text-zinc-950 mt-2 tabular-nums tracking-tight">
+                        $15
                       </div>
-                      <div id="receipt-equivalent" class="text-xs font-mono text-zinc-400 mt-2 tabular-nums">
-                        ($20 USD / 5,000 Robux)
+                      <div id="receipt-equivalent" class="text-xs font-mono text-zinc-600 mt-2 tabular-nums">
+                        ($15 USD / 5,000 Robux)
                       </div>
                     </div>
                     <div class="text-right shrink-0">
-                      <div class="text-[11px] font-mono uppercase tracking-widest text-zinc-500">Est. Turnaround</div>
-                      <div id="receipt-delivery" class="font-mono text-sm font-semibold text-white mt-1 tabular-nums">1–3 Days</div>
+                      <div class="text-xs font-medium text-zinc-600">Est. Turnaround</div>
+                      <div id="receipt-delivery" class="font-mono text-sm font-bold text-zinc-950 mt-1 tabular-nums">1–3 Days / Task</div>
                     </div>
                   </div>
 
-                  <!-- Precision 40% / 60% Architectural Ratio Bar -->
-                  <div class="px-6 sm:px-8 py-5 border-b border-white/10 space-y-2.5">
-                    <div class="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider">
-                      <span class="text-[#DFC08A] font-semibold">40% Upfront Commencement</span>
-                      <span class="text-zinc-400">60% Upon Delivery</span>
+                  <!-- Dynamic Scope Notice Box inside Invoice -->
+                  <div class="px-7 py-4 bg-orange-500/10 border-b border-zinc-300/80">
+                    <div id="receipt-scope-policy" class="text-xs text-zinc-800 leading-relaxed font-medium">
+                      <strong class="text-zinc-950">Per Task Scope:</strong> Payment covers strictly <strong class="text-rose-700">1 single task only</strong>. Additional tasks or extra features are billed separately.
                     </div>
-                    <div class="h-2 w-full bg-[#16161A] flex overflow-hidden">
+                  </div>
+
+                  <!-- 40% / 60% Visual Progress Split -->
+                  <div class="px-7 py-5 border-b border-zinc-300/80 space-y-2.5">
+                    <div class="flex items-center justify-between text-xs font-semibold">
+                      <span class="text-rose-700">40% Upfront to Begin</span>
+                      <span class="text-zinc-600">60% on Final Delivery</span>
+                    </div>
+                    <div class="h-2.5 w-full rounded-full bg-zinc-300 flex overflow-hidden">
                       <div class="w-[40%] h-full studio-btn-gradient"></div>
-                      <div class="w-[60%] h-full bg-zinc-800 border-l border-[#09090B]"></div>
+                      <div class="w-[60%] h-full bg-zinc-400"></div>
                     </div>
                   </div>
 
-                  <!-- Flush 2-Column Milestone Breakdown (Hairline Divided) -->
-                  <div class="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-white/10 border-b border-white/10">
-                    <div class="p-6 sm:p-7 studio-active-cell flex flex-col justify-between">
+                  <!-- 2-Column Milestone Amounts -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-zinc-300/80 border-b border-zinc-300/80">
+                    <div class="p-6 bg-white/60 flex flex-col justify-between">
                       <div>
-                        <div class="text-[11px] font-mono uppercase tracking-widest text-[#DFC08A] font-semibold">
-                          Milestone 01 // 40%
+                        <div class="text-xs font-bold text-rose-700">
+                          Upfront Deposit (40%)
                         </div>
-                        <div class="text-xs text-zinc-300 mt-1">Upfront deposit to start</div>
+                        <div class="text-xs text-zinc-600 mt-0.5">Required before work starts</div>
                       </div>
-                      <div id="receipt-upfront-amount" class="font-display text-3xl sm:text-4xl font-bold text-white mt-4 tabular-nums">
-                        $8
+                      <div id="receipt-upfront-amount" class="font-display text-3xl sm:text-4xl font-extrabold text-zinc-950 mt-4 tabular-nums">
+                        $6
                       </div>
                     </div>
 
-                    <div class="p-6 sm:p-7 bg-[#0B0B0E]/60 flex flex-col justify-between">
+                    <div class="p-6 bg-transparent flex flex-col justify-between">
                       <div>
-                        <div class="text-[11px] font-mono uppercase tracking-widest text-zinc-400 font-semibold">
-                          Milestone 02 // 60%
+                        <div class="text-xs font-bold text-zinc-700">
+                          Completion Balance (60%)
                         </div>
-                        <div class="text-xs text-zinc-500 mt-1">Balance on final approval</div>
+                        <div class="text-xs text-zinc-600 mt-0.5">Paid upon final approval</div>
                       </div>
-                      <div id="receipt-completion-amount" class="font-display text-3xl sm:text-4xl font-bold text-zinc-300 mt-4 tabular-nums">
-                        $12
+                      <div id="receipt-completion-amount" class="font-display text-3xl sm:text-4xl font-extrabold text-zinc-800 mt-4 tabular-nums">
+                        $9
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Ledger Footer & Action CTA -->
-                <div class="p-6 sm:p-8 space-y-5 bg-[#0D0D10]">
-                  <div class="flex items-center justify-between text-xs font-mono">
-                    <span class="text-zinc-400 uppercase tracking-wider">Revenue Share Policy</span>
-                    <span class="text-white font-semibold uppercase tracking-wider">Strictly 0% Rev-Share</span>
+                <!-- Invoice Footer & Copy Button -->
+                <div class="p-7 space-y-4 bg-zinc-900/5">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-zinc-600 font-medium">Revenue Share Policy</span>
+                    <span class="text-zinc-950 font-bold">Strictly 0% Rev-Share</span>
                   </div>
 
                   <button
                     id="estimator-copy-rate-btn"
                     type="button"
-                    class="w-full py-4 px-6 text-xs font-mono uppercase tracking-widest font-semibold studio-btn-gradient rounded-sm transition-all whitespace-nowrap shrink-0 cursor-pointer"
+                    class="w-full py-4 px-6 text-sm font-semibold studio-btn-gradient rounded-xl transition-all whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     Copy Official Quote Summary
                   </button>
@@ -458,35 +459,35 @@
       </div>
 
       <!-- 2. PREVIOUS WORK (DEMO) VIEW -->
-      <div id="view-previous-work" class="hidden-view min-h-[calc(100vh-64px)] bg-[#09090B] text-[#F4F1EA] py-14 lg:py-20 px-6 lg:px-12">
+      <div id="view-previous-work" class="hidden-view min-h-[calc(100vh-64px)] bg-[#0B0C10] text-[#F5F5F7] py-14 lg:py-20 px-6 lg:px-12">
         <div class="max-w-[1280px] mx-auto">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-white/10">
-            <div class="flex items-center gap-3 text-xs font-mono uppercase tracking-wider">
+            <div class="flex items-center gap-3 text-xs sm:text-sm font-medium">
               <button
                 type="button"
                 data-nav-view="portfolio"
                 class="inline-flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
-                <span>← Back to Index</span>
+                <span>← Back to Portfolio</span>
               </button>
-              <span aria-hidden="true" class="text-zinc-600">/</span>
-              <span class="text-zinc-300">Archive</span>
-              <span aria-hidden="true" class="text-zinc-600">/</span>
-              <span id="previous-work-breadcrumb-sub" class="text-[#DFC08A]">Previous Work (Demo)</span>
+              <span aria-hidden="true" class="text-zinc-600">·</span>
+              <span class="text-zinc-300">Work Archive</span>
+              <span aria-hidden="true" class="text-zinc-600">·</span>
+              <span id="previous-work-breadcrumb-sub" class="text-orange-300 font-semibold">Previous Work (Demo)</span>
             </div>
 
             <div
               id="previous-work-tabs"
               role="tablist"
               aria-label="Previous Work Sub-Pages"
-              class="inline-flex flex-wrap items-center border border-white/15 bg-[#0C0C0E] self-start sm:self-auto"
+              class="inline-flex flex-wrap items-center p-1 rounded-xl border border-white/15 bg-[#12141D] self-start sm:self-auto"
             ></div>
           </div>
 
           <div class="pt-10 pb-10 border-b border-white/10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div class="max-w-3xl">
-              <p class="text-xs font-mono uppercase tracking-widest text-[#DFC08A] mb-3">
-                Archive // Verified Studio Demonstrations &amp; Production Assets
+              <p class="text-sm font-semibold text-orange-300 mb-2">
+                Verified Studio Demonstrations &amp; UI Assets
               </p>
               <h1
                 id="previous-work-main-heading"
@@ -495,8 +496,8 @@
                 Previous Work (Demo)
               </h1>
               <p class="mt-4 text-base text-zinc-400 leading-relaxed">
-                Inspect live recorded Roblox Studio demonstrations, custom scale interface systems, and 3D assets engineered by
-                <strong class="text-white">balo_xio</strong> across Scripting, Animation, UI Design, and 3D Modeling.
+                Inspect live recorded Roblox Studio combat scripting demonstrations and custom studded &amp; glossy UI designs engineered by
+                <strong class="text-white">balo_xio</strong>.
               </p>
             </div>
           </div>
@@ -509,12 +510,12 @@
     <!-- =====================================================================
          FOOTER
          ===================================================================== -->
-    <footer class="border-t border-white/10 py-10 px-6 lg:px-12 bg-[#070709]">
-      <div class="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-400">
+    <footer class="border-t border-white/10 py-10 px-6 lg:px-12 bg-[#08090D]">
+      <div class="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
         <div>
           <span class="text-white font-semibold">balo_xio</span>
-          <span aria-hidden="true" class="mx-2 text-zinc-600">/</span>
-          <span>Scripter (3+ Yrs) · UI Designer (2+ Yrs) · Modeler (2+ Yrs) · Animator (1+ Yr)</span>
+          <span aria-hidden="true" class="mx-2 text-zinc-600">·</span>
+          <span>Scripter (3+ Yrs) · UI Designer (2+ Yrs)</span>
         </div>
         <div class="flex flex-wrap items-center gap-4">
           <a
@@ -528,7 +529,7 @@
           <button
             type="button"
             data-nav-view="previous-work"
-            class="text-zinc-400 hover:text-[#DFC08A] underline underline-offset-4 cursor-pointer"
+            class="text-zinc-400 hover:text-orange-300 underline underline-offset-4 cursor-pointer"
           >
             Previous Work (Demo)
           </button>
@@ -538,7 +539,7 @@
             data-nav-view="portfolio"
             class="text-zinc-400 hover:text-white underline underline-offset-4"
           >
-            Specification Ledger
+            Rate Calculator
           </a>
         </div>
       </div>
@@ -554,11 +555,11 @@
       aria-labelledby="gp-modal-title"
       class="hidden-view fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 sm:p-6 overflow-y-auto"
     >
-      <div class="relative w-full max-w-2xl bg-[#0C0C0E] border border-white/20 rounded-sm shadow-2xl overflow-hidden my-8">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#111115]">
+      <div class="relative w-full max-w-2xl bg-[#11131C] border border-white/20 rounded-2xl shadow-2xl overflow-hidden my-8">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#161925]">
           <div>
-            <p class="text-xs font-mono uppercase tracking-wider text-[#DFC08A]">
-              Roblox Gamepass Verification Bot // Instant Link Unlock
+            <p class="text-xs font-semibold text-orange-300">
+              Roblox Gamepass Verification · Instant Link Unlock
             </p>
             <h2 id="gp-modal-title" class="font-display text-xl font-bold text-white mt-0.5">
               Buy Gamepass to Unlock Creation Link
@@ -568,7 +569,7 @@
             type="button"
             data-close-gamepass="true"
             aria-label="Close Gamepass unlock modal"
-            class="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white bg-[#18181D] border border-white/15 cursor-pointer"
+            class="px-3.5 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white bg-white/[0.06] rounded-lg border border-white/15 cursor-pointer"
           >
             Close [ESC]
           </button>
@@ -576,10 +577,10 @@
 
         <div class="p-6 space-y-5 max-h-[82vh] overflow-y-auto">
           <!-- Selected Creation Summary Banner -->
-          <div class="p-4 bg-[#111115] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="p-4 rounded-xl bg-[#161925] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <div id="gp-creation-category" class="text-xs font-mono uppercase tracking-wider text-[#DFC08A]">
-                SCRIPTING WORK
+              <div id="gp-creation-category" class="text-xs font-semibold text-orange-300">
+                Scripting Work
               </div>
               <div id="gp-creation-title" class="font-display text-lg font-bold text-white mt-0.5">
                 The Combat System By Balo_xio
@@ -589,8 +590,8 @@
               </div>
             </div>
             <div class="sm:text-right shrink-0">
-              <div class="text-xs font-mono uppercase tracking-wider text-zinc-500">Gamepass Price</div>
-              <div id="gp-creation-price" class="font-display text-2xl font-bold text-[#DFC08A] tabular-nums">
+              <div class="text-xs text-zinc-400">Gamepass Price</div>
+              <div id="gp-creation-price" class="font-display text-2xl font-bold text-orange-300 tabular-nums">
                 3,500 R$
               </div>
             </div>
@@ -598,20 +599,20 @@
 
           <!-- Step 1: Enter Roblox Username -->
           <div class="space-y-2">
-            <label for="gp-roblox-username" class="block text-xs font-mono uppercase tracking-wider text-zinc-300">
-              Step 01 // Enter Your Roblox Username (Bot Checks Public Inventory) *
+            <label for="gp-roblox-username" class="block text-xs font-semibold text-zinc-200">
+              1. Enter Your Roblox Username (Bot Checks Public Inventory) *
             </label>
             <div class="flex gap-2">
               <input
                 id="gp-roblox-username"
                 type="text"
                 placeholder="e.g. tpjerry6789"
-                class="flex-1 px-3.5 py-2.5 text-sm bg-[#141418] border border-white/15 text-white focus:outline-none focus:border-[#DFC08A]"
+                class="flex-1 px-3.5 py-2.5 text-sm rounded-xl bg-[#0B0C10] border border-white/15 text-white focus:outline-none focus:border-orange-400"
               />
               <button
                 id="gp-lookup-btn"
                 type="button"
-                class="px-5 py-2.5 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient cursor-pointer whitespace-nowrap shrink-0"
+                class="px-5 py-2.5 text-xs font-semibold studio-btn-gradient rounded-xl cursor-pointer whitespace-nowrap shrink-0"
               >
                 Connect Account
               </button>
@@ -620,12 +621,12 @@
           </div>
 
           <!-- Step 2: Redirect to Buy Gamepass & Return to Unlock Link -->
-          <div class="p-4 bg-[#111115] border border-white/10 space-y-3">
+          <div class="p-4 rounded-xl bg-[#161925] border border-white/10 space-y-3">
             <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-mono uppercase tracking-wider text-zinc-300">
-                Step 02 // Purchase Gamepass on Roblox &amp; Verify
+              <span class="text-xs font-semibold text-zinc-200">
+                2. Purchase Gamepass on Roblox &amp; Verify
               </span>
-              <span id="gp-auto-listen-badge" class="text-[11px] font-mono text-[#DFC08A]">
+              <span id="gp-auto-listen-badge" class="text-[11px] font-mono text-orange-300">
                 Auto-Check on Tab Return: Ready
               </span>
             </div>
@@ -636,7 +637,7 @@
                 href="https://www.roblox.com/game-pass/2053169441"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient transition-all whitespace-nowrap"
+                class="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold studio-btn-gradient rounded-xl transition-all whitespace-nowrap"
               >
                 <span id="gp-buy-btn-text">1. Buy Gamepass (3,500 R$)</span>
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
@@ -645,21 +646,21 @@
               <button
                 id="gp-verify-btn"
                 type="button"
-                class="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-mono uppercase tracking-wider font-semibold text-white bg-[#18181D] hover:bg-[#222228] border border-[#DFC08A]/50 transition-colors cursor-pointer whitespace-nowrap"
+                class="inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold text-white bg-white/[0.06] hover:bg-white/[0.12] border border-orange-400/50 rounded-xl transition-colors cursor-pointer whitespace-nowrap"
               >
                 <span>2. Verify &amp; Unlock Link</span>
               </button>
             </div>
 
             <div class="pt-1">
-              <label for="gp-claim-code" class="block text-[11px] font-mono text-zinc-400 mb-1">
+              <label for="gp-claim-code" class="block text-[11px] text-zinc-400 mb-1">
                 Optional: Have a Private Inventory or Instant Claim Passcode?
               </label>
               <input
                 id="gp-claim-code"
                 type="text"
                 placeholder="Optional claim code (e.g. BALO-GAMEPASS-VERIFIED)"
-                class="w-full px-3 py-2 text-xs font-mono bg-[#09090B] border border-white/10 text-zinc-200 focus:outline-none focus:border-[#DFC08A]"
+                class="w-full px-3 py-2 text-xs font-mono rounded-lg bg-[#0B0C10] border border-white/10 text-zinc-200 focus:outline-none focus:border-orange-400"
               />
             </div>
           </div>
@@ -677,31 +678,31 @@
       id="ui-lightbox-modal"
       role="dialog"
       aria-modal="true"
-      aria-label="Viral Game UI Fullscreen Preview"
+      aria-label="UI Design Fullscreen Preview"
       class="hidden-view fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-6"
     >
-      <div class="relative max-w-5xl w-full bg-[#0C0C0E] border border-white/20 overflow-hidden shadow-2xl">
+      <div class="relative max-w-5xl w-full bg-[#11131C] border border-white/20 rounded-2xl overflow-hidden shadow-2xl">
         <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
           <div>
-            <h3 id="lightbox-title" class="font-display text-lg font-bold text-white">Viral Game UI</h3>
-            <p id="lightbox-subtitle" class="text-xs font-mono text-zinc-400">UI Design · Created by Balo_xio</p>
+            <h3 id="lightbox-title" class="font-display text-lg font-bold text-white">Custom Studded &amp; Front-Page Game UI Pack</h3>
+            <p id="lightbox-subtitle" class="text-xs text-zinc-400">UI Design · Created by Balo_xio</p>
           </div>
           <button
             type="button"
             data-close-lightbox="true"
             aria-label="Close fullscreen preview"
-            class="px-3 py-1.5 text-xs font-mono text-zinc-300 hover:text-white bg-[#18181D] border border-white/15 cursor-pointer"
+            class="px-3.5 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white bg-white/[0.06] rounded-lg border border-white/15 cursor-pointer"
           >
             Close [ESC]
           </button>
         </div>
-        <div class="p-6 flex items-center justify-center bg-[#070709]">
+        <div class="p-6 flex items-center justify-center bg-[#08090D]">
           <img
             id="lightbox-img"
-            src="/assets/aistudio/Gemini_Generated_Image_tmic7xtmic7xtmic_f9b1a615.jpg"
-            alt="Viral Game UI"
+            src="/assets/aistudio/Screenshot_2026-11-04_170408_bce1d72f.png"
+            alt="UI Design Preview"
             referrerpolicy="no-referrer"
-            class="max-h-[75vh] w-auto object-contain"
+            class="max-h-[75vh] w-auto object-contain rounded-lg"
           />
         </div>
       </div>

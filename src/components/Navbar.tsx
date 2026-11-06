@@ -18,17 +18,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between gap-8 px-6 lg:px-12 h-16 bg-[#09090B]/90 backdrop-blur-md border-b border-white/10">
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-8 px-6 lg:px-12 h-16 bg-[#0B0C10]/85 backdrop-blur-xl border-b border-white/10">
       <a
         href="#overview"
         data-sfx="page-change"
         onClick={() => handleNavClick('portfolio')}
-        className="font-display text-lg font-bold tracking-tight text-white hover:text-[#DFC08A] transition-colors whitespace-nowrap shrink-0 flex items-baseline gap-2.5"
+        className="font-display text-xl font-bold tracking-tight text-white hover:text-orange-300 transition-colors whitespace-nowrap shrink-0"
       >
-        <span>balo_xio</span>
-        <span className="hidden sm:inline-block font-mono text-[11px] font-normal uppercase tracking-widest text-zinc-500">
-          / Studio
-        </span>
+        balo_xio
       </a>
 
       <nav
@@ -39,9 +36,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           href="#overview"
           data-sfx="page-change"
           onClick={() => handleNavClick('portfolio')}
-          className={`hover:text-[#DFC08A] transition-colors whitespace-nowrap shrink-0 ${
+          className={`hover:text-orange-300 transition-colors whitespace-nowrap shrink-0 ${
             activeView === 'portfolio'
-              ? 'text-white font-semibold underline underline-offset-8 decoration-[#DFC08A]'
+              ? 'text-white font-semibold underline underline-offset-8 decoration-orange-400'
               : ''
           }`}
         >
@@ -51,9 +48,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           type="button"
           data-sfx="page-change"
           onClick={() => handleNavClick('previous-work')}
-          className={`hover:text-[#DFC08A] transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+          className={`hover:text-orange-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
             activeView === 'previous-work'
-              ? 'text-[#DFC08A] font-semibold underline underline-offset-8 decoration-[#DFC08A]'
+              ? 'text-orange-300 font-semibold underline underline-offset-8 decoration-orange-400'
               : ''
           }`}
         >
@@ -73,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => handleNavClick('portfolio')}
           className="hover:text-white transition-colors whitespace-nowrap shrink-0"
         >
-          Estimator
+          Rate Calculator
         </a>
       </nav>
 
@@ -81,9 +78,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         <a
           href="#estimator"
           onClick={() => handleNavClick('portfolio')}
-          className="px-4 py-2 text-xs font-mono uppercase tracking-wider font-semibold studio-btn-gradient rounded-sm transition-all whitespace-nowrap"
+          className="px-4 py-2 text-xs font-semibold studio-btn-gradient rounded-lg transition-all whitespace-nowrap shrink-0"
         >
-          Configure Quote
+          Calculate Quote
         </a>
       </div>
     </header>
